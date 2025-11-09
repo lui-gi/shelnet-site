@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shelnet | Practice PBQs</title>
+  <meta name="description" content="Browse and launch CompTIA A+ PBQs. Filter by domain and open each PBQ in-page via iframe." />
+  <link rel="icon" href="assets/Shelnet-Logo.jpeg" />
+  <style>
+    :root{
+      --bg:#1b1b1d; --bg-grid:#212124; --ink:#e8e8ea; --muted:#a7a7ad;
+      --accent:#ffffff; --card:#202024; --border:#2a2a2f; --navy:#0b3a6f; --navy-dim:#0a2d56;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink); background:
+        linear-gradient(0deg,var(--bg-grid) 1px,transparent 1px) 0 0/48px 48px,
+        linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px) 0 0/48px 48px,
+        radial-gradient(1200px 700px at 80% -10%, rgba(255,255,255,.06), transparent 70%),
+        var(--bg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      letter-spacing:.2px;
+    }
+    a{color:var(--ink); text-decoration:none}
+    a:hover{opacity:.85}
+
+    header{position:sticky; top:0; z-index:10; background:linear-gradient(to bottom, rgba(27,27,29,.9), rgba(27,27,29,.6)); backdrop-filter:blur(6px); border-bottom:1px solid var(--border)}
+    .wrap{max-width:1200px; margin:0 auto; padding:18px 20px}
+    .brand{display:flex; align-items:center; gap:14px}
+    .brand img{width:36px; height:36px; border-radius:6px; filter:grayscale(100%)}
+    .brand h1{font-size:18px; margin:0; color:var(--navy)}
+    nav{display:flex; gap:18px; align-items:center}
+    .row{display:flex; align-items:center; justify-content:space-between}
+
+    main{padding:26px 20px}
+
+    .grid{display:grid; grid-template-columns: 340px 1fr; gap:18px; align-items:stretch}
+    @media (max-width:960px){ .grid{grid-template-columns:1fr} }
+
+    .panel{background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden}
+    .panel h2{margin:0; padding:14px 16px; border-bottom:1px solid var(--border); font-size:15px; color:var(--accent); background:#151518}
+    .panel .body{padding:14px}
+
+    .controls{display:grid; grid-template-columns: 1fr; gap:10px; margin-bottom:10px}
+    .controls .row{display:grid; grid-template-columns: 1fr auto; gap:10px}
+
+    select{width:100%; background:#141416; border:1px solid var(--border); border-radius:8px; padding:10px 12px; color:var(--ink)}
+    select:focus{outline:none; border-color:var(--navy)}
+
+    .pbq-list{display:flex; flex-direction:column; gap:8px; max-height:60vh; overflow:auto; padding-right:4px}
+    .item{display:flex; flex-direction:column; gap:4px; border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:#1c1c20; transition:background .2s ease, border-color .2s ease, transform .2s ease}
+    .item:hover{background:#212126; border-color:var(--navy); transform:translateY(-1px)}
+    .item.active{border-color:var(--navy); box-shadow:0 10px 24px rgba(0,0,0,.25)}
+    .title{font-size:14px; color:#fff}
+    .meta{font-size:12px; color:var(--muted)}
+
+    .viewer-toolbar{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 14px; border-bottom:1px solid var(--border); background:#151518}
+    .viewer-title{font-size:14px; color:#fff; margin:0}
+    .btn{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--navy-dim); padding:8px 10px; border-radius:8px; background:var(--navy); color:#fff; font-weight:600; cursor:pointer}
+    .btn:disabled{opacity:.5; cursor:not-allowed}
+
+    iframe{width:100%; height:70vh; border:0; background:#0f0f11}
+    @media (max-width:960px){ iframe{height:60vh} }
+
+    .empty{padding:24px; color:var(--muted)}
+    .status{font-size:12px; color:var(--muted)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap row">
+    <div class="brand"><img src="assets/Shelnet-Logo.jpeg" alt="Shelnet Logo"/><h1>Shelnet</h1></div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="pbqs.html">PBQs</a>
+      <a href="exam.html">Practice Exam</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="panel">
+      <h2>PBQ Browser</h2>
+      <div class="body">
+        <div class="controls">
+          <div class="row">
+            <select id="domain" aria-label="Filter by domain">
+              <option value="">All Domains</option>
+            </select>
+            <button id="clear" class="btn" type="button">Clear</button>
+          </div>
+        </div>
+        <div id="list" class="pbq-list" role="listbox" aria-label="PBQ list"></div>
+        <div id="list-status" class="status" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="viewer-toolbar">
+        <h3 id="viewer-title" class="viewer-title">Select a PBQ to begin</h3>
+        <div>
+          <button id="prev" class="btn" type="button" disabled>◀ Prev</button>
+          <button id="next" class="btn" type="button" disabled>Next ▶</button>
+        </div>
+      </div>
+      <iframe id="viewer" title="PBQ Viewer" srcdoc="<p class='empty'>Nothing loaded yet.</p>"></iframe>
+    </section>
+  </div>
+</main>
+
+<!-- Inline JSON manifest (Core 2 — 220-1202 for all) -->
+
+
+<script>
+(async function(){
+  const $ = sel => document.querySelector(sel);
+  const listEl = $('#list');
+  const domainEl = $('#domain');
+  const clearEl = $('#clear');
+  const viewer = $('#viewer');
+  const titleEl = $('#viewer-title');
+  const prevEl = $('#prev');
+  const nextEl = $('#next');
+  const statusEl = $('#list-status');
+
+  let data = [];
+  try {
+    const res = await fetch('assets/pbqs.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    data = await res.json();
+  } catch (e){
+    listEl.innerHTML = `<div class='empty'>Failed to load PBQs. Check assets/pbqs.json.</div>`;
+    console.error('PBQ JSON load error:', e);
+    return;
+  }
+
+  // Build domain filter from manifest
+  const domains = Array.from(new Set(data.map(d => d.domain).filter(Boolean))).sort();
+  for(const d of domains){
+    const opt = document.createElement('option');
+    opt.value = d; opt.textContent = d; domainEl.appendChild(opt);
+  }
+
+  let filtered = [...data];
+  let activeIndex = -1;
+
+  function renderList(){
+    const dom = domainEl.value;
+    filtered = data.filter(item => !dom || item.domain === dom);
+    listEl.innerHTML = '';
+
+    if(filtered.length === 0){
+      listEl.innerHTML = `<div class='empty'>No matches. Try clearing filters.</div>`;
+      statusEl.textContent = '0 results';
+      setActive(-1);
+      return;
+    }
+
+    for(const item of filtered){
+      const div = document.createElement('button');
+      div.type = 'button';
+      div.className = 'item';
+      div.setAttribute('data-id', item.id);
+      div.innerHTML = `<div class='title'>${escapeHtml(item.title)}</div><div class='meta'>${escapeHtml(item.domain)}</div>`;
+      div.addEventListener('click', () => openById(item.id));
+      listEl.appendChild(div);
+    }
+    statusEl.textContent = `${filtered.length} result${filtered.length!==1?'s':''}`;
+  }
+
+  function setActive(i){ activeIndex = i; highlightActive(); updateNavButtons(); }
+  function highlightActive(){
+    const buttons = listEl.querySelectorAll('.item');
+    buttons.forEach(btn => btn.classList.remove('active'));
+    if(activeIndex>=0 && activeIndex<buttons.length){ buttons[activeIndex].classList.add('active'); }
+  }
+  function updateNavButtons(){ prevEl.disabled = !(activeIndex > 0); nextEl.disabled = !(activeIndex >= 0 && activeIndex < filtered.length-1); }
+  function openById(id){
+    const i = filtered.findIndex(x => x.id === id);
+    if(i === -1) return;
+    setActive(i);
+    const item = filtered[i];
+    titleEl.textContent = item.title;
+    viewer.removeAttribute('srcdoc');
+    viewer.src = item.filepath;
+    // Update hash for deep-linking
+    location.hash = '#' + encodeURIComponent(item.id);
+  }
+  function openByHash(){
+    const id = decodeURIComponent((location.hash || '').replace('#',''));
+    if(!id){ setActive(-1); titleEl.textContent = 'Select a PBQ to begin'; viewer.removeAttribute('src'); viewer.setAttribute('srcdoc', "<p class='empty'>Nothing loaded yet.</p>"); return; }
+    const found = data.find(x => x.id === id);
+    if(!found){ return; }
+    if(found.domain && domainEl.value && domainEl.value !== found.domain){ domainEl.value = ''; }
+    renderList();
+    const idx = filtered.findIndex(x => x.id === id);
+    if(idx !== -1){ setActive(idx); viewer.src = filtered[idx].filepath; titleEl.textContent = filtered[idx].title; }
+  }
+
+  // Safe HTML escape (fixes previous invalid mapping)
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[c]);
+  }
+
+  // Wire controls
+  domainEl.addEventListener('change', renderList);
+  clearEl.addEventListener('click', () => { domainEl.value=''; renderList(); });
+  prevEl.addEventListener('click', () => { if(activeIndex>0) openById(filtered[activeIndex-1].id); });
+  nextEl.addEventListener('click', () => { if(activeIndex<filtered.length-1) openById(filtered[activeIndex+1].id); });
+  window.addEventListener('hashchange', openByHash);
+
+  // Init
+  renderList();
+  if(location.hash){ openByHash(); }
+
+  /* =====================
+     Minimal test cases
+     ===================== */
+  (function tests(){
+    const T = [];
+    const eq = (a,b,msg) => T.push([a===b,msg||`${a} === ${b}`]);
+
+    eq(escapeHtml('<div>'), '&lt;div&gt;', 'Escapes angle brackets');
+    eq(escapeHtml('A & B'), 'A &amp; B', 'Escapes ampersand');
+    eq(escapeHtml('"quotes" and \'' + "'" + 'single'), '&quot;quotes&quot; and &#39;single', 'Escapes quotes');
+
+    // Render at least one item without throwing
+    try {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = `<div class='title'>${escapeHtml('<test & "q"') }</div>`;
+      eq(!!tmp.firstChild, true, 'Safe innerHTML insert');
+    } catch(e){
+      console.error('Test render failed', e); eq(true,false,'Render should not throw');
+    }
+
+    // Report results in console
+    if(window.console){
+      const pass = T.filter(t=>t[0]).length; const fail = T.length - pass;
+      console.log(`[PBQs tests] pass:${pass} fail:${fail}`, T);
+    }
+  })();
+})();
+</script>
+</body>
+</html>

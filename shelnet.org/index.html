@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shelnet | Free IT Study Resources, PBQs & Exams</title>
+  <meta name="description" content="Shelnet — free CompTIA A+ PBQs and practice exams. Built by an IT educator for students. Monochrome, terminal-inspired UI." />
+  <link rel="icon" href="assets/Shelnet-Logo.jpeg" />
+  <style>
+    :root{
+      --bg:#1b1b1d;
+      --bg-grid:#212124;
+      --ink:#e8e8ea;
+      --muted:#a7a7ad;
+      --accent:#ffffff;
+      --card:#202024;
+      --border:#2a2a2f;
+      --success:#b6f39b;
+      --navy:#0b3a6f;
+      --navy-dim:#0a2d56;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--ink); background:
+        linear-gradient(0deg,var(--bg-grid) 1px,transparent 1px) 0 0/48px 48px,
+        linear-gradient(90deg,var(--bg-grid) 1px,transparent 1px) 0 0/48px 48px,
+        radial-gradient(1200px 700px at 80% -10%, rgba(255,255,255,.06), transparent 70%),
+        var(--bg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      letter-spacing:.2px;
+    }
+    a{color:var(--ink); text-decoration:none}
+    a:hover{opacity:.85}
+
+    header{position:sticky; top:0; z-index:10; background:linear-gradient(to bottom, rgba(27,27,29,.9), rgba(27,27,29,.6)); backdrop-filter:blur(6px); border-bottom:1px solid var(--border)}
+    .wrap{max-width:1100px; margin:0 auto; padding:18px 20px}
+    .brand{display:flex; align-items:center; gap:14px}
+    .brand img{width:36px; height:36px; border-radius:6px; filter:grayscale(100%)}
+    .brand h1{font-size:18px; margin:0; color:var(--navy)}
+    nav{display:flex; gap:18px; align-items:center}
+    .row{display:flex; align-items:center; justify-content:space-between}
+
+    main{padding:28px 20px}
+
+    .hero{display:grid; grid-template-columns:1.1fr .9fr; gap:24px; align-items:stretch}
+    .terminal{background:linear-gradient(180deg,#1d1d20,#17171a); border:1px solid var(--border); border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,.35); overflow:hidden}
+    .term-bar{display:flex; align-items:center; gap:8px; padding:10px 12px; border-bottom:1px solid var(--border); background:#151518}
+    .dot{width:10px; height:10px; border-radius:50%; background:#2c2c31}
+    .term-body{padding:18px; font-size:15px; line-height:1.55; min-height:260px}
+    .prompt{color:#cfcfd6}
+    .cmd{color:#fff}
+    .caret{display:inline-block; width:8px; height:1.1em; background:#e8e8ea; margin-left:2px; animation:blink 1s steps(2,end) infinite}
+    @keyframes blink{50%{opacity:0}}
+    .dim{color:var(--muted)}
+
+    .earth-wrap{display:grid; place-items:center; min-height:260px}
+    #earth{font:12px/12px ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; color:#bcd7ff; margin:0; white-space:pre}
+
+    .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:26px}
+    .card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:18px; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease, background-color .2s ease}
+    .card:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(0,0,0,.25); border-color:var(--navy); background:#232327}
+    .btn{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--navy-dim); padding:10px 12px; border-radius:8px; background:var(--navy); color:#fff; font-weight:600}
+    .btn:hover{filter:brightness(1.1)}
+
+    footer{border-top:1px solid var(--border); color:var(--muted); padding:22px 0 40px}
+    @media (max-width:1000px){.hero{grid-template-columns:1fr}}
+    @media (max-width:780px){.cards{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap row">
+    <div class="brand"><img src="assets/Shelnet-Logo.jpeg" alt="Shelnet Logo"/><h1>Shelnet</h1></div>
+    <nav><a href="index.html">Home</a><a href="pbqs.html">PBQs</a><a href="exam.html">Practice Exam</a><a href="about.html">About</a></nav>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero">
+    <div class="terminal">
+      <div class="term-bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dim" style="margin-left:8px">bash — <span class="prompt">shelnet@studio</span></span></div>
+      <div class="term-body" id="term">
+        <pre class="dim" id="intro"></pre>
+        <div><span class="prompt">shelnet@studio</span>:<span class="dim">~</span>$ <span class="cmd" id="typed"></span><span class="caret"></span></div>
+        <pre id="output" class="dim" style="margin:10px 0 0 0"></pre>
+      </div>
+    </div>
+    <div class="earth-wrap"><pre id="earth" aria-hidden="true"></pre></div>
+  </section>
+
+  <section class="cards">
+    <article class="card"><h3>Practice PBQs</h3><p>Search and load self-contained PBQs by Domain and Objective — all in-page.</p><a class="btn" href="pbqs.html">Open PBQs →</a></article>
+    <article class="card"><h3>Practice Exam</h3><p>Run the full A+ practice exam inside the page with no external deps.</p><a class="btn" href="exam.html">Start Exam →</a></article>
+    <article class="card"><h3>About / Contact</h3><p>Who I am, how to reach me, and how to use these free resources.</p><a class="btn" href="about.html">Learn More →</a></article>
+  </section>
+
+  <section style="margin-top:28px"><div class="card"><h3 style="margin-top:0">Built for IT students — clean, fast, and free.</h3><p class="dim">Monochrome, terminal-inspired experience. No logins, no tracking bloat. Just PBQs and exams that load instantly.</p></div></section>
+</main>
+<footer><div class="wrap">© <span id="year"></span> Shelnet — <span class="dim">shelnet.org</span></div></footer>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const introText = `<span class='prompt'>shelnet@studio</span>:~$ cat shelnet-info.txt\nShelnet is a free study hub for IT students.\n\nWhat you’ll find here:\n• Hands-on PBQs that load in-page (no deps)\n• A+ full-length practice exam\n• Clean, fast, terminal-inspired UI\n\nGoal: help you pass faster with targeted practice.\n`;
+document.getElementById('intro').innerHTML = introText;
+
+const commands = [
+  { cmd: 'nslookup shelnet.org', out: `Server: dns.google\nAddress: 8.8.8.8\n\nNon-authoritative answer:\nName: shelnet.org\nAddress: 203.0.113.42` },
+  { cmd: 'dig +short shelnet.org', out: `203.0.113.42` },
+  { cmd: 'ping -c 3 shelnet.org', out: `PING shelnet.org (203.0.113.42): 56 data bytes\n64 bytes from 203.0.113.42: icmp_seq=0 time=14.2 ms\n64 bytes from 203.0.113.42: icmp_seq=1 time=14.0 ms\n64 bytes from 203.0.113.42: icmp_seq=2 time=14.5 ms\n--- shelnet.org ping statistics ---\n3 packets transmitted, 3 received, 0% packet loss, time 2ms` },
+  { cmd: 'traceroute shelnet.org', out: `traceroute to shelnet.org (203.0.113.42)\n 1 10.0.0.1 1.123 ms\n 2 198.51.100.5 6.887 ms\n 3 203.0.113.42 14.312 ms` },
+  { cmd: 'arp -a', out: `gateway (10.0.0.1) at 00:11:22:33:44:55 on en0 [ethernet]\nprinter (10.0.0.42) at 66:77:88:99:aa:bb on en0 [ethernet]` },
+  { cmd: 'ip addr show en0', out: `2: en0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500\n inet 10.0.0.24/24 brd 10.0.0.255 scope global en0` },
+  { cmd: 'tcpdump -n -c 3 icmp', out: `listening on en0, link-type EN10MB\n12:00:01 IP 10.0.0.24 > 203.0.113.42: ICMP echo request\n12:00:01 IP 203.0.113.42 > 10.0.0.24: ICMP echo reply\n12:00:02 IP 10.0.0.24 > 203.0.113.42: ICMP echo request` },
+  { cmd: 'dirb / pbqs', out: `/pbqs/\n - disk-management-pbq-3.html\n - suspicious-services-pbq-4.html\n - ...` }
+];
+
+const typed=document.getElementById('typed');const output=document.getElementById('output');
+let idx=0,char=0,phase='type',cooldown=0,frame=0;const TYPE_EVERY=3;
+function tick(){const current=commands[idx];if(phase==='type'){if(frame++%TYPE_EVERY===0){char++;typed.textContent=current.cmd.slice(0,char);}if(char>=current.cmd.length){phase='wait';cooldown=30;}}else if(phase==='wait'){if(--cooldown<=0){phase='print';output.textContent='';}}else if(phase==='print'){output.textContent=current.out;phase='done';cooldown=120;}else if(phase==='done'){if(--cooldown<=0){idx=(idx+1)%commands.length;char=0;phase='type';output.textContent='';typed.textContent='';}}requestAnimationFrame(tick);}tick();
+</script>
+<script>
+(function(){const earth=document.getElementById('earth');const W=72,H=36,CELL_ASPECT=0.55;const mapRows=`
+................................................###########################################........................
+............................................##############################........................................
+......................................#########################..................................................
+..............................#############################......................................................
+.........................############################.............................................................
+......................#############################.................######........................................
+...................############################..................###########......................................
+................############################..................#################...................................
+.............############################..................#########################..............................
+...........###########################...................#############################............................
+.........##########################....................#################################..........................
+........#########################....................#####################################........................
+.......########################....................#########################################......................
+......#######################....................#############################################....................
+......######################....................###############################################...................
+.....#####################....................#################################################..................
+.....####################....................###################################################.................
+.....###################.....................###################################################.................
+.....###################.....................###################################################.................
+.....####################....................###################################################.................
+.....#####################....................#################################################..................
+......######################....................###############################################...................
+......#######################....................#############################################....................
+.......########################....................#########################################......................
+........#########################....................#####################################........................
+.........##########################....................#################################..........................
+...........###########################...................#############################............................
+.............############################..................#########################..............................
+................############################..................#################...................................
+...................############################..................###########......................................
+......................#############################.................######........................................
+.........................############################.............................................................
+..............................#############################......................................................
+......................................#########################..................................................
+............................................##############################........................................
+................................................###########################################........................`.trim().split('\n');
+console.assert(mapRows.length===H);console.assert(mapRows.every(r=>r.length===W));const radius=Math.min(W/2,H/2)-1;let lon=0;function render(){const lines=[];for(let y=0;y<H;y++){let row='';for(let x=0;x<W;x++){const nx=((x-W/2+0.5)/radius)*CELL_ASPECT;const ny=(y-H/2+0.5)/radius;const r2=nx*nx+ny*ny;if(r2>1){row+=' ';continue;}const nz=Math.sqrt(1-r2);const phi=Math.asin(ny);const theta=Math.atan2(nx,nz)+lon;const mx=Math.floor(((theta/(2*Math.PI))+0.5)*W)%W;const my=Math.floor(((phi/Math.PI)+0.5)*H);const ch=mapRows[my][mx];const light=(nz*0.7+0.3);if(ch==='#'){row+=light>0.6?'M':light>0.4?'N':light>0.2?'m':'.';}else{row+=light>0.6?':':light>0.4?'.':' ';}}lines.push(row);}earth.textContent=lines.join('\n');lon+=0.01;requestAnimationFrame(render);}render();})();
+</script>
+</body>
+</html>
