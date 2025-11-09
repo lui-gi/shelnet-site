@@ -47,4 +47,10 @@ Shelnet is an ongoing project — if you discover a bug, have a PBQ idea, or wan
 
 ---
 
+## Changelog
+
+9 Nov '25 | v1.1 -> initialized site files, moved files to root; still developing 'Practice Exams,' 'About,' and 'Contact' pages
+
+---
+
 © 2025 Shelnet. All rights reserved.
