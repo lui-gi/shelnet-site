@@ -36,6 +36,8 @@
     main{padding:26px 20px}
 
     .grid{display:grid; grid-template-columns: 340px 1fr; gap:18px; align-items:stretch}
+    .grid.grid--viewer-only{ grid-template-columns: 1fr; }
+    .grid.grid--viewer-only > .panel:first-child{ display:none; }
     @media (max-width:960px){ .grid{grid-template-columns:1fr} }
 
     .panel{background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden}
@@ -57,7 +59,7 @@
 
     .viewer-toolbar{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 14px; border-bottom:1px solid var(--border); background:#151518}
     .viewer-title{font-size:14px; color:#fff; margin:0}
-    .btn{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--navy-dim); padding:8px 10px; border-radius:8px; background:var(--navy); color:#fff; font-weight:600; cursor:pointer}
+    .btn{display:inline-flex; align-items:center; gap:8px; border:1px solid var(--navy-dim); padding:8px 10px; border-radius:8px; background:var(--navy); color:#fff; font-weight:600; font-size:14px; line-height:1; cursor:pointer}
     .btn:disabled{opacity:.5; cursor:not-allowed}
 
     iframe{width:100%; height:70vh; border:0; background:#0f0f11}
@@ -65,6 +67,11 @@
 
     .empty{padding:24px; color:var(--muted)}
     .status{font-size:12px; color:var(--muted)}
+
+    .btn[aria-disabled="true"]{opacity:.5; pointer-events:none}
+    .viewer--full iframe{ height: calc(100dvh - 160px); }
+    @media (max-width:960px){ .viewer--full iframe{ height: calc(100dvh - 140px); } }
+    body.viewer-lock{ overflow:hidden; }
   </style>
 </head>
 <body>
@@ -102,6 +109,8 @@
       <div class="viewer-toolbar">
         <h3 id="viewer-title" class="viewer-title">Select a PBQ to begin</h3>
         <div>
+          <button id="expand" class="btn" type="button" aria-pressed="false">Expand ⤢</button>
+          <a id="openTab" class="btn" role="button" aria-label="Open current PBQ in a new tab" aria-disabled="true" rel="noopener" target="_blank">Open in new tab</a>
           <button id="prev" class="btn" type="button" disabled>◀ Prev</button>
           <button id="next" class="btn" type="button" disabled>Next ▶</button>
         </div>
@@ -111,8 +120,42 @@
   </div>
 </main>
 
-<!-- Inline JSON manifest (Core 2 — 220-1202 for all) -->
-
+<!--
+  Fallback manifest to be used if assets/pbqs.json fails to load (e.g., file:// preview or missing file).
+  You can edit this list or delete it once your external JSON is reachable.
+-->
+<script type="application/json" id="pbqs-fallback">[
+  {
+    "id": "network-conn-1",
+    "title": "Network Connectivity (PBQ 1)",
+    "filepath": "pbqs/network-connectivity-pbq-1.html",
+    "domain": "Core 2 — 220-1202"
+  },
+  {
+    "id": "boot-repair-2",
+    "title": "Boot Repair (PBQ 2)",
+    "filepath": "pbqs/boot-repair-pbq-2.html",
+    "domain": "Core 2 — 220-1202"
+  },
+  {
+    "id": "suspicious-svc-3",
+    "title": "Suspicious Services (PBQ 3)",
+    "filepath": "pbqs/suspicious-services-pbq-3.html",
+    "domain": "Core 2 — 220-1202"
+  },
+  {
+    "id": "phishing-4",
+    "title": "Phishing (PBQ 4)",
+    "filepath": "pbqs/phishing-pbq-4.html",
+    "domain": "Core 2 — 220-1202"
+  },
+  {
+    "id": "disk-mgmt-5",
+    "title": "Disk Management (PBQ 5)",
+    "filepath": "pbqs/disk-management-pbq-5.html",
+    "domain": "Core 2 — 220-1202"
+  }
+]</script>
 
 <script>
 (async function(){
@@ -124,18 +167,67 @@
   const titleEl = $('#viewer-title');
   const prevEl = $('#prev');
   const nextEl = $('#next');
+  const expandEl = document.getElementById('expand');
+  const openTabEl = document.getElementById('openTab');
   const statusEl = $('#list-status');
 
-  let data = [];
-  try {
-    const res = await fetch('assets/pbqs.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    data = await res.json();
-  } catch (e){
-    listEl.innerHTML = `<div class='empty'>Failed to load PBQs. Check assets/pbqs.json.</div>`;
-    console.error('PBQ JSON load error:', e);
-    return;
+  function updateControls(item){
+    const has = !!item;
+    if(openTabEl){
+      if(has){ openTabEl.setAttribute('href', item.filepath); openTabEl.setAttribute('aria-disabled','false'); }
+      else { openTabEl.removeAttribute('href'); openTabEl.setAttribute('aria-disabled','true'); }
+    }
   }
+  if(expandEl){
+    expandEl.addEventListener('click', () => {
+      const panel = viewer.closest('.panel');
+      const grid = panel && panel.parentElement; // .grid
+      const isFull = panel.classList.toggle('viewer--full');
+      if(grid){ grid.classList.toggle('grid--viewer-only', isFull); }
+      expandEl.setAttribute('aria-pressed', isFull ? 'true' : 'false');
+      expandEl.textContent = isFull ? 'Collapse ⤡' : 'Expand ⤢';
+      document.body.classList.toggle('viewer-lock', isFull);
+    });
+  }
+
+  // Load PBQs: try external JSON first, then fallback inline JSON, then show helpful diagnostics.
+  async function loadManifest(){
+    const manifestURL = 'assets/pbqs.json';
+    try {
+      const res = await fetch(manifestURL, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      console.info('[PBQs] Loaded external manifest:', manifestURL);
+      return json;
+    } catch (e){
+      console.warn('[PBQs] External JSON failed, attempting inline fallback...', e?.message || e);
+      try {
+        const f = document.getElementById('pbqs-fallback');
+        if(!f) throw new Error('No inline fallback present');
+        const json = JSON.parse(f.textContent.trim());
+        console.info('[PBQs] Using inline fallback manifest');
+        return json;
+      } catch (e2){
+        const fileMode = location.protocol === 'file:';
+        listEl.innerHTML = `<div class='empty'>
+          <strong>PBQs failed to load.</strong><br/>
+          ${fileMode ? 'You are previewing via <code>file://</code>. Many browsers block <code>fetch()</code> in this mode.' : 'Could not fetch <code>assets/pbqs.json</code>.'}
+          <div style="margin-top:8px">
+            <ul style="margin:8px 0 0 18px; line-height:1.5">
+              <li>Ensure <code>/assets/pbqs.json</code> exists and is reachable.</li>
+              <li>${fileMode ? 'Run a local server: <code>python -m http.server</code> or use GitHub Pages.' : 'Check path/case and CORS for static hosting.'}</li>
+              <li>Or keep an inline fallback <code>#pbqs-fallback</code> script in this page.</li>
+            </ul>
+          </div>
+        </div>`;
+        console.error('PBQ JSON load error:', (e?.message||e), (e2?.message||e2));
+        return null;
+      }
+    }
+  }
+
+  let data = await loadManifest();
+  if(!Array.isArray(data)) return;
 
   // Build domain filter from manifest
   const domains = Array.from(new Set(data.map(d => d.domain).filter(Boolean))).sort();
@@ -184,6 +276,7 @@
     setActive(i);
     const item = filtered[i];
     titleEl.textContent = item.title;
+    updateControls(item);
     viewer.removeAttribute('srcdoc');
     viewer.src = item.filepath;
     // Update hash for deep-linking
@@ -191,13 +284,13 @@
   }
   function openByHash(){
     const id = decodeURIComponent((location.hash || '').replace('#',''));
-    if(!id){ setActive(-1); titleEl.textContent = 'Select a PBQ to begin'; viewer.removeAttribute('src'); viewer.setAttribute('srcdoc', "<p class='empty'>Nothing loaded yet.</p>"); return; }
+    if(!id){ setActive(-1); titleEl.textContent = 'Select a PBQ to begin'; viewer.removeAttribute('src'); viewer.setAttribute('srcdoc', "<p class='empty'>Nothing loaded yet.</p>"); updateControls(null); return; }
     const found = data.find(x => x.id === id);
     if(!found){ return; }
     if(found.domain && domainEl.value && domainEl.value !== found.domain){ domainEl.value = ''; }
     renderList();
     const idx = filtered.findIndex(x => x.id === id);
-    if(idx !== -1){ setActive(idx); viewer.src = filtered[idx].filepath; titleEl.textContent = filtered[idx].title; }
+    if(idx !== -1){ setActive(idx); viewer.src = filtered[idx].filepath; titleEl.textContent = filtered[idx].title; updateControls(filtered[idx]); } else { updateControls(null); }
   }
 
   // Safe HTML escape (fixes previous invalid mapping)
@@ -220,10 +313,11 @@
 
   // Init
   renderList();
+  updateControls(null);
   if(location.hash){ openByHash(); }
 
   /* =====================
-     Minimal test cases
+     Minimal test cases (kept and expanded)
      ===================== */
   (function tests(){
     const T = [];
@@ -231,7 +325,16 @@
 
     eq(escapeHtml('<div>'), '&lt;div&gt;', 'Escapes angle brackets');
     eq(escapeHtml('A & B'), 'A &amp; B', 'Escapes ampersand');
-    eq(escapeHtml('"quotes" and \'' + "'" + 'single'), '&quot;quotes&quot; and &#39;single', 'Escapes quotes');
+    eq(escapeHtml('"quotes" and \'single\''), '&quot;quotes&quot; and &#39;single', 'Escapes quotes');
+
+    // New tests: data presence and item shape
+    eq(Array.isArray(data), true, 'Manifest is an array');
+    eq(data.length > 0, true, 'Manifest has at least one PBQ');
+    const hasShape = data.every(it => typeof it?.id==='string' && typeof it?.title==='string' && typeof it?.filepath==='string');
+    eq(hasShape, true, 'Each PBQ has id/title/filepath');
+
+    // New tests: controls state without selection
+    eq(openTabEl.getAttribute('aria-disabled') === 'true', true, 'Open in new tab disabled initially');
 
     // Render at least one item without throwing
     try {
@@ -242,7 +345,6 @@
       console.error('Test render failed', e); eq(true,false,'Render should not throw');
     }
 
-    // Report results in console
     if(window.console){
       const pass = T.filter(t=>t[0]).length; const fail = T.length - pass;
       console.log(`[PBQs tests] pass:${pass} fail:${fail}`, T);
