@@ -56,3 +56,9 @@ Shelnet is an ongoing project — if you discover a bug, have a PBQ idea, or wan
 ## License
 This project is licensed under the MIT License. See the LICENSE file for details.
 
+Branding Notice:
+All logos, images, and branding elements of Shelnet are copyright © 2025 
+lui-gi and may not be reused without permission. Only the source code 
+is covered under the MIT License.
+
+
