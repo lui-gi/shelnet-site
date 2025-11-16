@@ -53,4 +53,6 @@ Shelnet is an ongoing project — if you discover a bug, have a PBQ idea, or wan
 
 ---
 
-© 2025 Shelnet. All rights reserved.
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
