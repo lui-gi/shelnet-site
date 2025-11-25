@@ -16,8 +16,8 @@ function Home() {
           <h3 className="mt-0 mb-2 text-lg">Practice PBQs</h3>
           <p className="mb-4 text-theme-muted">Search and load self-contained PBQs by Domain and Objective — all in-page.</p>
           <Link 
-            to="/pbqs" 
-            className="inline-flex items-center gap-2 border border-theme-navyDim px-3 py-2.5 rounded-lg bg-theme-navy text-white font-semibold hover:brightness-110"
+            to="/pbqs"
+            className="inline-flex items-center gap-2 border border-theme-navyDim px-3 py-2.5 rounded-lg bg-theme-navy text-white font-semibold hover:brightness-110 no-underline"
           >
             Open PBQs <ArrowRight className="w-4 h-4" />
           </Link>
@@ -27,8 +27,8 @@ function Home() {
           <h3 className="mt-0 mb-2 text-lg">Practice Exam</h3>
           <p className="mb-4 text-theme-muted">Run the full A+ practice exam inside the page with no external deps.</p>
           <Link 
-            to="/exam" 
-            className="inline-flex items-center gap-2 border border-theme-navyDim px-3 py-2.5 rounded-lg bg-theme-navy text-white font-semibold hover:brightness-110"
+            to="/exam"
+            className="inline-flex items-center gap-2 border border-theme-navyDim px-3 py-2.5 rounded-lg bg-theme-navy text-white font-semibold hover:brightness-110 no-underline"
           >
             Start Exam <ArrowRight className="w-4 h-4" />
           </Link>
@@ -38,8 +38,8 @@ function Home() {
           <h3 className="mt-0 mb-2 text-lg">About / Contact</h3>
           <p className="mb-4 text-theme-muted">Who I am, how to reach me, and how to use these free resources.</p>
           <Link 
-            to="/about" 
-            className="inline-flex items-center gap-2 border border-theme-navyDim px-3 py-2.5 rounded-lg bg-theme-navy text-white font-semibold hover:brightness-110"
+            to="/about"
+            className="inline-flex items-center gap-2 border border-theme-navyDim px-3 py-2.5 rounded-lg bg-theme-navy text-white font-semibold hover:brightness-110 no-underline"
           >
             Learn More <ArrowRight className="w-4 h-4" />
           </Link>
