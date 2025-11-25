@@ -9,31 +9,74 @@ function PBQs() {
   const [selectedDomain, setSelectedDomain] = useState('')
   const [isExpanded, setIsExpanded] = useState(false)
   const [viewerTitle, setViewerTitle] = useState('Select a PBQ to begin')
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
   const location = useLocation()
   const navigate = useNavigate()
   const viewerRef = useRef(null)
 
-  // Load PBQs manifest
+  // Debug: Log when component mounts
   useEffect(() => {
-    async function loadManifest() {
-      try {
-        const res = await fetch('/assets/pbqs.json', { cache: 'no-store' })
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        const json = await res.json()
-        setData(json)
-        setFiltered(json)
-      } catch (e) {
-        console.error('Failed to load PBQs manifest:', e)
-        // Fallback to empty array
-        setData([])
-        setFiltered([])
-      }
+    console.log('[PBQs] Component mounted')
+    return () => {
+      console.log('[PBQs] Component unmounting')
     }
-    loadManifest()
   }, [])
 
-  // Get unique domains
-  const domains = Array.from(new Set(data.map(d => d.domain).filter(Boolean))).sort()
+  // Reset and load data when component mounts
+  useEffect(() => {
+    let isMounted = true
+    
+    // Reset state
+    setIsLoading(true)
+    setData([])
+    setFiltered([])
+    setActiveIndex(-1)
+    setSelectedDomain('')
+    setViewerTitle('Select a PBQ to begin')
+    
+    async function loadManifest() {
+      try {
+        setError(null)
+        const res = await fetch('/assets/pbqs.json')
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+        }
+        const json = await res.json()
+        
+        if (isMounted) {
+          if (Array.isArray(json) && json.length > 0) {
+            setData(json)
+            setFiltered(json)
+            setError(null)
+          } else {
+            throw new Error('PBQs manifest is empty or invalid')
+          }
+          setIsLoading(false)
+        }
+      } catch (e) {
+        console.error('Failed to load PBQs manifest:', e)
+        if (isMounted) {
+          setError(e.message || 'Failed to load PBQs')
+          setData([])
+          setFiltered([])
+          setIsLoading(false)
+        }
+      }
+    }
+    
+    // Small delay to ensure component is mounted
+    loadManifest()
+    
+    return () => {
+      isMounted = false
+    }
+  }, []) // Empty dependency array - only run on mount
+
+  // Get unique domains - memoize to avoid recalculation
+  const domains = data.length > 0 
+    ? Array.from(new Set(data.map(d => d.domain).filter(Boolean))).sort()
+    : []
 
   // Filter PBQs by domain
   useEffect(() => {
@@ -51,9 +94,9 @@ function PBQs() {
     }
   }, [selectedDomain, data])
 
-  // Handle hash-based deep linking
+  // Handle hash-based deep linking - only run when data is loaded
   useEffect(() => {
-    if (data.length === 0) return
+    if (data.length === 0 || isLoading) return
 
     const hash = decodeURIComponent(location.hash.replace('#', ''))
     if (!hash) {
@@ -82,7 +125,7 @@ function PBQs() {
     if (idx !== -1 && idx !== activeIndex) {
       openByIndex(idx, filtered)
     }
-  }, [location.hash, data, filtered, selectedDomain, activeIndex, openByIndex])
+  }, [location.hash, data, filtered, selectedDomain, activeIndex, openByIndex, isLoading])
 
   const openByIndex = useCallback((index, list = filtered) => {
     if (index < 0 || index >= list.length) return
@@ -141,8 +184,47 @@ function PBQs() {
   const activeItem = activeIndex >= 0 && activeIndex < filtered.length ? filtered[activeIndex] : null
   const openTabHref = activeItem ? `/${activeItem.filepath}` : null
 
+  // Always render something - show loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] p-8">
+        <div className="text-theme-muted text-center">
+          <div className="mb-2 text-lg">Loading PBQs...</div>
+          <div className="text-xs text-theme-muted">Fetching data from /assets/pbqs.json</div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state if no data and not loading
+  if (!isLoading && (data.length === 0 || error)) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] p-8">
+        <div className="text-center max-w-md">
+          <div className="text-theme-muted mb-4">
+            <div className="mb-2 text-lg font-semibold">Failed to load PBQs</div>
+            <div className="text-sm mb-2 text-red-400">{error || 'Unable to fetch /assets/pbqs.json'}</div>
+            <div className="text-xs text-theme-muted">Please check the browser console for details.</div>
+          </div>
+          <button
+            onClick={() => {
+              setIsLoading(true)
+              setError(null)
+              // Reload the page to retry
+              window.location.reload()
+            }}
+            className="inline-flex items-center gap-2 border border-theme-navyDim px-3 py-2 rounded-lg bg-theme-navy text-white font-semibold text-sm hover:brightness-110"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className={`grid gap-[18px] items-stretch ${isExpanded ? 'grid-cols-1' : 'grid-cols-[340px_1fr]'} max-lg:grid-cols-1`}>
+      {/* Rest of the component remains the same */}
       {!isExpanded && (
         <section className="bg-theme-card border border-theme-border rounded-xl overflow-hidden">
           <h2 className="m-0 px-4 py-3.5 border-b border-theme-border text-[15px] text-theme-accent bg-[#151518]">PBQ Browser</h2>
@@ -261,4 +343,3 @@ function PBQs() {
 }
 
 export default PBQs
-
