@@ -1,46 +1,11 @@
+@import "tailwindcss";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  * {
-    @apply box-border;
-  }
-
-  html,
-  body {
-    @apply h-full;
-  }
-
-  body {
-    @apply m-0 text-theme-ink;
-    background:
-      linear-gradient(0deg, theme(colors.theme.grid) 1px, transparent 1px) 0 0/48px 48px,
-      linear-gradient(90deg, theme(colors.theme.grid) 1px, transparent 1px) 0 0/48px 48px,
-      radial-gradient(1200px 700px at 80% -10%, rgba(255, 255, 255, 0.06), transparent 70%),
-      theme(colors.theme.bg);
-    font-family: theme(fontFamily.mono);
-    letter-spacing: 0.2px;
-  }
-
-  a {
-    @apply text-theme-ink no-underline;
-  }
-
-  a:hover {
-    @apply opacity-85;
-  }
+/* Ensure the background is black by default to prevent white flashes */
+body {
+  background-color: #000000;
+  color: #fff;
 }
-
-@layer utilities {
-  @keyframes blink {
-    50% {
-      opacity: 0;
-    }
-  }
-  
-  .animate-blink {
-    animation: blink 1s steps(2, end) infinite;
-  }
-}
-
