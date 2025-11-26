@@ -239,8 +239,11 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-green-500/30 selection:text-green-200">
-      
+    <div className="min-h-screen bg-black text-white font-sans selection:bg-green-500/30 selection:text-green-200 relative">
+      {/* GLOBAL BINARY RAIN - Fixed position covering entire viewport */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <BinaryRain />
+      </div>
       {/* NAVBAR */}
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b ${scrolled ? 'bg-black/90 backdrop-blur-md border-white/10 py-4' : 'bg-transparent border-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -278,7 +281,6 @@ export default function App() {
       <section className="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
         {/* BACKGROUNDS */}
         <GridBackground />
-        <BinaryRain />
 
         <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
           {/* Left Content */}
