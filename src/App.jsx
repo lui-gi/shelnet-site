@@ -108,94 +108,88 @@ const BinaryRain = () => {
 
 /* --- TERMINAL COMPONENT --- */
 
+/* --- TERMINAL COMPONENT --- */
+
 const TerminalComponent = () => {
-  const [lines, setLines] = useState([]);
-  const [currentCmd, setCurrentCmd] = useState('');
+  const [typedCmd, setTypedCmd] = useState('');
+  const [output, setOutput] = useState(null); // null = hidden, string = visible
   const [showCursor, setShowCursor] = useState(true);
-  const terminalRef = useRef(null);
+  
+  // Refs for managing the loop safely
+  const isMounted = useRef(true);
 
-  const introText = `Shelnet is a free study hub for IT students.
+  const introText = `Shelnet is a free study hub for all things cybersecurity.
 
-What you'll find here:
-• Hands-on PBQs that load in-page
-• Full-length practice exams
-• Clean, fast, terminal-inspired UI
+Contents:
+• Completely free, self-made practice PBQs and Exams
+• Core concept visualizations
+• YouTube tutorials for the above
 
-Goal: help you pass faster.`;
+Goal: to document my own cybersecurity journey while also teaching others.`;
 
   const commands = [
-    { cmd: 'whoami', out: 'shelnet_guest' },
+    { cmd: 'whoami', out: 'shelnet' },
     { cmd: 'ip a | grep inet', out: 'inet 10.0.0.42/24 brd 10.0.0.255 scope global eth0' },
-    { cmd: 'cat current_status.txt', out: 'CompTIA A+ and Sec+ Resources: [ONLINE]' },
-    { cmd: 'echo "Ready to study?"', out: 'Ready.' }
+    { cmd: 'cat current_status.txt', out: 'Rolling out Security+ PBQs.' },
+    { cmd: 'ls', out: 'PBQS     Exams     About     contact.pcap' }
   ];
 
+  // Helper for delays
+  const delay = (ms) => new Promise(r => setTimeout(r, ms));
+
   useEffect(() => {
-    let isMounted = true;
-    let cmdIndex = 0;
-    let charIndex = 0;
-    let phase = 'intro'; // intro, type, process, output, wait
+    isMounted.current = true;
 
-    const runTerminal = async () => {
-      // 1. Show Intro
-      if (phase === 'intro') {
-        setLines([{ type: 'output', text: introText }]);
-        await new Promise(r => setTimeout(r, 1000));
-        phase = 'type';
-      }
+    const runTerminalLoop = async () => {
+      let cmdIndex = 0;
 
-      while (isMounted) {
-        if (phase === 'type') {
-          const targetCmd = commands[cmdIndex].cmd;
-          if (charIndex < targetCmd.length) {
-            setCurrentCmd(targetCmd.slice(0, charIndex + 1));
-            charIndex++;
-            await new Promise(r => setTimeout(r, 50 + Math.random() * 50));
-          } else {
-            phase = 'process';
-            await new Promise(r => setTimeout(r, 300));
-          }
-        } 
-        else if (phase === 'process') {
-          setLines(prev => [...prev, { type: 'command', text: commands[cmdIndex].cmd }]);
-          setCurrentCmd('');
-          charIndex = 0;
-          phase = 'output';
+      while (isMounted.current) {
+        const current = commands[cmdIndex];
+
+        // --- STEP 1: RESET ---
+        // Clear previous command and output, leaving only Intro
+        setTypedCmd('');
+        setOutput(null);
+        await delay(800); // Pause before starting next command
+
+        // --- STEP 2: TYPE COMMAND ---
+        if (!isMounted.current) return;
+        for (let i = 0; i <= current.cmd.length; i++) {
+          if (!isMounted.current) return;
+          setTypedCmd(current.cmd.slice(0, i));
+          // Typing speed variation
+          await delay(50 + Math.random() * 40); 
         }
-        else if (phase === 'output') {
-          setLines(prev => [...prev, { type: 'output', text: commands[cmdIndex].out }]);
-          phase = 'wait';
-          cmdIndex = (cmdIndex + 1) % commands.length;
-          await new Promise(r => setTimeout(r, 2000));
-          if(cmdIndex === 0) {
-             // Clear screen occasionally
-             setLines([{ type: 'output', text: introText }]);
-          }
-          phase = 'type';
-        }
+
+        // --- STEP 3: PROCESS DELAY ---
+        await delay(400); // Slight pause after typing before enter is "hit"
+
+        // --- STEP 4: SHOW OUTPUT ---
+        if (!isMounted.current) return;
+        setOutput(current.out);
+
+        // --- STEP 5: READ DELAY ---
+        // Wait for user to read the output before clearing
+        await delay(2500); 
+
+        // --- STEP 6: LOOP INCREMENT ---
+        cmdIndex = (cmdIndex + 1) % commands.length;
       }
     };
 
-    runTerminal();
-    return () => { isMounted = false; };
+    runTerminalLoop();
+
+    return () => { isMounted.current = false; };
   }, []);
 
-  // Blink cursor
+  // Blinking cursor effect
   useEffect(() => {
     const interval = setInterval(() => setShowCursor(prev => !prev), 500);
     return () => clearInterval(interval);
   }, []);
 
-  // Auto scroll
-  useEffect(() => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
-    }
-  }, [lines, currentCmd]);
-
   return (
-    <div className="w-full max-w-xl mx-auto font-mono text-sm md:text-base leading-relaxed bg-[#0c0c0c] border border-white/20 rounded-lg shadow-2xl overflow-hidden relative z-20">
-      {/* Terminal Bar */}
+    <div className="w-full max-w-xl mx-auto font-mono text-xs md:text-sm leading-relaxed bg-[#0c0c0c] border border-white/20 rounded-lg shadow-2xl overflow-hidden relative z-20">      {/* Terminal Bar */}
       <div className="flex items-center gap-2 px-4 py-3 bg-white/5 border-b border-white/10">
         <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
         <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
@@ -204,24 +198,39 @@ Goal: help you pass faster.`;
       </div>
       
       {/* Terminal Body */}
-      <div ref={terminalRef} className="h-[300px] md:h-[400px] overflow-y-auto p-4 md:p-6 text-gray-300 font-mono">
-        {lines.map((line, i) => (
-          <div key={i} className="mb-2 whitespace-pre-wrap">
-            {line.type === 'command' ? (
-              <div className="flex">
-                <span className="text-green-500 mr-2">➜</span>
-                <span className="text-white/90">{line.text}</span>
-              </div>
-            ) : (
-              <div className="text-gray-400">{line.text}</div>
-            )}
-          </div>
-        ))}
-        <div className="flex">
-          <span className="text-green-500 mr-2">➜</span>
-          <span className="text-white/90">{currentCmd}</span>
-          <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} w-2.5 h-5 bg-white ml-1 block`}></span>
+      <div className="h-[350px] md:h-[450px] overflow-y-auto p-4 md:p-6 text-gray-300 font-mono">
+        
+        {/* 1. Static Intro Text (Always visible) */}
+        <div className="mb-6 whitespace-pre-wrap text-gray-400">
+          {introText}
         </div>
+
+        {/* 2. Dynamic Command Line */}
+        <div className="flex flex-wrap">
+          <span className="text-green-500 mr-2 shrink-0">$</span>
+          <span className="text-white/90 break-all">{typedCmd}</span>
+          
+          {/* Cursor: Only show if output isn't displayed yet (mimics typing active) */}
+          {!output && (
+            <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} w-2.5 h-5 bg-white ml-1 block`}></span>
+          )}
+        </div>
+
+        {/* 3. Output Section */}
+        {output && (
+          <div className="mt-2 text-gray-400 whitespace-pre-wrap animate-in fade-in duration-300">
+            {output}
+          </div>
+        )}
+
+        {/* Empty prompt shown after output to mimic terminal waiting state */}
+        {output && (
+           <div className="flex mt-2">
+            <span className="text-green-500 mr-2">$</span>
+            <span className={`${showCursor ? 'opacity-100' : 'opacity-0'} w-2.5 h-5 bg-white ml-1 block`}></span>
+           </div>
+        )}
+
       </div>
     </div>
   );
@@ -286,7 +295,7 @@ export default function App() {
           {/* Left Content */}
           <div>
              <div className="mb-6 inline-block px-3 py-1 bg-white/5 border border-white/10 rounded text-xs font-mono text-green-400">
-               // SYSTEM_READY: v2.0.4
+               SYSTEM_READY: v2.0.4
              </div>
              <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6" style={{ fontFamily: 'Helvetica Neue, sans-serif' }}>
                LEARN CYBER<br />
@@ -294,8 +303,8 @@ export default function App() {
                  WITH ME.
                </span>
              </h1>
-             <p className="text-white/60 text-lg md:text-xl max-w-lg leading-relaxed mb-8">
-               Free IT/cybersecurity study resources. No data collections. No log ins. Just free self-made resources so everyone can succeed.
+             <p className="text-white/60 text-base md:text-base max-w-base leading-relaxed mb-8">
+               Welcome to Shelnet! My mission is to provide everyone with free cybersecurity resources with no strings attached. I just want to share what I learn with others so we all can succeed in the world of cyber.
              </p>
              <div className="flex flex-wrap gap-4">
                <a href="#pbqs" className="group px-6 py-3 bg-white text-black font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors">
@@ -324,7 +333,7 @@ export default function App() {
       <section id="pbqs" className="py-24 px-6 relative bg-black border-t border-white/5">
         <GridBackground />
         <div className="max-w-6xl mx-auto relative z-10">
-          <BrutalHeader title="PRACTICE PBQS" subtitle="// PERFORMANCE BASED QUESTIONS" counter="01" id="CORE" />
+          <BrutalHeader title="PRACTICE PBQS" subtitle="C:\Shelnet>  PERFORMANCE BASED QUESTIONS" counter="01" id="CORE" />
           
           <div className="grid md:grid-cols-2 gap-8">
             {/* A+ Card */}
@@ -376,7 +385,7 @@ export default function App() {
       <section id="exams" className="py-24 px-6 relative bg-black border-t border-white/5">
         <GridBackground />
         <div className="max-w-6xl mx-auto relative z-10">
-          <BrutalHeader title="PRACTICE EXAMS" subtitle="// FULL LENGTH MOCK TESTS" counter="02" id="TEST" />
+          <BrutalHeader title="PRACTICE EXAMS" subtitle="C:\Shelnet> FULL LENGTH MOCK TESTS" counter="02" id="TEST" />
 
           {/* Using the layout from "Get Involved" (two columns with terminal accent) */}
           <div className="grid lg:grid-cols-2 gap-6">
@@ -389,7 +398,7 @@ export default function App() {
                       <h3 className="text-2xl font-bold text-white mb-1">A+ Full Exam</h3>
                       <div className="text-sm text-white/50 font-mono">// 90 questions • 90 mins</div>
                     </div>
-                    <div className="text-lg font-mono text-white/40">[220-1101]</div>
+                    <div className="text-lg font-mono text-white/40">[220-1202]</div>
                   </div>
                   <div className="space-y-3 mb-8">
                     <div className="flex items-center space-x-3 text-white/70">
@@ -461,14 +470,15 @@ export default function App() {
       <section id="about" className="py-24 px-6 relative bg-black border-t border-white/5">
         <GridBackground />
         <div className="max-w-5xl mx-auto relative z-10">
-          <BrutalHeader title="ABOUT SHELNET" subtitle="// MANIFESTO" counter="03" id="INFO" />
+          <BrutalHeader title="ABOUT SHELNET" subtitle="C:\Shelnet> MISSION STATEMENT" counter="03" id="INFO" />
           
           <div className="border border-white/10 bg-white/[0.02] p-8 md:p-12">
             <div className="grid md:grid-cols-[1fr_200px] gap-12 items-start">
                <div className="space-y-6 text-lg text-white/80 font-light leading-relaxed">
                  <p>
-                   Built by an IT educator for students who are tired of bloated, ad-ridden study sites. 
-                   Shelnet focuses on <span className="text-white font-bold">speed, simplicity, and simulation</span>.
+                   The site was created to host all of my self-made study resources so other students like me can succeed in the world of cyber.
+
+                   Shelnet focuses on <span className="text-white font-bold">fill</span>.
                  </p>
                  <p>
                    Most "free" resources require email signups or hide the best content behind paywalls. 
@@ -520,7 +530,7 @@ export default function App() {
       {/* CONNECT / FOOTER */}
       <section id="connect" className="py-24 px-6 relative bg-black border-t border-white/5">
         <div className="max-w-6xl mx-auto relative z-10">
-           <BrutalHeader title="GET INVOLVED" subtitle="// COMMUNITY CHANNELS" counter="04" id="SOCIAL" />
+           <BrutalHeader title="GET INVOLVED" subtitle="C:\Shelnet> SOCIALS" counter="04" id="SOCIAL" />
            
            <div className="grid md:grid-cols-3 gap-4">
               {/* YouTube */}
@@ -529,7 +539,7 @@ export default function App() {
                     <Youtube className="text-white" />
                  </div>
                  <h4 className="text-xl font-bold mb-2">YouTube</h4>
-                 <p className="text-white/50 text-sm mb-4">Video walkthroughs of every PBQ.</p>
+                 <p className="text-white/50 text-sm mb-4">Video explanations of PBQs and visualizations.</p>
                  <div className="text-xs font-mono text-red-400 group-hover:underline">SUBSCRIBE & COMMENT &rarr;</div>
               </a>
 
