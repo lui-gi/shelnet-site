@@ -540,7 +540,7 @@ export default function App() {
                  </div>
                  <h4 className="text-xl font-bold mb-2">YouTube</h4>
                  <p className="text-white/50 text-sm mb-4">Video explanations of PBQs and visualizations.</p>
-                 <div className="text-xs font-mono text-red-400 group-hover:underline">SUBSCRIBE & COMMENT &rarr;</div>
+                 <div className="text-xs font-mono text-red-400 group-hover:underline">SUBSCRIBE / COMMENT &rarr;</div>
               </a>
 
               {/* LinkedIn */}
@@ -559,7 +559,7 @@ export default function App() {
                     <Mail className="text-white" />
                  </div>
                  <h4 className="text-xl font-bold mb-2">Email</h4>
-                 <p className="text-white/50 text-sm mb-4">Resource requests or bug reports.</p>
+                 <p className="text-white/50 text-sm mb-4">Resource requests or business inquiries.</p>
                  <div className="text-xs font-mono text-gray-300 group-hover:underline">SEND MESSAGE &rarr;</div>
               </a>
            </div>
