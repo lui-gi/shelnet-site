@@ -15,7 +15,7 @@ const BrutalHeader = ({ title, subtitle, counter, id }) => (
     </div>
     <div className="text-right hidden md:block">
       <div className="text-2xl font-bold text-white font-mono">
-        [{counter}]
+        {counter}
       </div>
       <div className="text-xs text-white/40 uppercase tracking-widest">
         {id}
@@ -125,7 +125,8 @@ Contents:
 • Core concept visualizations
 • YouTube tutorials for the above
 
-Goal: to document my own cybersecurity journey while also teaching others.`;
+News 11/27/25:
+• Opened Core 2 PBQs. Working on Security+ resources.`;
 
   const commands = [
     { cmd: 'whoami', out: 'shelnet' },
@@ -333,7 +334,7 @@ export default function App() {
       <section id="pbqs" className="py-24 px-6 relative bg-black border-t border-white/5">
         <GridBackground />
         <div className="max-w-6xl mx-auto relative z-10">
-          <BrutalHeader title="PRACTICE PBQS" subtitle="C:\Shelnet>  PERFORMANCE BASED QUESTIONS" counter="01" id="CORE" />
+          <BrutalHeader title="PRACTICE PBQS" subtitle="C:\Shelnet>  PERFORMANCE BASED QUESTIONS" counter="11.27.25" id="Status: Security+ in progress" />
           
           <div className="grid md:grid-cols-2 gap-8">
             {/* A+ Card */}
@@ -385,7 +386,7 @@ export default function App() {
       <section id="exams" className="py-24 px-6 relative bg-black border-t border-white/5">
         <GridBackground />
         <div className="max-w-6xl mx-auto relative z-10">
-          <BrutalHeader title="PRACTICE EXAMS" subtitle="C:\Shelnet> FULL LENGTH MOCK TESTS" counter="02" id="TEST" />
+          <BrutalHeader title="PRACTICE EXAMS" subtitle="C:\Shelnet> FULL LENGTH MOCK TESTS" counter="11.27.25" id="Status: A+ done, Security+ in progress" />
 
           {/* Using the layout from "Get Involved" (two columns with terminal accent) */}
           <div className="grid lg:grid-cols-2 gap-6">
@@ -395,23 +396,27 @@ export default function App() {
                 <div>
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <h3 className="text-2xl font-bold text-white mb-1">A+ Full Exam</h3>
-                      <div className="text-sm text-white/50 font-mono">// 90 questions • 90 mins</div>
+                      <h3 className="text-2xl font-bold text-white mb-1">A+ Core 2 Full Exam</h3>
+                      <div className="text-sm text-white/50 font-mono">90 questions</div>
                     </div>
                     <div className="text-lg font-mono text-white/40">[220-1202]</div>
                   </div>
                   <div className="space-y-3 mb-8">
                     <div className="flex items-center space-x-3 text-white/70">
                        <span className="text-green-500 font-mono">01.</span>
-                       <span>Mobile Devices & Networking</span>
+                       <span>Operating Systems</span>
                     </div>
                     <div className="flex items-center space-x-3 text-white/70">
                        <span className="text-green-500 font-mono">02.</span>
-                       <span>Hardware & Virtualization</span>
+                       <span>Security</span>
                     </div>
                     <div className="flex items-center space-x-3 text-white/70">
                        <span className="text-green-500 font-mono">03.</span>
-                       <span>Cloud Computing Basics</span>
+                       <span>Software Troubleshooting</span>
+                    </div>
+                    <div className="flex items-center space-x-3 text-white/70">
+                       <span className="text-green-500 font-mono">04.</span>
+                       <span>Operational Procedures</span>
                     </div>
                   </div>
                 </div>
@@ -420,7 +425,7 @@ export default function App() {
                 <div className="border border-white/10 bg-black p-4 font-mono text-sm">
                    <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type a-plus</div>
                    <div className="text-green-500 mb-4">Generating question pool... Done.</div>
-                   <button className="w-full bg-white text-black hover:bg-gray-200 font-bold py-3 px-4 transition-colors text-center">
+                   <button className="w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center">
                      START EXAM SESSION
                    </button>
                 </div>
@@ -431,23 +436,31 @@ export default function App() {
                 <div>
                   <div className="flex justify-between items-start mb-6">
                     <div>
-                      <h3 className="text-2xl font-bold text-white mb-1">Sec+ Full Exam</h3>
-                      <div className="text-sm text-white/50 font-mono">// 90 questions • 90 mins</div>
+                      <h3 className="text-2xl font-bold text-white mb-1">Security+ Full Exam</h3>
+                      <div className="text-sm text-white/50 font-mono">90 questions</div>
                     </div>
                     <div className="text-lg font-mono text-white/40">[SY0-701]</div>
                   </div>
                   <div className="space-y-3 mb-8">
                     <div className="flex items-center space-x-3 text-white/70">
                        <span className="text-blue-500 font-mono">01.</span>
-                       <span>Attacks, Threats & Vulnerabilities</span>
+                       <span>General Security Concepts</span>
                     </div>
                     <div className="flex items-center space-x-3 text-white/70">
                        <span className="text-blue-500 font-mono">02.</span>
-                       <span>Architecture & Design</span>
+                       <span>Threats, Vulnerabilities, and Mitigations</span>
                     </div>
                     <div className="flex items-center space-x-3 text-white/70">
                        <span className="text-blue-500 font-mono">03.</span>
-                       <span>Implementation & Operations</span>
+                       <span>Security Architecture</span>
+                    </div>
+                    <div className="flex items-center space-x-3 text-white/70">
+                       <span className="text-blue-500 font-mono">04.</span>
+                       <span>Security Operations</span>
+                    </div>
+                    <div className="flex items-center space-x-3 text-white/70">
+                       <span className="text-blue-500 font-mono">05.</span>
+                       <span>Security Program Management and Oversight</span>
                     </div>
                   </div>
                 </div>
@@ -470,36 +483,43 @@ export default function App() {
       <section id="about" className="py-24 px-6 relative bg-black border-t border-white/5">
         <GridBackground />
         <div className="max-w-5xl mx-auto relative z-10">
-          <BrutalHeader title="ABOUT SHELNET" subtitle="C:\Shelnet> MISSION STATEMENT" counter="03" id="INFO" />
+          <BrutalHeader title="ABOUT SHELNET" subtitle="C:\Shelnet> OUR PURPOSE" counter="11.27.25" id="Status: Updated" />
           
           <div className="border border-white/10 bg-white/[0.02] p-8 md:p-12">
             <div className="grid md:grid-cols-[1fr_200px] gap-12 items-start">
                <div className="space-y-6 text-lg text-white/80 font-light leading-relaxed">
                  <p>
-                   The site was created to host all of my self-made study resources so other students like me can succeed in the world of cyber.
+                   The site was created by me, a university student who is passionate about all things tech, especially cybersecurity.
+                   I initially created this site as a private repo to track my progress and to solidify my own understanding of concepts by writing about them.               
+                 </p>
+                 <p>
+                   However, as my explanation videos started gaining traction, I realized just how difficult it is to find truly 
+                  <span className="text-white font-bold"> free </span>
+                   educational materials in this field. 
+                   That realization changed my goal: I decided to open-source my notes and turn this into a public resource where cybersecurity students can learn freely, 
+                   without paywalls or data tracking.
 
-                   Shelnet focuses on <span className="text-white font-bold">fill</span>.
                  </p>
                  <p>
                    Most "free" resources require email signups or hide the best content behind paywalls. 
-                   We don't do that here. Everything runs client-side in your browser. 
-                   No tracking. No logins. Just raw practice.
+                   At Shelnet, everything runs client-side in your browser. Experienced users can even view our resource source code if they want (it's pure HTML)! We promise
+                   <span className="text-white font-bold"> no tracking, no data collection, no logins. </span>
                  </p>
                </div>
                
                {/* Stat Box */}
                <div className="hidden md:block space-y-4">
-                  <div className="p-4 bg-white/5 border-l-2 border-green-500">
+                  <div className="p-4 bg-white/5 border-l-2 border-red-500">
                     <div className="text-2xl font-bold text-white">100%</div>
                     <div className="text-xs text-white/40 uppercase">Free</div>
                   </div>
-                  <div className="p-4 bg-white/5 border-l-2 border-green-500">
-                    <div className="text-2xl font-bold text-white">0ms</div>
-                    <div className="text-xs text-white/40 uppercase">Latency</div>
+                  <div className="p-4 bg-white/5 border-l-2 border-yellow-500">
+                    <div className="text-2xl font-bold text-white">100%</div>
+                    <div className="text-xs text-white/40 uppercase">Available</div>
                   </div>
                   <div className="p-4 bg-white/5 border-l-2 border-green-500">
-                    <div className="text-2xl font-bold text-white">NO</div>
-                    <div className="text-xs text-white/40 uppercase">Ads</div>
+                    <div className="text-2xl font-bold text-white">0.00 MB</div>
+                    <div className="text-xs text-white/40 uppercase">Data Collected</div>
                   </div>
                </div>
             </div>
@@ -508,7 +528,7 @@ export default function App() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 pt-12 border-t border-white/10">
                <div className="text-center">
                  <div className="mx-auto w-10 h-10 bg-white/10 rounded flex items-center justify-center mb-2"><Terminal size={20} /></div>
-                 <div className="text-xs font-mono text-white/50">BASH INSPIRED</div>
+                 <div className="text-xs font-mono text-white/50">BASH THEMED</div>
                </div>
                <div className="text-center">
                  <div className="mx-auto w-10 h-10 bg-white/10 rounded flex items-center justify-center mb-2"><Activity size={20} /></div>
@@ -516,7 +536,7 @@ export default function App() {
                </div>
                <div className="text-center">
                  <div className="mx-auto w-10 h-10 bg-white/10 rounded flex items-center justify-center mb-2"><Globe size={20} /></div>
-                 <div className="text-xs font-mono text-white/50">OFFLINE READY</div>
+                 <div className="text-xs font-mono text-white/50">ACCESSIBLE</div>
                </div>
                <div className="text-center">
                  <div className="mx-auto w-10 h-10 bg-white/10 rounded flex items-center justify-center mb-2"><BookOpen size={20} /></div>
@@ -530,7 +550,7 @@ export default function App() {
       {/* CONNECT / FOOTER */}
       <section id="connect" className="py-24 px-6 relative bg-black border-t border-white/5">
         <div className="max-w-6xl mx-auto relative z-10">
-           <BrutalHeader title="GET INVOLVED" subtitle="C:\Shelnet> SOCIALS" counter="04" id="SOCIAL" />
+           <BrutalHeader title="CONNECT WITH ME" subtitle="C:\Shelnet> SOCIALS" counter="11.27.25" id="LAST UPDATED" />
            
            <div className="grid md:grid-cols-3 gap-4">
               {/* YouTube */}
@@ -549,7 +569,7 @@ export default function App() {
                     <Linkedin className="text-white" />
                  </div>
                  <h4 className="text-xl font-bold mb-2">LinkedIn</h4>
-                 <p className="text-white/50 text-sm mb-4">If you would like to talk employment.</p>
+                 <p className="text-white/50 text-sm mb-4">Connect with me.</p>
                  <div className="text-xs font-mono text-blue-400 group-hover:underline">CONNECT &rarr;</div>
               </a>
 
@@ -563,6 +583,7 @@ export default function App() {
                  <div className="text-xs font-mono text-gray-300 group-hover:underline">SEND MESSAGE &rarr;</div>
               </a>
            </div>
+           
 
            {/* Footer Line */}
            <div className="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-white/30 text-xs font-mono">
