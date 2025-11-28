@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Terminal, Cpu, Youtube, Linkedin, Mail, Shield, Monitor, Command, ChevronRight, BookOpen, Activity, Globe } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 /* --- UTILITY COMPONENTS --- */
 

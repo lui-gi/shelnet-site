@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f0f0; /* Darker background to simulate desktop */
+            color: #000000;
+        }
+        .task-manager {
+            background-color: #ffffff; /* Dark theme for Task Manager */
+            border: 1px solid #ababab;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 900px; /* Wider to match screenshot aspect */
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 6px; /* Slightly rounded corners */
+            overflow: hidden; /* For rounded corners to apply to internal elements */
+        }
+
+        /* Window controls */
+        .title-bar {
+            background-color: #f0f0f0;
+            color: #222;
+            padding: 4px 8px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .title-bar-buttons button {
+            background: transparent;
+            border: none;
+            color: #222;
+            width: 30px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .title-bar-buttons button:hover {
+            background-color: #e6e6e6;
+        }
+        .title-bar-buttons .close-btn:hover {
+            background-color: #e81123;
+            color: white;
+        }
+
+        /* Menu Bar */
+        .menu-bar {
+            background-color: #ffffff;
+            padding: 0;
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .menu-bar button {
+            background: transparent;
+            border: none;
+            color: #222;
+            padding: 4px 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-right: 1px solid transparent; /* Visual separation */
+            border-left: 1px solid transparent;
+        }
+        .menu-bar button:hover {
+            background-color: #e6e6e6;
+            border-color: #e0e0e0;
+        }
+        .menu-bar span {
+            padding: 4px 8px;
+            color: #555; /* For "Last BIOS time:" */
+            font-size: 0.8rem;
+            margin-left: auto; /* Pushes it to the right */
+        }
+
+        /* Tabs */
+        .tabs {
+            background-color: #ffffff; /* Match main background */
+            border-bottom: 1px solid #e0e0e0;
+            padding-left: 8px;
+        }
+        .tabs button {
+            background: transparent;
+            border: none;
+            color: #555;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            position: relative;
+            bottom: -1px; /* Align with border */
+            border-bottom: 2px solid transparent; /* Placeholder for active tab underline */
+        }
+        .tabs button.active {
+            color: #000;
+            border-bottom: 2px solid #0078d7; /* Windows blue active tab */
+            background-color: #ffffff;
+        }
+        .tabs button:not(.active):hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+            padding: 16px; /* Padding for placeholder content */
+            flex-grow: 1; /* Allows content area to fill space */
+            overflow: auto; /* For scrollable content if needed */
+        }
+        .tab-content.active {
+            display: block; /* Use block for now, adjust if flex needed for specific content */
+        }
+
+        /* Table Styling */
+        #startup-table {
+            color: #222;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        #startup-table thead {
+            background-color: #f0f0f0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        #startup-table th {
+            padding: 8px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #222;
+            cursor: pointer;
+            position: sticky;
+            top: 0; /* Keep header visible on scroll */
+            z-index: 10;
+        }
+        #startup-table th:hover {
+            background-color: #e6e6e6;
+        }
+        #startup-table td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: middle; /* Align icon and text */
+        }
+        #startup-table tbody tr {
+            background-color: #ffffff;
+        }
+        #startup-table tbody tr.selected {
+            background-color: #cce8ff; /* Darker blue for selection */
+            color: #000;
+        }
+        #startup-table tbody tr:not(.selected):hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Program Name Column */
+        .program-name-col {
+            display: flex;
+            align-items: center;
+        }
+        .program-name-col img {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .program-name-col .name-text {
+            color: #000;
+            font-weight: 400;
+        }
+        .program-name-col .path-text {
+            font-size: 0.75rem;
+            color: #555;
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* Status colors */
+        .status-enabled { color: #107c10; } /* Lighter green */
+        .status-disabled { color: #a4262c; } /* Lighter red */
+
+        /* Impact Badges */
+        /* Styles removed to show plain text */
+
+        /* Footer */
+        .task-manager-footer {
+            background-color: #f0f0f0;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #e0e0e0;
+            font-size: 0.8rem;
+        }
+        .task-manager-footer button {
+            padding: 6px 18px;
+            border: 1px solid #adadad;
+            background-color: #e1e1e1;
+            color: #000;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .task-manager-footer button:hover:not(:disabled) {
+            background-color: #e5f1fb;
+            border-color: #0078d7;
+        }
+        .task-manager-footer button:disabled {
+            opacity: 0.7;
+            color: #555;
+            background-color: #e1e1e1;
+            border-color: #adadad;
+            cursor: not-allowed;
+        }
+
+        /* Special "End task" button styling (our disable button) */
+        #toggle-btn {
+            background-color: #e1e1e1; /* Windows blue */
+            border-color: #adadad;
+            font-weight: 400;
+            color: #000;
+            padding: 6px 20px;
+        }
+        #toggle-btn:hover:not(:disabled) {
+            background-color: #e5f1fb;
+            border-color: #0078d7;
+        }
+        #toggle-btn:disabled {
+            background-color: #e1e1e1;
+            border-color: #adadad;
+            color: #777;
+        }
+
+        /* Submit Button (our custom PBQ button) */
+        #pbq-submit-btn { /* Renamed to avoid clash with toggle-btn styling */
+            background-color: #4CAF50; /* Green submit button */
+            border-color: #4CAF50;
+            color: white;
+            font-weight: 600;
+            margin-right: 10px; /* Space between submit and disable */
+        }
+        #pbq-submit-btn:hover {
+            background-color: #45a049;
+            border-color: #45a049;
+        }
+
+        /* Context Menu */
+        .context-menu {
+            position: absolute;
+            background-color: #f0f0f0;
+            border: 1px solid #ababab;
+            border-radius: 3px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            min-width: 150px;
+            display: none;
+        }
+        .context-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .context-menu ul li {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            color: #000;
+            cursor: pointer;
+        }
+        .context-menu ul li:hover {
+            background-color: #0078d7;
+            color: white;
+        }
+        .context-menu ul li.separator {
+            border-top: 1px solid #e0e0e0;
+            margin: 4px 0;
+            padding: 0;
+        }
+        .context-menu ul li.disabled-menu-item {
+            color: #777;
+            cursor: default;
+        }
+        .context-menu ul li.disabled-menu-item:hover {
+            background-color: transparent;
+            color: #777;
+        }
+
+
+        /* PBQ Scenario box */
+        .scenario-box {
+            background-color: #2a3d58; /* Darker blue */
+            border-left: 4px solid #6cb2eb; /* Lighter blue */
+            padding: 16px;
+            border-radius: 4px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            color: #e0e7ff;
+            font-size: 0.9rem;
+        }
+        .scenario-box h2 {
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+        .scenario-box strong {
+            color: #ffffff;
+        }
+
+        /* Modal styling */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 1001; /* Above task manager */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background-color: #f0f0f0;
+            margin: auto;
+            padding: 24px;
+            border: 1px solid #ababab;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            color: #000;
+        }
+        .modal-content h2 {
+            color: #000;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .modal-content ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .modal-content ul li {
+            margin-bottom: 4px;
+        }
+        .modal-close-btn {
+            background-color: #0078d7;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        .modal-close-btn:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <div class="w-full max-w-7xl flex flex-col items-center">
+        <!-- Scenario Box --><div class="scenario-box w-full max-w-6xl">
+            <h2>PBQ Scenario: Suspicious Startup Items</h2>
+            <p>A user has reported that their computer is running very slowly and exhibiting strange behavior after they downloaded a "free video editor." A Level 1 technician scanned for viruses, but the user is still concerned.</p>
+            <p class="mt-2"><strong>Your Task:</strong> Using the Task Manager, investigate the list of startup applications. Identify and <strong>disable</strong> any applications that appear suspicious. Do not disable legitimate system or user applications.</p>
+        </div>
+
+        <!-- Task Manager Simulation --><div class="task-manager">
+            <!-- Title Bar --><div class="title-bar">
+                <div class="flex items-center">
+                    <!-- Task Manager Icon (Placeholder) --><svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zM5 9a1 1 0 000 2h10a1 1 0 000-2H5z"></path>
+                    </svg>
+                    <span>Task Manager</span>
+                </div>
+                <div class="title-bar-buttons flex">
+                    <button>&#x2014;</button> <!-- Minimize --><button>&#x25A1;</button> <!-- Maximize --><button class="close-btn">&times;</button> <!-- Close --></div>
+            </div>
+
+            <!-- Menu Bar --><div class="menu-bar">
+                <button>File</button>
+                <button>Options</button>
+                <button>View</button>
+                <span class="ml-auto text-gray-400">Last BIOS time: 8.7 seconds</span>
+            </div>
+
+            <!-- Tabs --><div class="tabs flex">
+                <button class="tab-btn" data-tab="processes">Processes</button>
+                <button class="tab-btn" data-tab="performance">Performance</button>
+                <button class="tab-btn" data-tab="apphistory">App history</button>
+                <button class="tab-btn active" data-tab="startup">Startup</button>
+                <button class="tab-btn" data-tab="users">Users</button>
+                <button class="tab-btn" data-tab="details">Details</button>
+                <button class="tab-btn" data-tab="services">Services</button>
+            </div>
+
+            <!-- Main Content Area --><div class="flex-grow overflow-hidden flex flex-col">
+                <!-- Placeholder Tab Contents --><div id="tab-processes" class="tab-content">
+                    <p class="text-gray-400">Processes are not relevant to this task.</p>
+                </div>
+                <div id="tab-performance" class="tab-content">
+                    <p class="text-gray-400">Performance is not relevant to this task.</p>
+                </div>
+                <div id="tab-apphistory" class="tab-content">
+                    <p class="text-gray-400">App history is not relevant to this task.</p>
+                </div>
+                <div id="tab-users" class="tab-content">
+                    <p class="text-gray-400">Users tab is not relevant to this task.</p>
+                </div>
+                <div id="tab-details" class="tab-content">
+                    <p class="text-gray-400">Details are not relevant to this task.</p>
+                </div>
+                <div id="tab-services" class="tab-content">
+                    <p class="text-gray-400">Please use the <strong>Startup</strong> tab as per the scenario instructions.</p>
+                </div>
+
+                <!-- Startup Tab Content (Active) --><div id="tab-startup" class="tab-content active p-0 flex flex-col">
+                    <div class="overflow-y-auto flex-grow">
+                        <table id="startup-table" class="w-full">
+                            <thead>
+                                <tr>
+                                    <th class="program-name-header p-3 text-sm">Name</th>
+                                    <th class="p-3 text-sm">Publisher</th>
+                                    <th class="p-3 text-sm">Status</th>
+                                    <th class="p-3 text-sm">Startup impact</th>
+                                </tr>
+                            </thead>
+                            <tbody id="startup-list">
+                                <!-- JS will populate this --></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer / Action Buttons --><div class="task-manager-footer">
+                <div class="flex-grow">
+                    <!-- "Fewer details" / "More details" (placeholder for now) --><button class="bg-transparent border-none text-blue-400 p-0 hover:underline">Fewer details</button>
+                </div>
+                <div class="flex items-center">
+                    <button id="pbq-submit-btn">Submit PBQ</button> <!-- Custom button for PBQ grading --><button id="toggle-btn" disabled>Disable</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu --><div id="context-menu" class="context-menu">
+        <ul>
+            <li id="context-toggle-status">Disable</li>
+            <li class="disabled-menu-item">Open file location</li>
+            <li class="disabled-menu-item">Search online</li>
+            <li class="separator"></li>
+            <li class="disabled-menu-item">Properties</li>
+        </ul>
+    </div>
+
+    <!-- Result Modal --><div id="result-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="modal-title">PBQ Results</h2>
+            <div id="modal-body" class="space-y-3">
+                <!-- JS will populate this --></div>
+            <button id="modal-close-btn" class="modal-close-btn">Try Again</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- State ---
+            let startupItems = [
+                { id: 1, name: 'hpwuSchd Application', publisher: 'Hewlett-Packard', status: 'Enabled', impact: 'None', isSuspicious: false, path: 'C:\\Program Files\\HP\\...' },
+                { id: 2, name: 'HP Digital Imaging Mon...', publisher: 'Hewlett-Packard Co.', status: 'Enabled', impact: 'None', isSuspicious: false, path: 'C:\\Program Files\\HP\\...' },
+                { id: 10, name: 'VideoEnhancer.exe', publisher: 'Free Editor Inc.', status: 'Enabled', impact: 'High', isSuspicious: true, path: 'C:\\Users\\User\\AppData\\Roaming\\VidEnhance\\VideoEnhancer.exe' },
+                { id: 3, name: 'Microsoft OneDrive', publisher: 'Microsoft Corporation', status: 'Enabled', impact: 'Low', isSuspicious: false, path: 'C:\\Users\\Admin\\AppData\\Local\\Microsoft\\OneDrive' },
+                { id: 4, name: 'Windows Defender notif...', publisher: 'Microsoft Corporation', status: 'Enabled', impact: 'None', isSuspicious: false, path: 'C:\\Windows\\System32\\SecurityHealthSystray.exe' },
+                { id: 11, name: 'svch0st.exe', publisher: '(Unknown)', status: 'Enabled', impact: 'High', isSuspicious: true, path: 'C:\\Users\\User\\AppData\\Local\\Temp\\svch0st.exe' },
+                { id: 5, name: 'Macrium Reflect UI Wat...', publisher: 'Paramount Software UK', status: 'Enabled', impact: 'Low', isSuspicious: false, path: 'C:\\Program Files\\Macrium\\...' },
+                { id: 6, name: 'PretonClientInternal', publisher: 'Preton Ltd.', status: 'Enabled', impact: 'Medium', isSuspicious: false, path: 'C:\\Program Files (x86)\\Preton\\...' },
+                { id: 12, name: 'SystemUtil', publisher: '(Unknown)', status: 'Enabled', impact: 'Medium', isSuspicious: true, path: 'C:\\Windows\\Temp\\run.exe' },
+                { id: 7, name: 'Realtek HD Audio Mana...', publisher: 'Realtek Semiconductor', status: 'Enabled', impact: 'None', isSuspicious: false, path: 'C:\\Program Files\\Realtek\\...' },
+                { id: 8, name: 'Realtek HD Audio Universal Service', publisher: 'Realtek Semiconductor', status: 'Enabled', impact: 'None', isSuspicious: false, path: 'C:\\Program Files\\Realtek\\...' },
+                { id: 9, name: 'ShareX', publisher: 'ShareX Team', status: 'Enabled', impact: 'None', isSuspicious: false, path: 'C:\\Program Files\\ShareX\\...' }
+            ];
+
+            let selectedItemId = null;
+
+            // --- Element References ---
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const startupList = document.getElementById('startup-list');
+            const toggleBtn = document.getElementById('toggle-btn');
+            const pbqSubmitBtn = document.getElementById('pbq-submit-btn'); // Renamed
+            const modal = document.getElementById('result-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+            const modalCloseBtn = document.getElementById('modal-close-btn');
+            const contextMenu = document.getElementById('context-menu');
+            const contextToggleStatus = document.getElementById('context-toggle-status');
+
+            // --- Helper Functions ---
+            /* getImpactClass function removed */
+
+            const getStatusClass = (status) => {
+                 return status === 'Enabled' ? 'status-enabled' : 'status-disabled';
+            };
+
+            // This is a simplified icon getter. In a real app, you'd have proper icons.
+            const getIconPath = (name) => {
+                if (name.includes('HP')) return 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%230096D6\'%3E%3Cpath d=\'M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-1 15.5l-2-2L7 17l4 4 7-7-2-2-5 5z\'/%3E%3C/svg%3E'; // Simple HP-like blue circle
+                if (name.includes('Microsoft OneDrive') || name.includes('Windows Defender')) return 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%230078D7\'%3E%3Cpath d=\'M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z\'/%3E%3C/svg%3E'; // Simple Microsoft blue square
+                if (name.includes('Macrium Reflect')) return 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23004C8C\'%3E%3Cpath d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z\'/%3E%3C/svg%3E'; // Dark blue circle
+                if (name.includes('Realtek')) return 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23d44d02\'%3E%3Cpath d=\'M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zM9.5 16.5v-9L16 12l-6.5 4.5z\'/%3E%3C/svg%3E'; // Realtek orange/red icon
+                if (name.includes('ShareX')) return 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%235C6BC0\'%3E%3Cpath d=\'M18 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-2-8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM6 10c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM4 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z\'/%3E%3C/svg%3E'; // ShareX-like purple icon
+                // Suspicious items get a different icon
+                if (name.includes('VideoEnhancer') || name.includes('svch0st') || name.includes('SystemUtil')) return 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23d9534f\'%3E%3Cpath d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z\'/%3E%3C/svg%3E'; // Red alert icon
+                return 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23888888\'%3E%3Cpath d=\'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9v-2h2v2zm0-4H9V7h2v6zm3 0h-2V7h2v6z\'/%3E%3C/svg%3E'; // Generic grey icon
+            };
+
+
+            // --- Render Function ---
+            const renderStartupList = () => {
+                startupList.innerHTML = ''; // Clear list
+                let currentlySelectedRow = null;
+
+                startupItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.dataset.id = item.id;
+                    row.className = 'cursor-pointer'; // Tailwind classes are combined with custom ones
+                    if (item.id === selectedItemId) {
+                        row.classList.add('selected');
+                        currentlySelectedRow = row;
+                    }
+
+                    row.innerHTML = `
+                        <td class="p-3">
+                            <div class="program-name-col">
+                                <img src="${getIconPath(item.name)}" alt="icon" class="w-4 h-4 mr-2">
+                                <div class="flex flex-col">
+                                    <span class="name-text">${item.name}</span>
+                                    <!-- Display path only for suspicious items, or as part of context awareness -->${item.isSuspicious ? `<span class="path-text text-red-600 font-mono">${item.path}</span>` : ''}
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-3">${item.publisher}</td>
+                        <td class="p-3 font-medium ${getStatusClass(item.status)}">${item.status}</td>
+                        <td class="p-3">
+                            ${item.impact}
+                        </td>
+                    `;
+
+                    // Row click event (left-click)
+                    row.addEventListener('click', () => {
+                        document.querySelectorAll('#startup-list tr.selected').forEach(r => r.classList.remove('selected'));
+                        row.classList.add('selected');
+                        selectedItemId = item.id;
+                        updateToggleButton(item);
+                        hideContextMenu();
+                    });
+
+                    // Right-click event for context menu
+                    row.addEventListener('contextmenu', (e) => {
+                        e.preventDefault(); // Prevent default browser context menu
+                        document.querySelectorAll('#startup-list tr.selected').forEach(r => r.classList.remove('selected'));
+                        row.classList.add('selected');
+                        selectedItemId = item.id;
+                        updateToggleButton(item);
+                        
+                        // Position and show context menu
+                        contextMenu.style.left = `${e.pageX}px`;
+                        contextMenu.style.top = `${e.pageY}px`;
+                        contextMenu.style.display = 'block';
+
+                        // Update context menu item text (Disable/Enable)
+                        contextToggleStatus.textContent = item.status === 'Enabled' ? 'Disable' : 'Enable';
+                    });
+
+                    startupList.appendChild(row);
+                });
+
+                // After re-render, if nothing is selected, disable button
+                if (selectedItemId === null) {
+                    updateToggleButton(null);
+                } else if (currentlySelectedRow) {
+                    const selectedItem = startupItems.find(i => i.id === selectedItemId);
+                    updateToggleButton(selectedItem);
+                }
+            };
+
+            // --- Update Button State ---
+            const updateToggleButton = (item) => {
+                if (!item) {
+                    toggleBtn.disabled = true;
+                    toggleBtn.textContent = 'Disable';
+                    toggleBtn.classList.remove('bg-blue-600', 'hover:bg-blue-500', 'bg-yellow-600', 'hover:bg-yellow-500', 'bg-opacity-50', 'border-gray-600'); // Clean old classes
+                    toggleBtn.classList.add('cursor-not-allowed'); // Add disabled styling
+                } else {
+                    toggleBtn.disabled = false;
+                    toggleBtn.classList.remove('cursor-not-allowed'); // Remove disabled styling
+
+                    if (item.status === 'Enabled') {
+                        toggleBtn.textContent = 'Disable';
+                        toggleBtn.classList.remove('bg-yellow-600', 'hover:bg-yellow-500', 'border-yellow-600');
+                    } else {
+                        toggleBtn.textContent = 'Enable';
+                        toggleBtn.classList.add('bg-yellow-600', 'hover:bg-yellow-500', 'border-yellow-600'); // Add special color for "Enable"
+                    }
+                }
+            };
+
+            const hideContextMenu = () => {
+                contextMenu.style.display = 'none';
+            };
+
+            const performToggleAction = () => {
+                if (selectedItemId === null) return;
+                const item = startupItems.find(i => i.id === selectedItemId);
+                if (item) {
+                    item.status = (item.status === 'Enabled') ? 'Disabled' : 'Enabled';
+                    renderStartupList(); // Re-render to show new status
+                }
+                hideContextMenu();
+            };
+
+            // --- Event Listeners ---
+
+            // Tab navigation
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.dataset.tab;
+
+                    // Update tab buttons
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    // Update tab content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(`tab-${targetTab}`).classList.add('active');
+                    hideContextMenu();
+                });
+            });
+
+            // Toggle Enable/Disable button (bottom right)
+            toggleBtn.addEventListener('click', performToggleAction);
+
+            // Context Menu Toggle Action
+            contextToggleStatus.addEventListener('click', performToggleAction);
+
+            // Hide context menu if clicking anywhere else
+            document.addEventListener('click', (e) => {
+                if (!contextMenu.contains(e.target) && e.target.closest('#startup-table tr') === null) {
+                    hideContextMenu();
+                }
+            });
+
+            // Submit button (PBQ grading)
+            pbqSubmitBtn.addEventListener('click', () => {
+                let correctActions = 0;
+                let falsePositives = 0;
+                let missedItems = 0;
+                const totalSuspicious = startupItems.filter(i => i.isSuspicious).length;
+                let explanations = [];
+
+                startupItems.forEach(item => {
+                    if (item.isSuspicious) {
+                        if (item.status === 'Disabled') {
+                            correctActions++;
+                        } else {
+                            missedItems++;
+                            explanations.push(`<li>❌ You missed <strong>${item.name}</strong>. It should have been disabled.</li>`);
+                        }
+                    } else {
+                        if (item.status === 'Disabled') {
+                            falsePositives++;
+                            explanations.push(`<li>⚠️ You incorrectly disabled <strong>${item.name}</strong>. This is a legitimate application and should remain enabled.</li>`);
+                        }
+                    }
+                });
+
+                let title = '';
+                let resultHTML = '';
+
+                if (correctActions === totalSuspicious && falsePositives === 0) {
+                    title = 'Excellent! (100%)';
+                    resultHTML = `<p class="text-green-700 font-semibold">You correctly identified and disabled all ${totalSuspicious} suspicious applications and left all legitimate applications enabled.</p><p class="mt-2">This resolves the user's issue effectively!</p>`;
+                } else {
+                    title = 'Partial Credit';
+                    resultHTML = `<p class="text-yellow-600 font-semibold">You found ${correctActions} out of ${totalSuspicious} suspicious items.</p>
+                                  <p>You had ${falsePositives} false positives (legitimate apps disabled).</p>
+                                  <p>You missed ${missedItems} suspicious items.</p>
+                                  <h3 class="font-semibold text-lg mt-4 mb-2 text-black">Detailed Feedback:</h3>
+                                  <ul class="list-disc pl-5 space-y-1 text-sm">${explanations.join('')}</ul>`;
+                }
+
+                // Add rationale for suspicious items for learning
+                resultHTML += `<h3 class="font-semibold text-lg mt-4 mb-2 text-black">Rationale for Suspicious Items:</h3>
+                              <ul class="list-disc pl-5 space-y-1 text-sm">
+                                  <li><strong>VideoEnhancer.exe:</strong> Matches the "free video editor" description. Non-standard publisher, often installed with unwanted software.</li>
+                                  <li><strong>svch0st.exe:</strong> A common malware technique. Mimics "svchost.exe" (note the '0' instead of 'o') and runs from a temporary directory.</li>
+                                  <li><strong>SystemUtil:</strong> Generic name, unknown publisher, and running from a temporary directory are all red flags.</li>
+                              </ul>`;
+
+
+                modalTitle.textContent = title;
+                modalBody.innerHTML = resultHTML;
+                modal.classList.add('flex'); // Show modal
+            });
+
+            // Modal close
+            modalCloseBtn.addEventListener('click', () => {
+                modal.classList.remove('flex'); // Hide modal
+                // Reset the PBQ on close for another attempt
+                startupItems.forEach(item => item.status = 'Enabled'); // Reset all to Enabled
+                selectedItemId = null;
+                renderStartupList(); // Re-render to reflect reset state
+                hideContextMenu();
+            });
+
+            // Initial Render
+            renderStartupList();
+            hideContextMenu(); // Ensure context menu is hidden initially
+        });
+    </script>
+</body>
+</html>
