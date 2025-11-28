@@ -241,52 +241,24 @@ News 11/27/25:
 /* --- MAIN APP --- */
 
 export default function App() {
+  
+{/*
   const [scrolled, setScrolled] = useState(false);
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
+*/}
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-green-500/30 selection:text-green-200 relative">
       {/* GLOBAL BINARY RAIN - Fixed position covering entire viewport */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <BinaryRain />
       </div>
-      {/* NAVBAR */}
-      <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b ${scrolled ? 'bg-black/90 backdrop-blur-md border-white/10 py-4' : 'bg-transparent border-transparent py-6'}`}>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            {/* Barcode SVG */}
-            <svg width="100" height="24" viewBox="0 0 140 30" className="opacity-80 fill-white hidden md:block">
-              <rect x="0" y="0" width="2" height="30" />
-              <rect x="4" y="0" width="1" height="30" />
-              <rect x="7" y="0" width="3" height="30" />
-              <rect x="15" y="0" width="2" height="30" />
-              <rect x="22" y="0" width="4" height="30" />
-              <rect x="31" y="0" width="2" height="30" />
-              <rect x="38" y="0" width="3" height="30" />
-              <rect x="46" y="0" width="2" height="30" />
-              <rect x="53" y="0" width="4" height="30" />
-              <rect x="62" y="0" width="2" height="30" />
-              <rect x="74" y="0" width="2" height="30" />
-              <rect x="81" y="0" width="3" height="30" />
-              <rect x="93" y="0" width="4" height="30" />
-              <rect x="102" y="0" width="2" height="30" />
-              <rect x="117" y="0" width="2" height="30" />
-              <rect x="124" y="0" width="4" height="30" />
-            </svg>
-            <span className="font-bold text-xl tracking-tighter">SHELNET_</span>
-          </div>
-          <div className="flex gap-8 font-mono text-sm text-white/60">
-            <a href="#pbqs" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">PBQs</a>
-            <a href="#exams" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">Exams</a>
-            <a href="#about" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">About</a>
-          </div>
-        </div>
-      </nav>
+
+      {/* NAVBAR PRIOR */}
+      
 
       {/* HERO SECTION */}
       <section className="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
@@ -352,10 +324,16 @@ export default function App() {
                 <p className="text-white/60 mb-8 leading-relaxed h-20">
                   Interactive simulations for hardware troubleshooting, printer configuration, and network setup. 
                 </p>
-                <button className="w-full py-4 border border-white/20 hover:border-green-500 hover:text-green-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center group-hover:bg-white/[0.02]">
+
+                {/* Replaced <button> with <Link> */}
+                <Link 
+                  to="/a-plus-pbqs" 
+                  className="w-full py-4 border border-white/20 hover:border-green-500 hover:text-green-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center group-hover:bg-white/[0.02]"
+                >
                   <span>Load Module</span>
                   <span>./launch_a_plus.sh</span>
-                </button>
+                </Link>
+    
               </div>
             </div>
 
