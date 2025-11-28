@@ -281,9 +281,16 @@ export default function App() {
                Welcome to Shelnet! My mission is to provide everyone with free cybersecurity resources with no strings attached. I just want to share what I learn with others so we all can succeed in the world of cyber.
              </p>
              <div className="flex flex-wrap gap-4">
-               <a href="#pbqs" className="group px-6 py-3 bg-white text-black font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors">
-                 START SIMULATION <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-               </a>
+               <a 
+                href="#pbqs" 
+                onClick={(e) => {
+                  e.preventDefault(); // Stop HashRouter from hijacking the URL
+                  document.getElementById('pbqs')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="group px-6 py-3 bg-white text-black font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors cursor-pointer"
+              >
+                START SIMULATION <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </a>
                <a 
                 href="#about" 
                 onClick={(e) => {
