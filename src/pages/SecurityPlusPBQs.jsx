@@ -8,11 +8,13 @@ const SecurityPlusPBQs = () => {
   // PLACEHOLDER DATA: Update these paths to match your actual files in 'public/security-pbqs'
   const pbqs = [
     { 
+      /*
       id: 1, 
-      title: 'Firewall Configuration', 
-      file: '/security-pbqs/firewall-config-pbq-1.html', 
-      description: 'Configure ACLs to permit/deny traffic based on security requirements.' 
+      title: 'In progress...', 
+      file: './security-pbqs/firewall-config-pbq-1.html', 
+      description: 'Most likely will be about ACLs.' 
     },
+    
     { 
       id: 2, 
       title: 'Vulnerability Scanning', 
@@ -36,7 +38,7 @@ const SecurityPlusPBQs = () => {
       title: 'Data Privacy Controls', 
       file: '/security-pbqs/data-privacy-pbq-5.html', 
       description: 'Implement DLP policies and classify sensitive data types.' 
-    },
+    },*/}
   ];
 
   const handleOpenInNewTab = () => {
@@ -70,7 +72,7 @@ const SecurityPlusPBQs = () => {
               </div>
             </div>
             <div className="text-white/60 max-w-2xl">
-              Select a PBQ from the list below to begin. Each simulation tests practical skills required for the Security+ exam.
+              [In progress...] Select a PBQ from the list below to begin. Each simulation tests practical skills required for the Security+ exam.
             </div>
           </div>
 

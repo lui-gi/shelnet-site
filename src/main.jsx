@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
-import APlusPBQs from './pages/APlusPBQs.jsx'
+import APlusPBQs from './pages/a-plus-pbqs.jsx'
 import SecurityPlusPBQs from './pages/SecurityPlusPBQs.jsx'
 import Layout from './Layout.jsx'
 

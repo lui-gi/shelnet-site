@@ -11,32 +11,32 @@ const APlusPBQs = () => {
     { 
       id: 1, 
       title: 'Network Connectivity', 
-      file: '/a-pbqs/network-connectivity-pbq-1.html', 
+      file: './a-pbqs/network-connectivity-pbq-1.html', 
       description: 'Diagnose and repair internet connection issues using CLI tools.' 
     },
     { 
       id: 2, 
       title: 'Boot Repair', 
-      file: '/a-pbqs/boot-repair-pbq-2.html', 
+      file: './a-pbqs/boot-repair-pbq-2.html', 
       description: 'Troubleshoot "Boot Device Not Found" errors and fix MBR.' 
     },
     { 
       id: 3, 
       title: 'Suspicious Services', 
-      file: '/a-pbqs/suspicious-services-pbq-3.html', 
-      description: 'Identify malware persistence and stop malicious services.' 
+      file: './a-pbqs/suspicious-services-pbq-3.html', 
+      description: 'Stop malicious services using Windows Task Manager.' 
     },
     { 
       id: 4, 
       title: 'Phishing Investigation', 
-      file: '/a-pbqs/phishing-pbq-4.html', 
-      description: 'Analyze email headers to identify social engineering attacks.' 
+      file: './a-pbqs/phishing-pbq-4.html', 
+      description: 'Analyze emails to identify social engineering attacks.' 
     },
     { 
       id: 5, 
       title: 'Disk Management', 
-      file: '/a-pbqs/disk-management-pbq-5.html', 
-      description: 'Partition, format, and resize volumes safely.' 
+      file: './a-pbqs/disk-management-pbq-5.html', 
+      description: 'Partition, format, and rename volumes safely.' 
     },
   ];
 

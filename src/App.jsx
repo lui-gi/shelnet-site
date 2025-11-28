@@ -284,9 +284,16 @@ export default function App() {
                <a href="#pbqs" className="group px-6 py-3 bg-white text-black font-bold flex items-center gap-2 hover:bg-gray-200 transition-colors">
                  START SIMULATION <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                </a>
-               <a href="#about" className="px-6 py-3 border border-white/20 text-white hover:bg-white/5 transition-colors font-mono text-sm flex items-center">
-                 $ man shelnet
-               </a>
+               <a 
+                href="#about" 
+                onClick={(e) => {
+                  e.preventDefault(); // Stop the router from changing the URL
+                  document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-6 py-3 border border-white/20 text-white hover:bg-white/5 transition-colors font-mono text-sm flex items-center cursor-pointer"
+              >
+                $ man shelnet
+              </a>
              </div>
           </div>
 
@@ -411,7 +418,7 @@ export default function App() {
                    <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type a-plus</div>
                    <div className="text-green-500 mb-4">Generating question pool... Done.</div>
                    <button className="w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center">
-                     START EXAM SESSION
+                     IN PROGRESS...
                    </button>
                 </div>
              </div>
@@ -455,7 +462,7 @@ export default function App() {
                    <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type sec-plus</div>
                    <div className="text-blue-500 mb-4">Decrypting exam key... Done.</div>
                    <button className="w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center">
-                     START EXAM SESSION
+                     IN PROGRESS...
                    </button>
                 </div>
              </div>
@@ -468,7 +475,7 @@ export default function App() {
       <section id="about" className="py-24 px-6 relative bg-black border-t border-white/5">
         <GridBackground />
         <div className="max-w-5xl mx-auto relative z-10">
-          <BrutalHeader title="ABOUT SHELNET" subtitle="C:\Shelnet> OUR PURPOSE" counter="11.27.25" id="Status: Updated" />
+          <BrutalHeader title="ABOUT SHELNET" subtitle="C:\Shelnet> OUR PURPOSE" counter="11.27.25" id="Status: Complete" />
           
           <div className="border border-white/10 bg-white/[0.02] p-8 md:p-12">
             <div className="grid md:grid-cols-[1fr_200px] gap-12 items-start">
@@ -535,7 +542,7 @@ export default function App() {
       {/* CONNECT / FOOTER */}
       <section id="connect" className="py-24 px-6 relative bg-black border-t border-white/5">
         <div className="max-w-6xl mx-auto relative z-10">
-           <BrutalHeader title="CONNECT WITH ME" subtitle="C:\Shelnet> SOCIALS" counter="11.27.25" id="LAST UPDATED" />
+           <BrutalHeader title="CONNECT WITH ME" subtitle="C:\Shelnet> SOCIALS" counter="11.27.25" id="Status: Working on email integration" />
            
            <div className="grid md:grid-cols-3 gap-4">
               {/* YouTube */}
