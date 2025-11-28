@@ -1,42 +1,41 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Terminal, Maximize2, ExternalLink, ChevronLeft, Monitor } from 'lucide-react';
+import { Terminal, Maximize2, ExternalLink, ChevronLeft, Shield } from 'lucide-react';
 
-const APlusPBQs = () => {
+const SecurityPlusPBQs = () => {
   const [selectedPBQ, setSelectedPBQ] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Updated to match the files in your 'public/a-pbqs' folder
+  // PLACEHOLDER DATA: Update these paths to match your actual files in 'public/security-pbqs'
   const pbqs = [
     { 
       id: 1, 
-      title: 'Network Connectivity', 
-      file: '/a-pbqs/network-connectivity-pbq-1.html', 
-      description: 'Diagnose and repair internet connection issues using CLI tools.' 
+      title: 'Firewall Configuration', 
+      file: '/security-pbqs/firewall-config-pbq-1.html', 
+      description: 'Configure ACLs to permit/deny traffic based on security requirements.' 
     },
     { 
       id: 2, 
-      title: 'Boot Repair', 
-      file: '/a-pbqs/boot-repair-pbq-2.html', 
-      description: 'Troubleshoot "Boot Device Not Found" errors and fix MBR.' 
+      title: 'Vulnerability Scanning', 
+      file: '/security-pbqs/vuln-scan-pbq-2.html', 
+      description: 'Analyze vulnerability scan logs and prioritize remediation.' 
     },
     { 
       id: 3, 
-      title: 'Suspicious Services', 
-      file: '/a-pbqs/suspicious-services-pbq-3.html', 
-      description: 'Identify malware persistence and stop malicious services.' 
+      title: 'Secure Wireless Setup', 
+      file: '/security-pbqs/wireless-setup-pbq-3.html', 
+      description: 'Configure WPA3 enterprise and RADIUS authentication.' 
     },
     { 
       id: 4, 
-      title: 'Phishing Investigation', 
-      file: '/a-pbqs/phishing-pbq-4.html', 
-      description: 'Analyze email headers to identify social engineering attacks.' 
+      title: 'Incident Response', 
+      file: '/security-pbqs/incident-response-pbq-4.html', 
+      description: 'Identify indicators of compromise (IoC) and isolate affected systems.' 
     },
     { 
       id: 5, 
-      title: 'Disk Management', 
-      file: '/a-pbqs/disk-management-pbq-5.html', 
-      description: 'Partition, format, and resize volumes safely.' 
+      title: 'Data Privacy Controls', 
+      file: '/security-pbqs/data-privacy-pbq-5.html', 
+      description: 'Implement DLP policies and classify sensitive data types.' 
     },
   ];
 
@@ -55,22 +54,23 @@ const APlusPBQs = () => {
           
           {/* Header & Back Button */}
           <div className="mb-8">
-            <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-green-400 transition-colors font-mono text-sm mb-6">
+            {/* Changed from <Link> to <a> to prevent crashes if run outside a Router context */}
+            <a href="/" className="inline-flex items-center gap-2 text-white/40 hover:text-blue-400 transition-colors font-mono text-sm mb-6">
               <ChevronLeft size={16} />
               ../BACK_TO_HOME
-            </Link>
+            </a>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-green-500/20 border border-green-500/50 rounded flex items-center justify-center">
-                <Monitor size={20} className="text-green-400" />
+              <div className="w-10 h-10 bg-blue-500/20 border border-blue-500/50 rounded flex items-center justify-center">
+                <Shield size={20} className="text-blue-400" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold uppercase tracking-tight">A+ Core 2 PBQs</h1>
-                <div className="text-sm text-white/50 font-mono">220-1202 // PERFORMANCE BASED QUESTIONS</div>
+                <h1 className="text-4xl font-bold uppercase tracking-tight">Security+ PBQs</h1>
+                <div className="text-sm text-white/50 font-mono">SY0-701 // PERFORMANCE BASED QUESTIONS</div>
               </div>
             </div>
             <div className="text-white/60 max-w-2xl">
-              Select a PBQ from the list below to begin. Each simulation tests practical skills required for the A+ Core 2 exam.
+              Select a PBQ from the list below to begin. Each simulation tests practical skills required for the Security+ exam.
             </div>
           </div>
 
@@ -90,14 +90,14 @@ const APlusPBQs = () => {
                     onClick={() => setSelectedPBQ(pbq)}
                     className={`w-full text-left p-4 border transition-all ${
                       selectedPBQ?.id === pbq.id
-                        ? 'border-green-500 bg-green-500/10 text-white'
+                        ? 'border-blue-500 bg-blue-500/10 text-white'
                         : 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/30 hover:bg-white/[0.05]'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <div className="font-bold text-sm text-green-400/80">PBQ_0{pbq.id}</div>
+                      <div className="font-bold text-sm text-blue-400/80">PBQ_0{pbq.id}</div>
                       {selectedPBQ?.id === pbq.id && (
-                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
                       )}
                     </div>
                     <div className="font-semibold mb-1">{pbq.title}</div>
@@ -123,7 +123,7 @@ const APlusPBQs = () => {
                   <div className="text-sm font-mono">
                     {selectedPBQ ? (
                       <>
-                        <span className="text-green-400">EXECUTING:</span> {selectedPBQ.file}
+                        <span className="text-blue-400">EXECUTING:</span> {selectedPBQ.file}
                       </>
                     ) : (
                       <span className="text-white/40">Waiting for input...</span>
@@ -142,7 +142,7 @@ const APlusPBQs = () => {
                     </button>
                     <button
                       onClick={handleOpenInNewTab}
-                      className="p-2 border border-white/20 hover:border-green-500 hover:text-green-400 transition-colors"
+                      className="p-2 border border-white/20 hover:border-blue-500 hover:text-blue-400 transition-colors"
                       title="Open in new tab"
                     >
                       <ExternalLink size={16} />
@@ -178,4 +178,4 @@ const APlusPBQs = () => {
   );
 };
 
-export default APlusPBQs;
+export default SecurityPlusPBQs;

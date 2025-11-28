@@ -351,10 +351,16 @@ export default function App() {
                 <p className="text-white/60 mb-8 leading-relaxed h-20">
                   Firewall configuration logs, vulnerability scanning analysis, and secure network architecture PBQs.
                 </p>
-                <button className="w-full py-4 border border-white/20 hover:border-blue-500 hover:text-blue-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center group-hover:bg-white/[0.02]">
+
+                {/* Replace the Security+ <button> with this <Link> */}
+                <Link 
+                  to="/security-plus-pbqs" 
+                  className="w-full py-4 border border-white/20 hover:border-blue-500 hover:text-blue-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center group-hover:bg-white/[0.02]"
+                >
                   <span>Load Module</span>
                   <span>./launch_sec_plus.sh</span>
-                </button>
+                </Link>
+
               </div>
             </div>
           </div>
