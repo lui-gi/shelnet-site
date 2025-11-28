@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import APlusPBQs from './pages/APlusPBQs.jsx'
+import SecurityPlusPBQs from './pages/SecurityPlusPBQs.jsx'
 import Layout from './Layout.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -13,6 +14,8 @@ createRoot(document.getElementById('root')).render(
         <Route element={<Layout />}>
            <Route path="/" element={<App />} />
            <Route path="/a-plus-pbqs" element={<APlusPBQs />} />
+           {/* 2. Add the Route below */}
+           <Route path="/security-plus-pbqs" element={<SecurityPlusPBQs />} />
         </Route>
       </Routes>
     </BrowserRouter>
