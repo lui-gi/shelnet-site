@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Terminal, Cpu, Youtube, Linkedin, Mail, Shield, Monitor, Command, ChevronRight, BookOpen, Activity, Globe } from 'lucide-react';
+import { Terminal, Cpu, Youtube, Linkedin, Mail, Shield, Monitor, Command, ChevronRight, BookOpen, Activity, Globe, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 /* --- UTILITY COMPONENTS --- */
@@ -241,15 +241,6 @@ News 11/27/25:
 /* --- MAIN APP --- */
 
 export default function App() {
-  
-{/*
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-*/}
   return (
     <div className="min-h-screen bg-black text-white font-sans selection:bg-green-500/30 selection:text-green-200 relative">
       {/* GLOBAL BINARY RAIN - Fixed position covering entire viewport */}
@@ -553,7 +544,7 @@ export default function App() {
            
            <div className="grid md:grid-cols-3 gap-4">
               {/* YouTube */}
-              <a href="#" className="group border border-white/10 bg-white/[0.02] hover:bg-red-900/10 hover:border-red-500/50 p-8 transition-all text-center">
+              <a href="https://youtube.com/@Shelnet" target="_blank" className="group border border-white/10 bg-white/[0.02] hover:bg-red-900/10 hover:border-red-500/50 p-8 transition-all text-center">
                  <div className="w-12 h-12 bg-red-600 rounded-lg mx-auto flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Youtube className="text-white" />
                  </div>
@@ -563,7 +554,7 @@ export default function App() {
               </a>
 
               {/* LinkedIn */}
-              <a href="#" className="group border border-white/10 bg-white/[0.02] hover:bg-blue-900/10 hover:border-blue-500/50 p-8 transition-all text-center">
+              <a href="https://linkedin.com/in/luigi-fernandez-502647333" target="_blank" className="group border border-white/10 bg-white/[0.02] hover:bg-blue-900/10 hover:border-blue-500/50 p-8 transition-all text-center">
                  <div className="w-12 h-12 bg-blue-700 rounded-lg mx-auto flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Linkedin className="text-white" />
                  </div>
@@ -573,7 +564,7 @@ export default function App() {
               </a>
 
               {/* Email */}
-              <a href="#" className="group border border-white/10 bg-white/[0.02] hover:bg-gray-800 hover:border-white/50 p-8 transition-all text-center">
+              <a href="https://forms.gle/WRM23ktXNZiupPaZA" target="_blank" className="group border border-white/10 bg-white/[0.02] hover:bg-gray-800 hover:border-white/50 p-8 transition-all text-center">
                  <div className="w-12 h-12 bg-gray-600 rounded-lg mx-auto flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                     <Mail className="text-white" />
                  </div>
