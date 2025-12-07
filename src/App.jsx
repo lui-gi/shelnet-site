@@ -327,7 +327,7 @@ export default function App() {
                 </div>
                 <h3 className="text-3xl font-bold mb-4">A+</h3>
                 <p className="text-white/60 mb-8 leading-relaxed h-20">
-                  Interactive simulations for hardware troubleshooting, printer configuration, and network setup. 
+                  Interactive simulations for OS troubleshooting, disk management, and  suspicious activity. 
                 </p>
 
                 {/* Replaced <button> with <Link> */}
