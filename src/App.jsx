@@ -126,8 +126,8 @@ Contents:
 • Core concept visualizations
 • YouTube tutorials for the above
 
-News 11/27/25:
-• Opened Core 2 PBQs. Working on Security+ resources.`;
+News 12/6/25:
+• Opened Core 2 Exam 1. Working on Security+ resources.`;
 
   const commands = [
     { cmd: 'whoami', out: 'shelnet' },
