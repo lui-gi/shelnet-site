@@ -33,32 +33,95 @@
                 opacity: 0;
             }
         }
+        /* Custom Scrollbar for terminal */
+        #terminal::-webkit-scrollbar {
+            width: 8px;
+        }
+        #terminal::-webkit-scrollbar-track {
+            background: #1f2937; 
+        }
+        #terminal::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+            border-radius: 4px;
+        }
+        #terminal::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; 
+        }
     </style>
 </head>
 <body class="bg-gray-800 text-white min-h-screen flex items-center justify-center p-4">
 
-    <div class="w-full max-w-4xl h-[80vh] flex flex-col">
-        <!-- Scenario Box -->
-        <div class="bg-gray-900 p-4 rounded-t-lg border-b-2 border-blue-500">
-            <h1 class="text-xl font-bold text-blue-300">Practice PBQ Scenario</h1>
-            <p class="mt-2 text-gray-300">You are a help desk technician. A user reports they cannot access any websites. Your task is to diagnose the network connectivity issue using the command line.</p>
-            <p class="mt-1 text-gray-400 text-sm">
-                <strong>Suggested Steps:</strong>
-                <ol class="list-decimal list-inside ml-4">
-                    <li>Check the computer's IP configuration.</li>
-                    <li>Verify connectivity to the default gateway (192.168.1.1).</li>
-                    <li>Test DNS resolution by pinging a public website (e.g., google.com).</li>
-                    <li>If DNS fails, test connectivity to a public DNS server (e.g., 8.8.8.8).</li>
-                </ol>
-            </p>
+    <div class="w-full max-w-4xl flex flex-col gap-4">
+        
+        <!-- Main Terminal Container -->
+        <div class="h-[70vh] flex flex-col shadow-2xl rounded-lg overflow-hidden">
+            <!-- Scenario Box -->
+            <div class="bg-gray-900 p-4 border-b-2 border-blue-500">
+                <h1 class="text-xl font-bold text-blue-300">Practice PBQ Scenario</h1>
+                <p class="mt-2 text-gray-300">You are a help desk technician. A user reports they cannot access any websites. Your task is to diagnose the network connectivity issue using the command line.</p>
+                <div class="mt-1 text-gray-400 text-sm">
+                    <strong>Suggested Steps:</strong>
+                    <ol class="list-decimal list-inside ml-4">
+                        <li>Check the computer's IP configuration.</li>
+                        <li>Verify connectivity to the default gateway (192.168.1.1).</li>
+                        <li>Test DNS resolution by pinging a public website (e.g., google.com).</li>
+                        <li>If DNS fails, test connectivity to a public DNS server (e.g., 8.8.8.8).</li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Terminal Window -->
+            <div id="terminal" class="bg-black text-white w-full flex-grow p-4 overflow-y-auto" onclick="document.getElementById('command-input').focus()">
+                <div id="output"></div>
+                <div id="input-line" class="flex">
+                    <span id="prompt" class="flex-shrink-0">C:\Users\Student></span>
+                    <input type="text" id="command-input" class="flex-grow pl-2" autocomplete="off" spellcheck="false" autofocus>
+                </div>
+            </div>
         </div>
 
-        <!-- Terminal Window -->
-        <div id="terminal" class="bg-black text-white w-full flex-grow rounded-b-lg p-4 overflow-y-auto" onclick="document.getElementById('command-input').focus()">
-            <div id="output"></div>
-            <div id="input-line" class="flex">
-                <span id="prompt" class="flex-shrink-0">C:\Users\Student></span>
-                <input type="text" id="command-input" class="flex-grow pl-2" autocomplete="off" spellcheck="false" autofocus>
+        <!-- Diagnosis Section (New) -->
+        <div class="bg-gray-900 p-6 rounded-lg shadow-xl border-l-4 border-yellow-500 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex-grow w-full sm:w-auto">
+                <label for="issue-select" class="block text-sm font-medium text-gray-300 mb-2">Select the root cause of the issue:</label>
+                <select id="issue-select" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                    <option value="" disabled selected>-- Select Diagnosis --</option>
+                    <option value="cable">Faulty Network Cable / Physical Layer Issue</option>
+                    <option value="gateway">Incorrect Default Gateway Configuration</option>
+                    <option value="dns">DNS Resolution Failure</option>
+                    <option value="dhcp">DHCP Server Timeout</option>
+                    <option value="duplicate">Duplicate IP Address Conflict</option>
+                </select>
+            </div>
+            <button onclick="submitDiagnosis()" class="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-800 text-white font-medium rounded-lg text-sm transition-colors duration-200">
+                Submit Diagnosis
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Modal Overlay (New) -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-70 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-gray-800 rounded-xl shadow-2xl max-w-md w-full border border-gray-700 transform transition-all scale-100">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center">
+                <h3 id="modal-title" class="text-xl font-bold text-white">Diagnosis Result</h3>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <!-- Modal Body -->
+            <div class="p-6">
+                <div id="modal-icon" class="flex justify-center mb-4">
+                    <!-- Icon injected by JS -->
+                </div>
+                <p id="modal-message" class="text-center text-gray-300 text-lg leading-relaxed"></p>
+            </div>
+            <!-- Modal Footer -->
+            <div class="p-6 pt-0 flex justify-center">
+                <button onclick="closeModal()" class="px-5 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-white font-medium transition-colors">
+                    Close
+                </button>
             </div>
         </div>
     </div>
@@ -140,7 +203,6 @@ PBQ Command Simulator Help:
                         currentPath = parts.join('\\');
                     }
                 } else {
-                    // Simple simulation, doesn't check for actual existence
                     currentPath += `\\${newDir.replace(/[/]/g, "\\")}`;
                 }
                 promptEl.textContent = `${currentPath}>`;
@@ -193,7 +255,7 @@ Ethernet adapter Ethernet0:
                     }
                      await appendOutputWithDelay(`<br>Ping statistics for ${host}:<br>    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss),<br>`, 0);
                 }
-                return ''; // Output is handled asynchronously
+                return ''; 
             },
             'tracert': async (args) => {
                 const host = args[0];
@@ -337,6 +399,63 @@ Network Card(s):           1 NIC(s) Installed.
                 }, delay);
             });
         }
+
+        // --- DIAGNOSIS LOGIC ---
+        
+        function submitDiagnosis() {
+            const select = document.getElementById('issue-select');
+            const selectedValue = select.value;
+            
+            if (!selectedValue) {
+                showModal('error', 'Please select a diagnosis from the dropdown menu before submitting.');
+                return;
+            }
+
+            if (selectedValue === 'dns') {
+                showModal('success', '<strong>CORRECT!</strong><br><br>The issue is a <strong>DNS Resolution Failure</strong>.<br><br>You were able to ping the Gateway (192.168.1.1) and a public IP (8.8.8.8), which confirms that your IP configuration and internet connection are working. However, the failure to ping "google.com" indicates the computer cannot resolve the name to an IP address.');
+            } else {
+                let hint = '';
+                if(selectedValue === 'cable') hint = 'If the cable were unplugged, you wouldn\'t be able to ping the gateway.';
+                if(selectedValue === 'gateway') hint = 'You were able to successfully ping the gateway (192.168.1.1), so the gateway is reachable.';
+                if(selectedValue === 'dhcp') hint = 'Your IP address (192.168.1.120) is valid and on the correct subnet, so DHCP likely worked.';
+                
+                showModal('error', `<strong>INCORRECT.</strong><br><br>${hint}<br><br>Review your ping results carefully. Can you reach the internet via IP? If yes, what specific service translates names to IPs?`);
+            }
+        }
+
+        function showModal(type, message) {
+            const modal = document.getElementById('modal-overlay');
+            const title = document.getElementById('modal-title');
+            const msgBody = document.getElementById('modal-message');
+            const iconContainer = document.getElementById('modal-icon');
+
+            modal.classList.remove('hidden');
+
+            if (type === 'success') {
+                title.textContent = 'Diagnosis Correct';
+                title.classList.remove('text-red-500');
+                title.classList.add('text-green-400');
+                iconContainer.innerHTML = `<div class="rounded-full bg-green-900 p-3"><svg class="w-12 h-12 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>`;
+            } else {
+                title.textContent = 'Diagnosis Incorrect';
+                title.classList.remove('text-green-400');
+                title.classList.add('text-red-500');
+                iconContainer.innerHTML = `<div class="rounded-full bg-red-900 p-3"><svg class="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></div>`;
+            }
+
+            msgBody.innerHTML = message;
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.add('hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal-overlay').addEventListener('click', (e) => {
+            if (e.target.id === 'modal-overlay') {
+                closeModal();
+            }
+        });
     </script>
 </body>
 </html>
