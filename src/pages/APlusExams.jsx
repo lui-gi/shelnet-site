@@ -1,58 +1,36 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, Maximize2, ExternalLink, ChevronLeft, Monitor } from 'lucide-react';
+// We are importing the icons used in the UI. 
+// If your app crashes, ensure 'lucide-react' is installed.
+import { Terminal, Maximize2, ExternalLink, ChevronLeft, Award, Play } from 'lucide-react';
 
-const APlusPBQs = () => {
-  const [selectedPBQ, setSelectedPBQ] = useState(null);
+const APlusExams = () => {
+  const [selectedExam, setSelectedExam] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const pbqs = [
+  // DATA: This points to the file in your /public/a-exams/ folder
+  const exams = [
     { 
       id: 1, 
-      title: 'Network Connectivity', 
-      file: './a-pbqs/network-connectivity-pbq-1.html', 
-      description: 'Diagnose and repair internet connection issues using CLI tools.' 
-    },
-    { 
-      id: 2, 
-      title: 'Boot Repair', 
-      file: './a-pbqs/boot-repair-pbq-2.html', 
-      description: 'Troubleshoot "Boot Device Not Found" errors and fix MBR.' 
-    },
-    { 
-      id: 3, 
-      title: 'Suspicious Services', 
-      file: './a-pbqs/suspicious-services-pbq-3.html', 
-      description: 'Stop malicious services using Windows Task Manager.' 
-    },
-    { 
-      id: 4, 
-      title: 'Phishing Investigation', 
-      file: './a-pbqs/phishing-pbq-4.html', 
-      description: 'Analyze emails to identify social engineering attacks.' 
-    },
-    { 
-      id: 5, 
-      title: 'Disk Management', 
-      file: './a-pbqs/disk-management-pbq-5.html', 
-      description: 'Partition, format, and rename volumes safely.' 
+      title: 'Core 2 Practice Exam 1 (220-1202)', 
+      file: '/a-exams/practice-exam-1.html', 
+      description: '90 Questions covering Operating Systems, Security, Software Troubleshooting, and Operational Procedures.' 
     },
   ];
 
   const handleOpenInNewTab = () => {
-    if (selectedPBQ) {
-      window.open(selectedPBQ.file, '_blank');
+    if (selectedExam) {
+      window.open(selectedExam.file, '_blank');
     }
   };
 
   return (
     <div className="min-h-screen bg-black text-white font-sans">
-      {/* MAIN CONTENT */}
-      {/* pt-24 ensures content clears the fixed Navbar from Layout.jsx */}
+      {/* PADDING-TOP: 24 (6rem) to clear the fixed navbar */}
       <div className="pt-24 px-6 pb-12">
         <div className="max-w-7xl mx-auto">
           
-          {/* Header & Back Button */}
+          {/* HEADER SECTION */}
           <div className="mb-8">
             <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-green-400 transition-colors font-mono text-sm mb-6">
               <ChevronLeft size={16} />
@@ -61,54 +39,55 @@ const APlusPBQs = () => {
 
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-green-500/20 border border-green-500/50 rounded flex items-center justify-center">
-                <Monitor size={20} className="text-green-400" />
+                <Award size={20} className="text-green-400" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold uppercase tracking-tight">A+ Core 2 PBQs</h1>
-                <div className="text-sm text-white/50 font-mono">220-1202 // PERFORMANCE BASED QUESTIONS</div>
+                <h1 className="text-4xl font-bold uppercase tracking-tight">A+ Core 2 Exams</h1>
+                <div className="text-sm text-white/50 font-mono">220-1202 // FULL SIMULATIONS</div>
               </div>
             </div>
             <div className="text-white/60 max-w-2xl">
-              Select a PBQ from the list below to begin. Each simulation tests practical skills required for the A+ Core 2 exam.
+              Full-length practice exams. Select an exam or quiz from the list to initialize the terminal environment.
             </div>
           </div>
 
-          {/* Main Layout: Sidebar + Viewer */}
+          {/* MAIN LAYOUT GRID */}
           <div className={`grid gap-6 transition-all duration-300 ${isFullscreen ? 'grid-cols-1' : 'lg:grid-cols-[300px_1fr]'}`}>
             
-            {/* Sidebar - PBQ List */}
+            {/* SIDEBAR (Hidden in fullscreen) */}
             {!isFullscreen && (
               <div className="space-y-3">
                 <div className="text-xs font-mono text-white/40 uppercase tracking-widest mb-4 flex items-center gap-2">
                   <Terminal size={14} />
-                  Available Simulations
+                  Available Exams
                 </div>
-                {pbqs.map((pbq) => (
+                {exams.map((exam) => (
                   <button
-                    key={pbq.id}
-                    onClick={() => setSelectedPBQ(pbq)}
-                    className={`w-full text-left p-4 border transition-all ${
-                      selectedPBQ?.id === pbq.id
+                    key={exam.id}
+                    onClick={() => setSelectedExam(exam)}
+                    className={`w-full text-left p-4 border transition-all group ${
+                      selectedExam?.id === exam.id
                         ? 'border-green-500 bg-green-500/10 text-white'
                         : 'border-white/10 bg-white/[0.02] text-white/70 hover:border-white/30 hover:bg-white/[0.05]'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <div className="font-bold text-sm text-green-400/80">PBQ_0{pbq.id}</div>
-                      {selectedPBQ?.id === pbq.id && (
+                      <div className="font-bold text-sm text-green-400/80">EXAM_0{exam.id}</div>
+                      {selectedExam?.id === exam.id && (
                         <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                       )}
                     </div>
-                    <div className="font-semibold mb-1">{pbq.title}</div>
-                    <div className="text-xs text-white/50">{pbq.description}</div>
+                    <div className="font-semibold mb-1 group-hover:text-green-400 transition-colors">{exam.title}</div>
+                    <div className="text-xs text-white/50 leading-relaxed">{exam.description}</div>
                   </button>
                 ))}
               </div>
             )}
 
-            {/* Viewer Area */}
-            <div className="border border-white/10 bg-black/50 overflow-hidden flex flex-col" style={{ height: isFullscreen ? '90vh' : '70vh' }}>
-              {/* Viewer Controls */}
+            {/* VIEWER AREA */}
+            <div className="border border-white/10 bg-[#0c0c0c] overflow-hidden flex flex-col" style={{ height: isFullscreen ? '90vh' : '80vh' }}>
+              
+              {/* VIEWER TOOLBAR */}
               <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/[0.02]">
                 <div className="flex items-center gap-3">
                   {isFullscreen && (
@@ -119,18 +98,18 @@ const APlusPBQs = () => {
                       <ChevronLeft size={18} />
                     </button>
                   )}
-                  <div className="text-sm font-mono">
-                    {selectedPBQ ? (
+                  <div className="text-sm font-mono truncate max-w-[200px] md:max-w-none">
+                    {selectedExam ? (
                       <>
-                        <span className="text-green-400">EXECUTING:</span> {selectedPBQ.file}
+                        <span className="text-green-400">RUNNING:</span> {selectedExam.title}
                       </>
                     ) : (
-                      <span className="text-white/40">Waiting for input...</span>
+                      <span className="text-white/40">Waiting for selection...</span>
                     )}
                   </div>
                 </div>
                 
-                {selectedPBQ && (
+                {selectedExam && (
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setIsFullscreen(!isFullscreen)}
@@ -150,24 +129,25 @@ const APlusPBQs = () => {
                 )}
               </div>
 
-              {/* iFrame Container */}
-              <div className="flex-1 relative bg-white">
-                {selectedPBQ ? (
+              {/* IFRAME CONTAINER */}
+              <div className="flex-1 relative bg-[#0c0c0c] flex flex-col">
+                {selectedExam ? (
                   <iframe
-                    src={selectedPBQ.file}
+                    src={selectedExam.file}
                     className="w-full h-full border-0"
-                    title={selectedPBQ.title}
+                    title={selectedExam.title}
+                    sandbox="allow-same-origin allow-scripts allow-forms allow-popups"
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-white/40 bg-black/50">
-                    <div className="text-center">
-                      <Terminal size={48} className="mx-auto mb-4 opacity-20" />
-                      <div className="font-mono text-sm">No PBQ selected</div>
-                      <div className="text-xs mt-2">Select a simulation to initialize environment</div>
+                  <div className="flex flex-col items-center justify-center h-full text-white/40 bg-white/[0.02]">
+                    <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">
+                        <Play size={24} className="ml-1 opacity-50" />
                     </div>
+                    <div className="font-mono text-sm">SELECT AN EXAM TO BEGIN</div>
                   </div>
                 )}
               </div>
+
             </div>
 
           </div>
@@ -177,4 +157,4 @@ const APlusPBQs = () => {
   );
 };
 
-export default APlusPBQs;
+export default APlusExams;
