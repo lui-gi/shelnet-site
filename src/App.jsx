@@ -581,7 +581,7 @@ export default function App() {
 
            {/* Footer Line */}
            <div className="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-white/30 text-xs font-mono">
-              <div>&copy; {new Date().getFullYear()} SHELNET ORG.</div>
+              <div>&copy; {new Date().getFullYear()} SHELNET.ORG</div>
               <div className="mt-4 md:mt-0 space-x-6">
                  <span className="hover:text-white cursor-pointer">PRIVACY</span>
                  <span className="hover:text-white cursor-pointer">TERMS</span>
