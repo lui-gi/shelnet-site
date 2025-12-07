@@ -302,10 +302,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/30 animate-bounce">
-          <div className="w-[1px] h-12 bg-gradient-to-b from-transparent via-white/50 to-transparent mx-auto"></div>
-        </div>
+        
       </section>
 
       {/* PBQS SECTION */}
