@@ -460,9 +460,12 @@ export default function App() {
                 <div className="border border-white/10 bg-black p-4 font-mono text-sm">
                    <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type sec-plus</div>
                    <div className="text-blue-500 mb-4">Decrypting exam key... Done.</div>
-                   <button className="w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center">
-                     IN PROGRESS...
-                   </button>
+                   <Link 
+                      to="/security-plus-exams"
+                      className="block w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center uppercase"
+                    >
+                      Launch Exam
+                    </Link>
                 </div>
              </div>
 
