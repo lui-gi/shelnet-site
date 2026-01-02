@@ -38,6 +38,11 @@ Shelnet is an evolving project with a growing roadmap of educational content. Up
 * **Concept Visualizations:** Interactive diagrams to explain complex networking and security topics.
 * **Video Tutorials:** Integrated YouTube explanations for key concepts.
 
+## Future Implementations
+
+* **SPA Optimization:** Separate educational content (main/landing) from about/connect (info page)
+* **External DB for resources:** Eventually implement pulling resource assets from database
+
 ## Privacy & Philosophy
 
 Shelnet promises to not collect or share user data.
