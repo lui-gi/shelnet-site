@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, Maximize2, ExternalLink, Monitor } from 'lucide-react';
+import { Terminal, Maximize2, ExternalLink, Monitor, ChevronLeft } from 'lucide-react';
 import PageHeader from '../components/shared/PageHeader';
 import GridBackground from '../components/shared/GridBackground';
 
