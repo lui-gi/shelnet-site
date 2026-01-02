@@ -31,6 +31,7 @@ const Layout = () => {
             <a href="/#pbqs" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">PBQs</a>
             <a href="/#exams" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">Exams</a>
             <a href="/#about" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">About</a>
+            <a href="/#connect" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">Connect</a>
           </div>
         </div>
       </nav>
