@@ -4,7 +4,7 @@ import TerminalComponent from '../animations/TerminalComponent';
 
 const HeroSection = () => {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
       {/* BACKGROUNDS */}
       <GridBackground />
 
