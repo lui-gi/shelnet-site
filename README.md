@@ -1,10 +1,8 @@
 # Shelnet
 
-**Mission:** To learn cybersecurity and share my entire journey, completely for free.
+**Core:** To learn cybersecurity and share my entire journey, completely for free. 
 
-**Access the Site:** [shelnet.org](https://shelnet.org)
-
-![Shelnet Site Demo](./assets/demo-intro.gif)
+![Shelnet Site Demo](./src/assets/homepage.png)
 
 ## What is Shelnet?
 
@@ -22,7 +20,7 @@ Shelnet offers interactive simulations designed to real CompTIA exams, preparing
 * **CompTIA A+ (220-1202):** Hands-on scenarios including hardware troubleshooting, printer configuration, and network setup.
 * **Security+ (SY0-701):** Advanced simulations covering firewall logs, vulnerability scanning analysis, and secure network architecture.
 
-![PBQ Simulation Interface](./assets/pbq-demo.png)
+![PBQ Simulation Interface](./src/assets/pbq-demo.png)
 
 ### 2. Free Full-Length Mock Exams
 90-question simulated exams that mirror the structure of the actual tests. These exams cover all major domains: Disclaimer: not taken from CompTIA directly. The exams were conceived by reading the Exam Objectives and deriving scenario-based questions per topic & sub-topic.
@@ -32,7 +30,7 @@ Shelnet offers interactive simulations designed to real CompTIA exams, preparing
 * **Threats, Vulnerabilities, & Mitigations**
 * **Security Operations & Architecture**
 
-![Mock Exam Interface](./assets/exam-ui.png)
+![Mock Exam Interface](./src/assets/exam-ui.png)
 
 ### 3. Expanding Resource Library
 Shelnet is an evolving project with a growing roadmap of educational content. Upcoming features include:
@@ -52,9 +50,9 @@ Shelnet is different:
 
 ## Connect
 
-* **YouTube:** [Shelnet Tutorials](https://youtube.com/@Shelnet)
-* **LinkedIn:** [Luigi Fernandez](https://linkedin.com/in/luigi-fernandez-502647333)
-* **Contact:** [Send a Message](https://forms.gle/WRM23ktXNZiupPaZA)
+* [Shelnet](https://youtube.com/@Shelnet)
+* [LinkedIn](https://linkedin.com/in/luigi-fernandez-502647333)
+* [Email](https://forms.gle/WRM23ktXNZiupPaZA)
 
 ---
 <p align="center">
