@@ -6,7 +6,7 @@ const AboutSection = () => {
   return (
     <section id="about" className="py-24 px-6 relative bg-black border-t border-white/5">
       <GridBackground />
-      <div className="max-w-5xl mx-auto relative z-10">
+      <div className="max-w-6xl mx-auto relative z-10">
         <BrutalHeader title="ABOUT SHELNET" subtitle="C:\Shelnet> OUR PURPOSE" />
 
         <div className="border border-white/10 bg-white/[0.02] p-8 md:p-12">
