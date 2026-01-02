@@ -7,7 +7,7 @@ const ExamsSection = () => {
     <section id="exams" className="py-24 px-6 relative bg-black border-t border-white/5">
       <GridBackground />
       <div className="max-w-6xl mx-auto relative z-10">
-        <BrutalHeader title="PRACTICE EXAMS" subtitle="C:\Shelnet> FULL LENGTH MOCK TESTS" counter="11.27.25" id="Status: A+ done, Security+ in progress" />
+        <BrutalHeader title="PRACTICE EXAMS" subtitle="C:\Shelnet> FULL LENGTH MOCK TESTS" />
 
         {/* Using the layout from "Get Involved" (two columns with terminal accent) */}
         <div className="grid lg:grid-cols-2 gap-6">

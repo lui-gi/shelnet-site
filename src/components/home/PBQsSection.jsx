@@ -8,7 +8,7 @@ const PBQsSection = () => {
     <section id="pbqs" className="py-24 px-6 relative bg-black border-t border-white/5">
       <GridBackground />
       <div className="max-w-6xl mx-auto relative z-10">
-        <BrutalHeader title="PRACTICE PBQS" subtitle="C:\Shelnet>  PERFORMANCE BASED QUESTIONS" counter="11.27.25" id="Status: Security+ in progress" />
+        <BrutalHeader title="PRACTICE PBQS" subtitle="C:\Shelnet>  PERFORMANCE BASED QUESTIONS" />
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* A+ Card */}

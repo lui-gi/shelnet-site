@@ -5,7 +5,7 @@ const ConnectSection = () => {
   return (
     <section id="connect" className="py-24 px-6 relative bg-black border-t border-white/5">
       <div className="max-w-6xl mx-auto relative z-10">
-         <BrutalHeader title="CONNECT WITH ME" subtitle="C:\Shelnet> SOCIALS" counter="11.27.25" id="Status: Working on email integration" />
+         <BrutalHeader title="CONNECT WITH ME" subtitle="C:\Shelnet> SOCIALS" />
 
          <div className="grid md:grid-cols-3 gap-4">
             {/* YouTube */}
