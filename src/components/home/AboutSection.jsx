@@ -13,22 +13,16 @@ const AboutSection = () => {
           <div className="grid md:grid-cols-[1fr_200px] gap-12 items-start">
              <div className="space-y-6 text-lg text-white/80 font-light leading-relaxed">
                <p>
-                 The site was created by me, a university student who is passionate about all things tech, especially cybersecurity.
-                 I initially created this site as a private repo to track my progress and to solidify my own understanding of concepts by writing about them.
-               </p>
-               <p>
-                 However, as my explanation videos started gaining traction, I realized just how difficult it is to find truly
-                <span className="text-white font-bold"> free </span>
-                 educational materials in this field.
-                 That realization changed my goal: I decided to open-source my notes and turn this into a public resource where cybersecurity students can learn freely,
-                 without paywalls or data tracking.
-
-               </p>
-               <p>
-                 Most "free" resources require email signups or hide the best content behind paywalls.
-                 At Shelnet, everything runs client-side in your browser. Experienced users can even view our resource source code if they want (it's pure HTML)! We promise
-                 <span className="text-white font-bold"> no tracking, no data collection, no logins. </span>
-               </p>
+                 Created by a cybersecurity student, this site began as a private repository to track my own 
+                 learning progress. After realizing how difficult it is to find high-quality, truly free 
+                 educational materials, I decided to open-source my notes to provide a 
+                 barrier-free platform for everyone.
+                </p>
+                <p>
+                  Unlike platforms that hide content behind signups or paywalls, Shelnet runs entirely 
+                  client-side in your browser. We are committed to a privacy-first experience,
+                   which means no tracking, no data collection, and no logins required.
+                </p>
              </div>
 
              {/* Stat Box */}

@@ -43,7 +43,6 @@ const ConnectSection = () => {
          {/* Footer Line */}
          <div className="mt-20 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-white/30 text-xs font-mono">
             <div>&copy; {new Date().getFullYear()} SHELNET.ORG</div>
-
          </div>
       </div>
     </section>
