@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-// We are importing the icons used in the UI. 
-// If your app crashes, ensure 'lucide-react' is installed.
-import { Terminal, Maximize2, ExternalLink, ChevronLeft, Award, Play } from 'lucide-react';
+import { Terminal, Maximize2, ExternalLink, Award, Play } from 'lucide-react';
+import PageHeader from '../components/shared/PageHeader';
+import GridBackground from '../components/shared/GridBackground';
 
 const APlusExams = () => {
   const [selectedExam, setSelectedExam] = useState(null);
@@ -27,29 +27,18 @@ const APlusExams = () => {
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       {/* PADDING-TOP: 24 (6rem) to clear the fixed navbar */}
-      <div className="pt-24 px-6 pb-12">
-        <div className="max-w-7xl mx-auto">
+      <div className="pt-24 px-6 pb-12 relative">
+        <GridBackground />
+        <div className="max-w-7xl mx-auto relative z-10">
           
           {/* HEADER SECTION */}
-          <div className="mb-8">
-            <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-green-400 transition-colors font-mono text-sm mb-6">
-              <ChevronLeft size={16} />
-              ../BACK_TO_HOME
-            </Link>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-green-500/20 border border-green-500/50 rounded flex items-center justify-center">
-                <Award size={20} className="text-green-400" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold uppercase tracking-tight">A+ Core 2 Exams</h1>
-                <div className="text-sm text-white/50 font-mono">220-1202 // FULL SIMULATIONS</div>
-              </div>
-            </div>
-            <div className="text-white/60 max-w-2xl">
-              Full-length practice exams. Select an exam or quiz from the list to initialize the terminal environment.
-            </div>
-          </div>
+          <PageHeader
+            icon={<Award size={20} />}
+            iconColor="green"
+            title="A+ Core 2 Exams"
+            subtitle="220-1202 // FULL SIMULATIONS"
+            description="Full-length practice exams. Select an exam or quiz from the list to initialize the terminal environment."
+          />
 
           {/* MAIN LAYOUT GRID */}
           <div className={`grid gap-6 transition-all duration-300 ${isFullscreen ? 'grid-cols-1' : 'lg:grid-cols-[300px_1fr]'}`}>

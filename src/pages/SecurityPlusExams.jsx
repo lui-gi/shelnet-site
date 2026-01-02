@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Terminal, Maximize2, ExternalLink, ChevronLeft, Shield, Play } from 'lucide-react';
+import { Terminal, Maximize2, ExternalLink, Shield, Play } from 'lucide-react';
+import PageHeader from '../components/shared/PageHeader';
+import GridBackground from '../components/shared/GridBackground';
 
 const SecurityPlusExams = () => {
   const [selectedExam, setSelectedExam] = useState(null);
@@ -27,29 +29,18 @@ const SecurityPlusExams = () => {
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       {/* PADDING-TOP: 24 (6rem) to clear the fixed navbar */}
-      <div className="pt-24 px-6 pb-12">
-        <div className="max-w-7xl mx-auto">
+      <div className="pt-24 px-6 pb-12 relative">
+        <GridBackground />
+        <div className="max-w-7xl mx-auto relative z-10">
           
           {/* HEADER SECTION */}
-          <div className="mb-8">
-            <Link to="/" className="inline-flex items-center gap-2 text-white/40 hover:text-blue-400 transition-colors font-mono text-sm mb-6">
-              <ChevronLeft size={16} />
-              ../BACK_TO_HOME
-            </Link>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-500/20 border border-blue-500/50 rounded flex items-center justify-center">
-                <Shield size={20} className="text-blue-400" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold uppercase tracking-tight">Security+ Exams</h1>
-                <div className="text-sm text-white/50 font-mono">SY0-701 // FULL SIMULATIONS</div>
-              </div>
-            </div>
-            <div className="text-white/60 max-w-2xl">
-              Full-length practice exams for CompTIA Security+. Select an exam or quiz from the list to initialize the secure environment.
-            </div>
-          </div>
+          <PageHeader
+            icon={<Shield size={20} />}
+            iconColor="blue"
+            title="Security+ Exams"
+            subtitle="SY0-701 // FULL SIMULATIONS"
+            description="Full-length practice exams for CompTIA Security+. Select an exam or quiz from the list to initialize the secure environment."
+          />
 
           {/* MAIN LAYOUT GRID */}
           <div className={`grid gap-6 transition-all duration-300 ${isFullscreen ? 'grid-cols-1' : 'lg:grid-cols-[300px_1fr]'}`}>

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Terminal, Maximize2, ExternalLink, ChevronLeft, Shield } from 'lucide-react';
+import { Terminal, Maximize2, ExternalLink, Shield } from 'lucide-react';
+import PageHeader from '../components/shared/PageHeader';
+import GridBackground from '../components/shared/GridBackground';
 
 const SecurityPlusPBQs = () => {
   const [selectedPBQ, setSelectedPBQ] = useState(null);
@@ -51,30 +53,18 @@ const SecurityPlusPBQs = () => {
     <div className="min-h-screen bg-black text-white font-sans">
       {/* MAIN CONTENT */}
       {/* pt-24 ensures content clears the fixed Navbar from Layout.jsx */}
-      <div className="pt-24 px-6 pb-12">
-        <div className="max-w-7xl mx-auto">
+      <div className="pt-24 px-6 pb-12 relative">
+        <GridBackground />
+        <div className="max-w-7xl mx-auto relative z-10">
           
           {/* Header & Back Button */}
-          <div className="mb-8">
-            {/* Changed from <Link> to <a> to prevent crashes if run outside a Router context */}
-            <a href="/" className="inline-flex items-center gap-2 text-white/40 hover:text-blue-400 transition-colors font-mono text-sm mb-6">
-              <ChevronLeft size={16} />
-              ../BACK_TO_HOME
-            </a>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-500/20 border border-blue-500/50 rounded flex items-center justify-center">
-                <Shield size={20} className="text-blue-400" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold uppercase tracking-tight">Security+ PBQs</h1>
-                <div className="text-sm text-white/50 font-mono">SY0-701 // PERFORMANCE BASED QUESTIONS</div>
-              </div>
-            </div>
-            <div className="text-white/60 max-w-2xl">
-              [In progress...] Select a PBQ from the list below to begin. Each simulation tests practical skills required for the Security+ exam.
-            </div>
-          </div>
+          <PageHeader
+            icon={<Shield size={20} />}
+            iconColor="blue"
+            title="Security+ PBQs"
+            subtitle="SY0-701 // PERFORMANCE BASED QUESTIONS"
+            description="[In progress...] Select a PBQ from the list below to begin. Each simulation tests practical skills required for the Security+ exam."
+          />
 
           {/* Main Layout: Sidebar + Viewer */}
           <div className={`grid gap-6 transition-all duration-300 ${isFullscreen ? 'grid-cols-1' : 'lg:grid-cols-[300px_1fr]'}`}>
