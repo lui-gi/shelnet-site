@@ -49,7 +49,7 @@ Shelnet promises to not collect or share user data.
 
 ## Connect
 
-* [Shelnet](https://youtube.com/@Shelnet)
+* [YouTube](https://youtube.com/@Shelnet)
 * [LinkedIn](https://linkedin.com/in/luigi-fernandez-502647333)
 * [Email](https://forms.gle/WRM23ktXNZiupPaZA)
 
