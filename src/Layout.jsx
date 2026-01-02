@@ -21,8 +21,10 @@ const Layout = () => {
       <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b ${scrolled ? 'bg-black/90 backdrop-blur-md border-white/10 py-4' : 'bg-transparent border-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            
-            <Link to="/" className="font-bold text-xl tracking-tighter">SHELNET_</Link>
+            <Link to="/" className="flex items-center gap-3">
+              <img src="/shelnet-v3.svg" alt="Shelnet Logo" className="w-6 h-6" />
+              <span className="font-bold text-xl tracking-tighter">SHELNET_</span>
+            </Link>
           </div>
           <div className="flex gap-8 font-mono text-sm text-white/60">
             {/* Links updated to work from any page */}
