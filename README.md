@@ -3,6 +3,7 @@
 **Core:** To learn cybersecurity and share my entire journey, completely for free. 
 
 ![Shelnet Site Demo](./src/assets/homepage.png)
+*Shelnet homepage*
 
 ## What is Shelnet?
 
@@ -21,16 +22,14 @@ Shelnet offers interactive simulations designed to real CompTIA exams, preparing
 * **Security+ (SY0-701):** Advanced simulations covering firewall logs, vulnerability scanning analysis, and secure network architecture.
 
 ![PBQ Simulation Interface](./src/assets/pbq-demo.png)
+*A+ Core 2 PBQ about bootrec commands*
 
 ### 2. Free Full-Length Mock Exams
-90-question simulated exams that mirror the structure of the actual tests. These exams cover all major domains: Disclaimer: not taken from CompTIA directly. The exams were conceived by reading the Exam Objectives and deriving scenario-based questions per topic & sub-topic.
-
-* **Operating Systems & Security**
-* **Software Troubleshooting**
-* **Threats, Vulnerabilities, & Mitigations**
-* **Security Operations & Architecture**
+90-question simulated exams that mirror the structure of the actual tests. These exams cover all major domains.
+*Disclaimer: not taken from CompTIA directly. The exams were conceived by reading the Exam Objectives and deriving scenario-based questions per topic & sub-topic.*
 
 ![Mock Exam Interface](./src/assets/exam-ui.png)
+*Practice Exam 1 for A+ Core 2*
 
 ### 3. Expanding Resource Library
 Shelnet is an evolving project with a growing roadmap of educational content. Upcoming features include:
@@ -41,12 +40,7 @@ Shelnet is an evolving project with a growing roadmap of educational content. Up
 
 ## Privacy & Philosophy
 
-> If a product is free, you are the product.
-
-Shelnet is different:
-* **Client-Side Only:** The entire app runs in your browser.
-* **Zero Tracking:** We collect 0.00 MB of data.
-* **Open Source:** You can audit the code yourself.
+Shelnet promises to not collect or share user data.
 
 ## Connect
 
@@ -56,5 +50,5 @@ Shelnet is different:
 
 ---
 <p align="center">
-  <small>&copy; 2025 Shelnet Org.</small>
+  <small>&copy; 2025 shelnet.org</small>
 </p>
