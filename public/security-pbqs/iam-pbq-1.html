@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PBQ Simulation: IAM Least Privilege</title>
+    <style>
+        :root {
+            --primary: #0078d4; /* Azure Blue */
+            --bg-color: #f3f2f1;
+            --surface: #ffffff;
+            --border: #e1dfdd;
+            --text: #323130;
+            --text-secondary: #605e5c;
+            --success: #107c10;
+            --error: #a80000;
+            --warning: #797775;
+            --shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- Header --- */
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 0 20px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .brand {
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .exam-timer {
+            font-family: monospace;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* --- Main Layout --- */
+        .container {
+            display: flex;
+            flex: 1;
+            padding: 20px;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        /* --- Sidebar (Permissions) --- */
+        .sidebar {
+            width: 300px;
+            background: var(--surface);
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .permission-pool {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 5px;
+        }
+
+        /* --- Draggable Permission Cards --- */
+        .permission-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            padding: 10px;
+            border-radius: 2px;
+            cursor: grab;
+            font-size: 0.9rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .permission-card:active {
+            cursor: grabbing;
+            transform: scale(0.98);
+        }
+
+        .permission-card.dragging {
+            opacity: 0.5;
+            background: #eef6ff;
+        }
+
+        /* --- Main Content (Users) --- */
+        .main-content {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .user-column {
+            background: var(--surface);
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow);
+        }
+
+        .user-header {
+            padding: 15px;
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .user-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .user-role {
+            font-weight: 600;
+            display: block;
+        }
+
+        .user-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .drop-zone {
+            flex: 1;
+            padding: 15px;
+            background: #faf9f8;
+            transition: background 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 200px;
+        }
+
+        .drop-zone.drag-over {
+            background: #eef6ff;
+            border: 2px dashed var(--primary);
+        }
+
+        /* --- Footer --- */
+        footer {
+            height: 60px;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 0 20px;
+            gap: 15px;
+        }
+
+        button {
+            padding: 8px 20px;
+            border-radius: 2px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .btn-reset {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-reset:hover {
+            background: #f3f2f1;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-submit:hover {
+            background: #005a9e;
+        }
+
+        /* --- Modal --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            width: 600px;
+            max-width: 90%;
+            border-radius: 4px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal h2 { margin-top: 0; }
+        
+        .score-bar {
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+        .score-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .feedback-list {
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .feedback-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+        .feedback-icon { font-weight: bold; }
+        .success { color: var(--success); }
+        .error { color: var(--error); }
+
+        /* Validation States for Exam Mode Results */
+        .correct-placement { border-left-color: var(--success) !important; background: #e6ffec !important; }
+        .wrong-placement { border-left-color: var(--error) !important; background: #ffe6e6 !important; }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">
+        <span>🔒 CloudIdentity</span>
+        <span style="font-weight:400; opacity:0.8;">| Access Governance Portal</span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="sidebar">
+        <h3>Available Permissions</h3>
+        <div class="permission-pool" id="permission-pool" ondrop="drop(event)" ondragover="allowDrop(event)">
+            </div>
+    </div>
+
+    <div class="main-content">
+        <div class="user-column">
+            <div class="user-header">
+                <span class="user-icon">👨‍💻</span>
+                <span class="user-role">Junior Developer</span>
+                <span class="user-desc">Needs code access. No prod access.</span>
+            </div>
+            <div class="drop-zone" id="role-dev" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+
+        <div class="user-column">
+            <div class="user-header">
+                <span class="user-icon">💰</span>
+                <span class="user-role">Payroll Specialist</span>
+                <span class="user-desc">Needs salary data. No admin rights.</span>
+            </div>
+            <div class="drop-zone" id="role-payroll" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+
+        <div class="user-column">
+            <div class="user-header">
+                <span class="user-icon">🛡️</span>
+                <span class="user-role">System Admin</span>
+                <span class="user-desc">Needs infrastructure control. Ethical boundaries apply.</span>
+            </div>
+            <div class="drop-zone" id="role-admin" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <button class="btn-reset" onclick="resetSimulation()">Reset All</button>
+    <button class="btn-submit" onclick="submitExam()">Submit Configuration</button>
+</footer>
+
+<div class="modal-overlay" id="resultModal">
+    <div class="modal">
+        <h2 id="modalTitle">Assessment Results</h2>
+        <p>Score: <span id="scoreText"></span></p>
+        <div class="score-bar"><div class="score-fill" id="scoreBar"></div></div>
+        
+        <div class="feedback-list" id="feedbackList">
+            </div>
+        
+        <div style="text-align: right;">
+            <button class="btn-submit" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Configuration ---
+    const permissions = [
+        { id: 'p1', text: 'Write Source Code', correctRole: 'role-dev' },
+        { id: 'p2', text: 'Read Repository', correctRole: 'role-dev' },
+        { id: 'p3', text: 'Deploy to Production', correctRole: 'trap', reason: 'TRAP: Junior Devs should not deploy to prod directly (Separation of Duties).' },
+        { id: 'p4', text: 'Process Payroll Batches', correctRole: 'role-payroll' },
+        { id: 'p5', text: 'View Employee Salaries', correctRole: 'role-payroll' },
+        { id: 'p6', text: 'Create New User Accounts', correctRole: 'role-admin' },
+        { id: 'p7', text: 'Configure Firewall Rules', correctRole: 'role-admin' },
+        { id: 'p8', text: 'Reset Any User Password', correctRole: 'role-admin' },
+        { id: 'p9', text: 'Read CEO Private Emails', correctRole: 'trap', reason: 'TRAP: Admin abuse. Violation of privacy/ethics policies.' },
+        { id: 'p10', text: 'Full Database Dump', correctRole: 'trap', reason: 'TRAP: High DLP risk. Rarely needed for routine roles.' }
+    ];
+
+    // Shuffle function
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // --- Initialization ---
+    function init() {
+        const pool = document.getElementById('permission-pool');
+        pool.innerHTML = '';
+        const zones = document.querySelectorAll('.drop-zone');
+        zones.forEach(z => z.innerHTML = '');
+
+        const shuffledParams = shuffle([...permissions]);
+
+        shuffledParams.forEach(p => {
+            const el = document.createElement('div');
+            el.className = 'permission-card';
+            el.draggable = true;
+            el.id = p.id;
+            el.innerText = p.text;
+            el.setAttribute('data-correct', p.correctRole);
+            
+            // Drag Events
+            el.addEventListener('dragstart', drag);
+            el.addEventListener('dragend', dragEnd);
+            
+            pool.appendChild(el);
+        });
+
+        // Reset Styles
+        document.querySelectorAll('.permission-card').forEach(c => {
+            c.classList.remove('correct-placement', 'wrong-placement');
+        });
+    }
+
+    // --- Drag & Drop Logic ---
+    function allowDrop(ev) {
+        ev.preventDefault();
+        if (ev.target.classList.contains('drop-zone') || ev.target.id === 'permission-pool') {
+            ev.target.classList.add('drag-over');
+        }
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+        ev.target.classList.add('dragging');
+    }
+
+    function dragEnd(ev) {
+        ev.target.classList.remove('dragging');
+        document.querySelectorAll('.drop-zone, .permission-pool').forEach(el => {
+            el.classList.remove('drag-over');
+        });
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const el = document.getElementById(data);
+        
+        // Handle dropping into a zone or back to pool
+        if (ev.target.classList.contains('drop-zone') || ev.target.id === 'permission-pool') {
+            ev.target.appendChild(el);
+            ev.target.classList.remove('drag-over');
+        } else if (ev.target.classList.contains('permission-card')) {
+            // If dropped on another card, append to parent container
+            ev.target.parentNode.appendChild(el);
+            ev.target.parentNode.classList.remove('drag-over');
+        }
+    }
+
+    // --- Submission Logic ---
+    function submitExam() {
+        let score = 0;
+        let totalItems = permissions.length; // Max possible points logic
+        // Actually, let's score based on: 
+        // +1 for Correct Placement
+        // -1 for Wrong Placement
+        // 0 for leaving a Trap in the pool (Correct behavior)
+        
+        let feedbackHTML = '';
+        let correctCount = 0;
+        let incorrectCount = 0;
+
+        permissions.forEach(p => {
+            const card = document.getElementById(p.id);
+            const parent = card.parentNode;
+            
+            const isAssigned = parent.classList.contains('drop-zone');
+            const assignedRole = parent.id;
+
+            if (p.correctRole === 'trap') {
+                if (isAssigned) {
+                    // BAD: User assigned a trap permission
+                    incorrectCount++;
+                    card.classList.add('wrong-placement');
+                    feedbackHTML += `<div class="feedback-item"><span class="feedback-icon error">✖</span> <div><strong>${p.text}</strong> was incorrectly assigned to <em>${getRoleName(assignedRole)}</em>. <br><small>${p.reason}</small></div></div>`;
+                } else {
+                    // GOOD: User left trap in pool
+                    correctCount++;
+                    // No visual change needed, they avoided the trap
+                }
+            } else {
+                if (assignedRole === p.correctRole) {
+                    // GOOD: Correct assignment
+                    correctCount++;
+                    card.classList.add('correct-placement');
+                    feedbackHTML += `<div class="feedback-item"><span class="feedback-icon success">✔</span> <div><strong>${p.text}</strong> correctly assigned.</div></div>`;
+                } else if (isAssigned && assignedRole !== p.correctRole) {
+                    // BAD: Assigned to wrong person
+                    incorrectCount++;
+                    card.classList.add('wrong-placement');
+                    feedbackHTML += `<div class="feedback-item"><span class="feedback-icon error">✖</span> <div><strong>${p.text}</strong> assigned to wrong role. Should be <em>${getRoleName(p.correctRole)}</em>.</div></div>`;
+                } else {
+                    // BAD: Left a required permission in the pool
+                    incorrectCount++;
+                    card.classList.add('wrong-placement'); // Highlight in pool to show it was missed
+                    feedbackHTML += `<div class="feedback-item"><span class="feedback-icon error">✖</span> <div><strong>${p.text}</strong> was left unassigned. Required for <em>${getRoleName(p.correctRole)}</em>.</div></div>`;
+                }
+            }
+        });
+
+        const finalScore = Math.round((correctCount / totalItems) * 100);
+        
+        // Show Modal
+        document.getElementById('scoreText').innerText = `${finalScore}% (${correctCount}/${totalItems})`;
+        document.getElementById('scoreBar').style.width = `${finalScore}%`;
+        
+        // Color the bar based on pass/fail
+        const bar = document.getElementById('scoreBar');
+        if(finalScore >= 85) bar.style.background = 'var(--success)';
+        else if(finalScore >= 70) bar.style.background = '#e0b000'; // warning yellow
+        else bar.style.background = 'var(--error)';
+
+        document.getElementById('feedbackList').innerHTML = feedbackHTML;
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+
+    function getRoleName(id) {
+        if(id === 'role-dev') return 'Junior Developer';
+        if(id === 'role-payroll') return 'Payroll Specialist';
+        if(id === 'role-admin') return 'Sys Admin';
+        return 'Permission Pool';
+    }
+
+    function closeModal() {
+        document.getElementById('resultModal').style.display = 'none';
+    }
+
+    function resetSimulation() {
+        if(confirm("Reset all placements?")) {
+            init();
+        }
+    }
+
+    // Start
+    window.onload = init;
+
+</script>
+
+</body>
+</html>

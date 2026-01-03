@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Firewall ACL Manager (v2.4.2)</title>
+    <style>
+        :root {
+            --header-bg: #2c3e50;
+            --panel-bg: #ecf0f1;
+            --border-color: #bdc3c7;
+            --header-text: #ecf0f1;
+            --table-header: #dfe6e9;
+            --row-hover: #b2bec3;
+            --accent: #2980b9;
+            --text: #2d3436;
+        }
+
+        body {
+            font-family: 'Tahoma', 'Verdana', sans-serif;
+            background-color: #95a5a6;
+            margin: 0;
+            padding: 20px;
+            color: var(--text);
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* --- Main Application Window --- */
+        .app-window {
+            background-color: #fff;
+            width: 100%;
+            height: 100%;
+            border: 1px solid #7f8c8d;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Header --- */
+        header {
+            background: linear-gradient(to bottom, #34495e, #2c3e50);
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #e67e22;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand { font-weight: bold; letter-spacing: 1px; }
+        .status { font-size: 0.8rem; color: #fab1a0; }
+
+        /* --- Layout --- */
+        .main-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* --- Left Panel (Scenario) --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+
+        .section-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+        }
+
+        h3 { margin-top: 0; font-size: 0.95rem; color: #2c3e50; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+
+        .object-list li { margin-bottom: 4px; font-family: monospace; }
+        
+        .req-list { padding-left: 20px; }
+        .req-list li { margin-bottom: 8px; }
+
+        /* --- Right Panel (Table) --- */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: white;
+        }
+
+        .toolbar {
+            padding: 8px;
+            background: #f1f2f6;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 5px;
+        }
+
+        button {
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid #95a5a6;
+            background: linear-gradient(#fff, #ecf0f1);
+            border-radius: 3px;
+        }
+        button:hover { background: #dfe6e9; }
+        button:active { background: #b2bec3; }
+
+        .btn-add { font-weight: bold; color: #006266; }
+        .btn-delete { color: #c0392b; }
+        .btn-submit { margin-left: auto; background: linear-gradient(#2ecc71, #27ae60); color: white; border-color: #27ae60; font-weight: bold; }
+        .btn-submit:hover { background: #2ecc71; }
+
+        /* --- The Data Table --- */
+        .table-container {
+            flex: 1;
+            overflow: auto;
+            padding: 10px;
+            background-color: #7f8c8d; /* Dark background behind table */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: linear-gradient(#ecf0f1, #bdc3c7);
+            padding: 6px;
+            text-align: left;
+            border: 1px solid #7f8c8d;
+            font-weight: bold;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            border: 1px solid #bdc3c7;
+            padding: 0;
+        }
+
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        tr:hover { background-color: #dff9fb; }
+
+        /* Visual Selected State */
+        .selected-row { background-color: #dff9fb !important; }
+
+        /* Input Styling within cells */
+        select, input {
+            width: 100%;
+            border: none;
+            padding: 8px;
+            background: transparent;
+            font-family: inherit;
+            font-size: inherit;
+            cursor: pointer;
+        }
+        select:focus, input:focus { outline: 2px solid var(--accent); background: white; }
+
+        .col-id { width: 40px; text-align: center; background: #ecf0f1; font-weight: bold; }
+        .col-action { width: 100px; }
+        .col-check { width: 30px; text-align: center; }
+
+        .action-deny { color: #c0392b; font-weight: bold; }
+        .action-allow { color: #27ae60; font-weight: bold; }
+
+        /* --- Modal --- */
+        .modal-overlay {
+            position: fixed; top:0; left:0; right:0; bottom:0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .modal {
+            background: white;
+            padding: 20px;
+            width: 400px;
+            border: 2px solid #2c3e50;
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.2);
+        }
+        .result-title { font-size: 1.2rem; margin-bottom: 10px; font-weight: bold; }
+        .success { color: #27ae60; }
+        .fail { color: #c0392b; }
+        .feedback-list { font-size: 0.9rem; margin: 15px 0; padding-left: 20px; }
+        .feedback-list li { margin-bottom: 5px; }
+
+    </style>
+</head>
+<body>
+
+<div class="app-window">
+    <header>
+        <div class="brand">🛡️ IronWall OS v8.2 - Policy Manager</div>
+        <div class="status">System Status: ONLINE | Mode: Read/Write</div>
+    </header>
+
+    <div class="main-body">
+        <div class="sidebar">
+            <div class="section-box">
+                <h3>Network Objects</h3>
+                <ul class="object-list" style="padding-left: 15px; margin: 0;">
+                    <li><strong>Any</strong> (0.0.0.0/0)</li>
+                    <li><strong>Web_Srv</strong> (192.168.1.10)</li>
+                    <li><strong>SQL_DB</strong> (10.0.0.5)</li>
+                    <li><strong>Admin_PC</strong> (10.0.0.100)</li>
+                    <li><strong>Int_LAN</strong> (10.0.0.0/24)</li>
+                </ul>
+            </div>
+
+            <div class="section-box">
+                <h3>Security Requirements</h3>
+                <ol class="req-list" style="margin: 0;">
+                    <li><strong>CRITICAL:</strong> Block <u>Telnet</u> traffic from ANY source immediately.</li>
+                    <li>Allow <strong>Public Internet</strong> (Any) to access the <strong>Web Server</strong> on HTTP/HTTPS.</li>
+                    <li>Allow the <strong>Web Server</strong> to query the <strong>Database</strong> (MySQL).</li>
+                    <li>Allow <strong>Admin_PC</strong> to manage <strong>Web_Srv</strong> via SSH.</li>
+                    <li>Ensure an <strong>Implicit Deny</strong> policy exists at the bottom.</li>
+                </ol>
+                <p style="font-size:0.8rem; color:#c0392b; margin-top:10px;">*Warning: Rules are processed top-down. The first match wins.*</p>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <div class="toolbar">
+                <button class="btn-add" onclick="addRule()">+ Add Rule</button>
+                <button onclick="moveUp()">▲ Move Up</button>
+                <button onclick="moveDown()">▼ Move Down</button>
+                <button class="btn-delete" onclick="deleteRule()">✖ Delete</button>
+                <button class="btn-submit" onclick="validatePolicy()">💾 Commit Policy</button>
+            </div>
+
+            <div class="table-container">
+                <table id="aclTable">
+                    <thead>
+                        <tr>
+                            <th class="col-check"></th>
+                            <th class="col-id">ID</th>
+                            <th>Source</th>
+                            <th>Destination</th>
+                            <th>Service (Port)</th>
+                            <th class="col-action">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="resultModal">
+    <div class="modal">
+        <div class="result-title" id="modalTitle">Validation Complete</div>
+        <div id="modalContent"></div>
+        <div style="text-align: right; margin-top: 20px;">
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- Data Definitions ---
+    const netObjects = ["Any", "Web_Srv", "SQL_DB", "Admin_PC", "Int_LAN"];
+    const services = [
+        "Any", 
+        "HTTP/HTTPS (80/443)", 
+        "SSH (22)", 
+        "Telnet (23)", 
+        "MySQL (3306)", 
+        "RDP (3389)"
+    ];
+    const actions = ["ALLOW", "DENY"];
+
+    // Initial State
+    let rules = [
+        { src: 'Any', dst: 'Any', svc: 'Any', action: 'DENY' } // Default implicit deny
+    ];
+
+    let selectedRowIndex = -1;
+
+    // --- Render Logic ---
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        rules.forEach((rule, index) => {
+            const tr = document.createElement('tr');
+            tr.id = `row-${index}`;
+            if (index === selectedRowIndex) tr.classList.add('selected-row');
+            
+            // Standard row click for non-input areas
+            tr.onclick = (e) => {
+                selectRow(index);
+            };
+
+            // Checkbox/Indicator
+            const tdCheck = document.createElement('td');
+            tdCheck.className = 'col-check';
+            tdCheck.innerHTML = selectedRowIndex === index ? '▶' : '';
+            tr.appendChild(tdCheck);
+
+            // ID
+            const tdId = document.createElement('td');
+            tdId.className = 'col-id';
+            tdId.innerText = index + 1;
+            tr.appendChild(tdId);
+
+            // Source
+            tr.appendChild(createSelectCell(index, 'src', netObjects, rule.src));
+            // Destination
+            tr.appendChild(createSelectCell(index, 'dst', netObjects, rule.dst));
+            // Service
+            tr.appendChild(createSelectCell(index, 'svc', services, rule.svc));
+            // Action
+            tr.appendChild(createSelectCell(index, 'action', actions, rule.action));
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function createSelectCell(index, field, options, currentValue) {
+        const td = document.createElement('td');
+        const select = document.createElement('select');
+        
+        options.forEach(opt => {
+            const el = document.createElement('option');
+            el.value = opt;
+            el.innerText = opt;
+            if (opt === currentValue) el.selected = true;
+            select.appendChild(el);
+        });
+
+        // Style coloring for Action
+        if (field === 'action') {
+            select.style.color = currentValue === 'DENY' ? '#c0392b' : '#27ae60';
+            select.style.fontWeight = 'bold';
+        }
+
+        // --- BUG FIX START ---
+        // Prevent click from propagating to TR (which causes re-render and closes dropdown)
+        select.onclick = (e) => {
+            e.stopPropagation(); // Stop bubbling
+            
+            // We still want to "select" this row logically so Up/Down buttons work
+            if (selectedRowIndex !== index) {
+                selectedRowIndex = index;
+                // Manually update visual selection without destroying DOM
+                updateVisualSelection();
+            }
+        };
+        // --- BUG FIX END ---
+
+        select.onchange = (e) => {
+            rules[index][field] = e.target.value;
+            renderTable(); // Re-render is fine here because selection is finished
+        };
+
+        td.appendChild(select);
+        return td;
+    }
+
+    // Helper to update highlighting without re-rendering
+    function updateVisualSelection() {
+        const rows = document.querySelectorAll('#tableBody tr');
+        rows.forEach((row, i) => {
+            if (i === selectedRowIndex) {
+                row.classList.add('selected-row');
+                row.querySelector('.col-check').innerHTML = '▶';
+            } else {
+                row.classList.remove('selected-row');
+                row.querySelector('.col-check').innerHTML = '';
+            }
+        });
+    }
+
+    // --- Interaction Logic ---
+    function selectRow(index) {
+        selectedRowIndex = index;
+        renderTable();
+    }
+
+    function addRule() {
+        const newRule = { src: 'Any', dst: 'Any', svc: 'Any', action: 'ALLOW' };
+        // Insert before the last rule (usually implicit deny)
+        if (rules.length > 0) {
+            rules.splice(rules.length - 1, 0, newRule);
+        } else {
+            rules.push(newRule);
+        }
+        renderTable();
+    }
+
+    function deleteRule() {
+        if (selectedRowIndex > -1) {
+            rules.splice(selectedRowIndex, 1);
+            selectedRowIndex = -1;
+            renderTable();
+        }
+    }
+
+    function moveUp() {
+        if (selectedRowIndex > 0) {
+            [rules[selectedRowIndex], rules[selectedRowIndex - 1]] = [rules[selectedRowIndex - 1], rules[selectedRowIndex]];
+            selectedRowIndex--;
+            renderTable();
+        }
+    }
+
+    function moveDown() {
+        if (selectedRowIndex > -1 && selectedRowIndex < rules.length - 1) {
+            [rules[selectedRowIndex], rules[selectedRowIndex + 1]] = [rules[selectedRowIndex + 1], rules[selectedRowIndex]];
+            selectedRowIndex++;
+            renderTable();
+        }
+    }
+
+    // --- Validation Logic (Same as before) ---
+    function validatePolicy() {
+        let score = 0;
+        let logs = [];
+        let criticalFail = false;
+
+        // 1. Check Telnet Block
+        let telnetBlocked = false;
+        let telnetIndex = -1;
+
+        for (let i = 0; i < rules.length; i++) {
+            const r = rules[i];
+            const srcMatch = (r.src === 'Any');
+            const dstMatch = (r.dst === 'Any' || r.dst === 'Web_Srv' || r.dst === 'SQL_DB' || r.dst === 'Admin_PC'); 
+            const svcMatch = (r.svc === 'Telnet (23)' || r.svc === 'Any');
+
+            if (srcMatch && dstMatch && svcMatch) {
+                if (r.action === 'DENY') {
+                    telnetBlocked = true;
+                    telnetIndex = i;
+                    logs.push("✅ Telnet is explicitly denied.");
+                } else {
+                    logs.push("❌ CRITICAL: Telnet is ALLOWED by rule #" + (i+1));
+                    criticalFail = true;
+                }
+                break; 
+            }
+        }
+        if (!telnetBlocked && !criticalFail) {
+             logs.push("⚠️ Telnet blocked by implicit deny, but explicit rule preferred for requirement.");
+        }
+
+        // 2. Check HTTP Access (Any -> Web_Srv : 80/443)
+        let httpAllowed = false;
+        for (let i = 0; i < rules.length; i++) {
+            const r = rules[i];
+            if (r.action === 'ALLOW' && r.src === 'Any' && r.dst === 'Web_Srv' && (r.svc === 'HTTP/HTTPS (80/443)' || r.svc === 'Any')) {
+                // Should check if blocked by prior rule, but assuming good faith ordering for basic test
+                httpAllowed = true;
+                break;
+            }
+        }
+        if(httpAllowed) logs.push("✅ Web Server is accessible from Internet.");
+        else { logs.push("❌ Web Server is NOT accessible (Missing Allow Rule)."); criticalFail = true; }
+
+        // 3. Check Web -> DB
+        let dbAllowed = false;
+        for (let i = 0; i < rules.length; i++) {
+            const r = rules[i];
+            if (r.action === 'ALLOW' && r.src === 'Web_Srv' && r.dst === 'SQL_DB' && (r.svc === 'MySQL (3306)' || r.svc === 'Any')) {
+                dbAllowed = true;
+                break;
+            }
+        }
+        if(dbAllowed) logs.push("✅ Web Server can access Database.");
+        else { logs.push("❌ Web Server cannot access Database."); criticalFail = true; }
+
+        // 4. Check SSH (Admin -> Web)
+        let sshAllowed = false;
+        for (let i = 0; i < rules.length; i++) {
+            const r = rules[i];
+            if (r.action === 'ALLOW' && r.src === 'Admin_PC' && r.dst === 'Web_Srv' && (r.svc === 'SSH (22)' || r.svc === 'Any')) {
+                sshAllowed = true;
+                break;
+            }
+        }
+        if(sshAllowed) logs.push("✅ Admin can SSH to Web Server.");
+        else { logs.push("❌ Admin SSH access missing."); criticalFail = true; }
+
+        // 5. Implicit Deny
+        const lastRule = rules[rules.length - 1];
+        if (lastRule.src === 'Any' && lastRule.dst === 'Any' && lastRule.svc === 'Any' && lastRule.action === 'DENY') {
+            logs.push("✅ Implicit Deny exists at the bottom.");
+        } else {
+            logs.push("❌ Final rule is NOT 'Deny Any Any'. Default Allow is dangerous!");
+            criticalFail = true;
+        }
+
+        // Result Display
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        
+        modalTitle.innerText = criticalFail ? "❌ Policy Check Failed" : "✅ Policy Verified Secure";
+        modalTitle.style.color = criticalFail ? "#c0392b" : "#27ae60";
+
+        let html = '<ul class="feedback-list">';
+        logs.forEach(l => html += `<li>${l}</li>`);
+        html += '</ul>';
+        modalContent.innerHTML = html;
+
+        document.getElementById('resultModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('resultModal').style.display = 'none';
+    }
+
+    // Initialize
+    renderTable();
+
+</script>
+
+</body>
+</html>
