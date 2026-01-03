@@ -12,37 +12,19 @@ const SecurityPlusPBQs = () => {
   // PLACEHOLDER DATA: Update these paths to match your actual files in 'public/security-pbqs'
   const pbqs = [
     { 
-      /*
+      
       id: 1, 
-      title: 'In progress...', 
-      file: './security-pbqs/firewall-config-pbq-1.html', 
-      description: 'Most likely will be about ACLs.' 
+      title: 'Identity Access Management', 
+      file: '../public/security-pbqs/iam-pbq-1.html', 
+      description: 'Assign the correct permissions based on "Least Privilege."' 
     },
     
     { 
       id: 2, 
-      title: 'Vulnerability Scanning', 
-      file: '/security-pbqs/vuln-scan-pbq-2.html', 
-      description: 'Analyze vulnerability scan logs and prioritize remediation.' 
+      title: 'Firewall ACL Configuration', 
+      file: '../public/security-pbqs/firewall-acl-pbq-2.html', 
+      description: 'Secure a network by assigning correct action (allow/deny) for specific traffic flows.' 
     },
-    { 
-      id: 3, 
-      title: 'Secure Wireless Setup', 
-      file: '/security-pbqs/wireless-setup-pbq-3.html', 
-      description: 'Configure WPA3 enterprise and RADIUS authentication.' 
-    },
-    { 
-      id: 4, 
-      title: 'Incident Response', 
-      file: '/security-pbqs/incident-response-pbq-4.html', 
-      description: 'Identify indicators of compromise (IoC) and isolate affected systems.' 
-    },
-    { 
-      id: 5, 
-      title: 'Data Privacy Controls', 
-      file: '/security-pbqs/data-privacy-pbq-5.html', 
-      description: 'Implement DLP policies and classify sensitive data types.' 
-    },*/}
   ];
 
   const handleOpenInNewTab = () => {
@@ -65,7 +47,7 @@ const SecurityPlusPBQs = () => {
             iconColor="blue"
             title="Security+ PBQs"
             subtitle="SY0-701 // PERFORMANCE BASED QUESTIONS"
-            description="[In progress...] Select a PBQ from the list below to begin. Each simulation tests practical skills required for the Security+ exam."
+            description="Select a PBQ from the list below to begin. Each simulation tests practical skills required for the Security+ exam."
           />
 
           {/* Main Layout: Sidebar + Viewer */}

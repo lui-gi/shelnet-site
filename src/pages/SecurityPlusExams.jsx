@@ -13,12 +13,11 @@ const SecurityPlusExams = () => {
   const exams = [
     { 
       id: 1, 
-      title: 'Security+ SY0-701 Practice Exam 1', 
-      // Ensure you create this folder and file in 'public'
-      file: '/sec-exams/practice-exam-1.html', 
-      description: '90 Questions covering General Security Concepts, Threats, Vulnerabilities, and Architecture.' 
+      title: 'Security+ SY0-701 Practice Quiz 1.1', 
+      file: '/security-exams/practice-quiz-1.html', 
+      description: '15 Questions covering Objective 1.1 [Compare and contrast various types of security controls]' 
     },
-    // Add more exams here in the future
+    // Plannig to add exam 1 later.. quiz will do for now
   ];
 
   const handleOpenInNewTab = () => {

@@ -13,15 +13,11 @@ const AboutSection = () => {
           <div className="grid md:grid-cols-[1fr_200px] gap-12 items-start">
              <div className="space-y-6 text-lg text-white/80 font-light leading-relaxed">
                <p>
-                 Created by a cybersecurity student, this site began as a private repository to track my own 
+                 Created by a university cybersecurity student, this site began as a private repository to track my own 
                  learning progress. After realizing how difficult it is to find high-quality, truly free 
                  educational materials, I decided to open-source my notes to provide a 
-                 barrier-free platform for everyone.
-                </p>
-                <p>
-                  Unlike platforms that hide content behind signups or paywalls, Shelnet runs entirely 
-                  client-side in your browser. We are committed to a privacy-first experience,
-                   which means no tracking, no data collection, and no logins required.
+                 barrier-free platform for everyone. Moreover, I became a firm believer in learning through teaching. 
+                 That way, we all can succeed as we move towards careers in cybersecurity.
                 </p>
              </div>
 
