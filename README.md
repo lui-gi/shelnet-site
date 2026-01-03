@@ -40,6 +40,7 @@ Shelnet is an evolving project with a growing roadmap of educational content. Up
 
 ## Future Implementations
 
+* **"What I'm Currently Learning":** Fully transparent learning journey, links to an external database that hosts my Obsidian vault of notes
 * **SPA Optimization:** Separate educational content (main/landing) from about/connect (info page)
 * **Site size:** Optimize site loading times as the number of resources increase
 * **External DB for resources:** Eventually implement pulling resource assets from database
