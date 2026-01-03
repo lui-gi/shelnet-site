@@ -15,14 +15,14 @@ const SecurityPlusPBQs = () => {
       
       id: 1, 
       title: 'Identity Access Management', 
-      file: '../public/security-pbqs/iam-pbq-1.html', 
+      file: './security-pbqs/iam-pbq-1.html', 
       description: 'Assign the correct permissions based on "Least Privilege."' 
     },
     
     { 
       id: 2, 
       title: 'Firewall ACL Configuration', 
-      file: '../public/security-pbqs/firewall-acl-pbq-2.html', 
+      file: './security-pbqs/firewall-acl-pbq-2.html', 
       description: 'Secure a network by assigning correct action (allow/deny) for specific traffic flows.' 
     },
   ];
