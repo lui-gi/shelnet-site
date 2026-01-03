@@ -39,7 +39,7 @@ const SecurityPlusExams = () => {
             iconColor="blue"
             title="Security+ Exams"
             subtitle="SY0-701 // FULL SIMULATIONS"
-            description="Full-length practice exams for CompTIA Security+. Select an exam or quiz from the list to initialize the secure environment."
+            description="Full-length practice exams. Select an exam or quiz from the list to begin."
           />
 
           {/* MAIN LAYOUT GRID */}

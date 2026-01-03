@@ -17,8 +17,8 @@ const ExamsSection = () => {
               <div>
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-1">A+ Core 2 Full Exam</h3>
-                    <div className="text-sm text-white/50 font-mono">90 questions</div>
+                    <h3 className="text-2xl font-bold text-white mb-1">A+ Core 2 Exams</h3>
+                    <div className="text-sm text-white/50 font-mono">Custom-made practice exams/quizzes</div>
                   </div>
                   <div className="text-lg font-mono text-white/40">[220-1202]</div>
                 </div>
@@ -46,12 +46,11 @@ const ExamsSection = () => {
               <div className="border border-white/10 bg-black p-4 font-mono text-sm">
                  <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type a-plus</div>
                  <div className="text-green-500 mb-4">Generating question pool... Done.</div>
-                 {/* UPDATED LINK HERE */}
                  <Link
                    to="/a-plus-exams"
                    className="block w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center uppercase"
                  >
-                   Launch Exam
+                   Launch Exams
                  </Link>
               </div>
            </div>
@@ -61,8 +60,8 @@ const ExamsSection = () => {
               <div>
                 <div className="flex justify-between items-start mb-6">
                   <div>
-                    <h3 className="text-2xl font-bold text-white mb-1">Security+ Full Exam</h3>
-                    <div className="text-sm text-white/50 font-mono">90 questions</div>
+                    <h3 className="text-2xl font-bold text-white mb-1">Security+ Exams</h3>
+                    <div className="text-sm text-white/50 font-mono">Custom-made practice exams/quizzes</div>
                   </div>
                   <div className="text-lg font-mono text-white/40">[SY0-701]</div>
                 </div>
@@ -98,7 +97,7 @@ const ExamsSection = () => {
                     to="/security-plus-exams"
                     className="block w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center uppercase"
                   >
-                    Launch Exam
+                    Launch Exams
                   </Link>
               </div>
            </div>

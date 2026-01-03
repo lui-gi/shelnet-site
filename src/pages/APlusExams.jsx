@@ -38,7 +38,7 @@ const APlusExams = () => {
             iconColor="green"
             title="A+ Core 2 Exams"
             subtitle="220-1202 // FULL SIMULATIONS"
-            description="Full-length practice exams. Select an exam or quiz from the list to initialize the terminal environment."
+            description="Full-length practice exams. Select an exam or quiz from the list to begin."
           />
 
           {/* MAIN LAYOUT GRID */}
