@@ -66,6 +66,7 @@ const Layout = () => {
             {/* Links updated to work from any page */}
             <a href="/#pbqs" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">PBQs</a>
             <a href="/#exams" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">Exams</a>
+            <a href="/#notes" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">Notes</a>
             <a href="/#about" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">About</a>
             <a href="/#connect" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">Connect</a>
           </div>
@@ -102,6 +103,13 @@ const Layout = () => {
             className="block w-full py-4 px-6 text-white/60 hover:text-white hover:bg-white/5 transition-colors border-b border-white/5 font-mono text-sm"
           >
             Exams
+          </a>
+          <a
+            href="/#notes"
+            onClick={() => setIsMenuOpen(false)}
+            className="block w-full py-4 px-6 text-white/60 hover:text-white hover:bg-white/5 transition-colors border-b border-white/5 font-mono text-sm"
+          >
+            Notes
           </a>
           <a
             href="/#about"
