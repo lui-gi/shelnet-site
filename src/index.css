@@ -9,3 +9,39 @@ body {
   background-color: #000000;
   color: #fff;
 }
+
+/* Custom scrollbar styling - brutalist dark theme with green accents */
+@layer base {
+  /* Standard properties (Firefox 64+, Chrome 121+) */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: #22c55e #000000;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge) */
+  @supports selector(::-webkit-scrollbar) {
+    ::-webkit-scrollbar {
+      @apply w-2 h-2;
+    }
+
+    ::-webkit-scrollbar-track {
+      @apply bg-black border border-white/10;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      @apply bg-green-500 rounded;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      @apply bg-green-400;
+    }
+
+    ::-webkit-scrollbar-thumb:active {
+      @apply bg-green-600;
+    }
+
+    ::-webkit-scrollbar-corner {
+      @apply bg-black;
+    }
+  }
+}
