@@ -12,23 +12,23 @@ const AboutSection = () => {
           {/* Story Content */}
           <div className="max-w-4xl mx-auto space-y-6 text-lg text-white/80 font-light leading-relaxed">
             <p>
-              Shelnet began as a private repository—a personal collection of notes created by a university
-              cybersecurity student trying to make sense of dense certification material. What started as
-              scattered Obsidian notes slowly evolved into a structured learning system, born out of necessity
-              and late-night study sessions.
+              Shelnet began as a private repository where I tracked my progress as a university student passionate 
+              about cybersecurity. It started as a personal tool to solidify my understanding, however I realized just 
+              how hard it is to find study materials that are high-quality, up-to-date, and actually free.
             </p>
             <p>
-              The turning point came when searching for practice questions and resources. Behind every
-              promising link was a paywall, a subscription, or worse—low-quality content disguised as
-              "premium." The frustration was real: why should quality education be locked behind barriers?
-              That's when the decision was made to open-source everything and build a platform that would
-              remain free, forever.
+              The turning point came when I went searching for practice questions and resources. Every resource I came across online
+              was either outdated, not true to the exam content, or a paid resource. That's when I made the decision to open-source
+              all of my notes and study resources. To ensure this knowledge remains accessible, I designed Shelnet to run 
+              entirely client-side. Unlike other 'free' resources that harvest data or hide content, we are fully open-source and 
+              privacy-first.
+              
             </p>
             <p>
-              Today, Shelnet stands as proof that learning through teaching works. By sharing my journey
-              publicly—mistakes, breakthroughs, and all—we create a resource that grows stronger with each
-              certification, each topic explored, each concept understood. This isn't just about passing exams;
-              it's about building a barrier-free foundation for everyone pursuing cybersecurity.
+              Today, Shelnet is proof that learning through teaching works. By sharing my learning journey
+              publicly, including all my mistakes and breakthroughs, I hope to create a living resource that grows with us. 
+              Shelnet is now about building a barrier-free community where anyone can break into 
+              tech without having to pay for the privilege.
             </p>
           </div>
 
