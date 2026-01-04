@@ -4,11 +4,12 @@ const introText = `Shelnet is a free study hub for all things cybersecurity.
 
 Contents:
 • Completely free, self-made practice PBQs and Exams
-• Core concept visualizations
-• YouTube tutorials for the above
+• YouTube walkthroughs
+• A searchable, live-synced archive of my personal notes
 
-News 12/6/25:
-• Opened Core 2 Exam 1. Working on Security+ resources.`;
+
+News 1/4/26:
+• Released Security+ resources and my personal notes.`;
 
 const commands = [
   { cmd: 'whoami', out: 'shelnet' },
