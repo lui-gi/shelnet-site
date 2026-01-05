@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Layers } from 'lucide-react';
 import GridBackground from '../shared/GridBackground';
 import BrutalHeader from '../shared/BrutalHeader';
-import SpinningKey from '../animations/SpinningKey';
+import ScanningWordCloud from '../animations/ScanningWordCloud';
 
 const VisualizationsSection = () => {
   return (
@@ -24,9 +24,9 @@ const VisualizationsSection = () => {
                   <Layers size={48} strokeWidth={1} className="text-purple-400" />
                 </div>
               </div>
-              {/* Spinning Key Animation */}
+              {/* Scanning Word Cloud Animation */}
               <div className="flex justify-center items-center my-12">
-                <SpinningKey />
+                <ScanningWordCloud />
               </div>
             </div>
 
