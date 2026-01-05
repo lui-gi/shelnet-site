@@ -102,7 +102,7 @@ function getStaleCache() {
   try {
     const cached = sessionStorage.getItem(MANIFEST_CACHE_KEY);
     return cached ? JSON.parse(cached) : null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -147,7 +147,8 @@ export function transformManifestResources(resources, resourceType) {
     'aPlusPBQs': 'practice-pbqs/a-plus',
     'securityPlusPBQs': 'practice-pbqs/security-plus',
     'aPlusExams': 'practice-exams/a-plus',
-    'securityPlusExams': 'practice-exams/security-plus'
+    'securityPlusExams': 'practice-exams/security-plus',
+    'visualizations': 'visualizations'
   };
 
   const basePath = pathMap[resourceType];
@@ -159,7 +160,7 @@ export function transformManifestResources(resources, resourceType) {
   return resources.map(resource => ({
     id: resource.id,
     title: resource.title,
-    file: `${baseUrl}/${basePath}/${resource.filename}`,
+    file: `${baseUrl}/${basePath}/${resource.filename || resource.file}`,
     description: resource.description
   }));
 }

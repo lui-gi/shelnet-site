@@ -7,6 +7,7 @@ import APlusPBQs from './pages/a-plus-pbqs.jsx'
 import SecurityPlusPBQs from './pages/SecurityPlusPBQs.jsx'
 import APlusExams from './pages/APlusExams.jsx'
 import SecurityPlusExams from './pages/SecurityPlusExams.jsx'
+import Visualizations from './pages/Visualizations.jsx'
 import Layout from './Layout.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -18,7 +19,8 @@ createRoot(document.getElementById('root')).render(
            <Route path="/a-plus-pbqs" element={<APlusPBQs />} />
            <Route path="/security-plus-pbqs" element={<SecurityPlusPBQs />} />
            <Route path="/a-plus-exams" element={<APlusExams />} />
-           <Route path="/security-plus-exams" element={<SecurityPlusExams />} /> 
+           <Route path="/security-plus-exams" element={<SecurityPlusExams />} />
+           <Route path="/visualizations" element={<Visualizations />} />
         </Route>
       </Routes>
     </BrowserRouter>

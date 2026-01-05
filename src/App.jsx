@@ -2,6 +2,7 @@ import BinaryRain from './components/animations/BinaryRain';
 import HeroSection from './components/home/HeroSection';
 import PBQsSection from './components/home/PBQsSection';
 import ExamsSection from './components/home/ExamsSection';
+import VisualizationsSection from './components/home/VisualizationsSection';
 import NotesSection from './components/home/NotesSection';
 import AboutSection from './components/home/AboutSection';
 import ConnectSection from './components/home/ConnectSection';
@@ -18,6 +19,7 @@ export default function App() {
       <HeroSection />
       <PBQsSection />
       <ExamsSection />
+      <VisualizationsSection />
       <NotesSection />
       <AboutSection />
       <ConnectSection />
