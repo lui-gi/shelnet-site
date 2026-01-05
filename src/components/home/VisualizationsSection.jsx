@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Layers } from 'lucide-react';
 import GridBackground from '../shared/GridBackground';
 import BrutalHeader from '../shared/BrutalHeader';
+import SpinningKey from '../animations/SpinningKey';
 
 const VisualizationsSection = () => {
   return (
@@ -23,19 +24,9 @@ const VisualizationsSection = () => {
                   <Layers size={48} strokeWidth={1} className="text-purple-400" />
                 </div>
               </div>
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center space-x-3 text-white/70">
-                  <span className="text-purple-500 font-mono">01.</span>
-                  <span>Public Key Cryptography</span>
-                </div>
-                <div className="flex items-center space-x-3 text-white/70">
-                  <span className="text-purple-500 font-mono">02.</span>
-                  <span>Network Attack Vectors</span>
-                </div>
-                <div className="flex items-center space-x-3 text-white/70">
-                  <span className="text-purple-500 font-mono">03.</span>
-                  <span>Authentication Flows</span>
-                </div>
+              {/* Spinning Key Animation */}
+              <div className="flex justify-center items-center my-12">
+                <SpinningKey />
               </div>
             </div>
 
