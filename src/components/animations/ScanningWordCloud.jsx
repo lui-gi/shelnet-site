@@ -1,3 +1,5 @@
+import { useState, useEffect, useRef } from 'react';
+
 const words = [
   // Row 1 (y: 10-15%)
   { text: 'FIREWALL', x: 8, y: 12, size: 0.75 },
@@ -40,6 +42,65 @@ const words = [
   { text: 'THREAT INTEL', x: 68, y: 90, size: 0.5 },
 ];
 
+// Glitch character set for random character substitution
+const GLITCH_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?~';
+
+// Component for individual glitched word
+const GlitchedWord = ({ word, x, y, size }) => {
+  const [displayText, setDisplayText] = useState(word);
+  const isMounted = useRef(true);
+  const cycleStartTime = useRef(Date.now());
+
+  useEffect(() => {
+    isMounted.current = true;
+    cycleStartTime.current = Date.now();
+
+    const glitchText = (text) => {
+      return text.split('').map((char) => {
+        if (char === ' ' || char === '-' || char === '/') return char;
+        return Math.random() > 0.7 ? char : GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+      }).join('');
+    };
+
+    const updateText = () => {
+      if (!isMounted.current) return;
+
+      const elapsed = (Date.now() - cycleStartTime.current) % 3000;
+      const scanReachTime = (x / 100) * 3000;
+      const revealStart = scanReachTime;
+      const revealEnd = scanReachTime + 650; // Show correct for ~650ms
+
+      if (elapsed >= revealStart && elapsed <= revealEnd) {
+        setDisplayText(word);
+      } else {
+        setDisplayText(glitchText(word));
+      }
+    };
+
+    // Update glitch every 50ms
+    const interval = setInterval(updateText, 50);
+
+    return () => {
+      isMounted.current = false;
+      clearInterval(interval);
+    };
+  }, [word, x]);
+
+  return (
+    <span
+      className="word absolute font-mono font-bold text-purple-400"
+      style={{
+        left: `${x}%`,
+        top: `${y}%`,
+        fontSize: `${size}rem`,
+        animationDelay: `${(x / 100) * 3}s`,
+      }}
+    >
+      {displayText}
+    </span>
+  );
+};
+
 const ScanningWordCloud = () => {
   return (
     <div className="relative w-full h-[200px] overflow-hidden">
@@ -49,18 +110,13 @@ const ScanningWordCloud = () => {
       {/* Word Cloud */}
       <div className="absolute inset-0">
         {words.map((word, idx) => (
-          <span
+          <GlitchedWord
             key={idx}
-            className="word absolute font-mono font-bold text-purple-400"
-            style={{
-              left: `${word.x}%`,
-              top: `${word.y}%`,
-              fontSize: `${word.size}rem`,
-              animationDelay: `${(word.x / 100) * 3}s`,
-            }}
-          >
-            {word.text}
-          </span>
+            word={word.text}
+            x={word.x}
+            y={word.y}
+            size={word.size}
+          />
         ))}
       </div>
 
