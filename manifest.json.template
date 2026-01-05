@@ -1,0 +1,68 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-01-05T00:00:00Z",
+  "resources": {
+    "aPlusPBQs": [
+      {
+        "id": 1,
+        "title": "Network Connectivity",
+        "filename": "network-connectivity-pbq-1.html",
+        "description": "Diagnose and repair internet connection issues using CLI tools."
+      },
+      {
+        "id": 2,
+        "title": "Boot Repair",
+        "filename": "boot-repair-pbq-2.html",
+        "description": "Troubleshoot \"Boot Device Not Found\" errors and fix MBR."
+      },
+      {
+        "id": 3,
+        "title": "Suspicious Services",
+        "filename": "suspicious-services-pbq-3.html",
+        "description": "Stop malicious services using Windows Task Manager."
+      },
+      {
+        "id": 4,
+        "title": "Phishing Investigation",
+        "filename": "phishing-pbq-4.html",
+        "description": "Analyze emails to identify social engineering attacks."
+      },
+      {
+        "id": 5,
+        "title": "Disk Management",
+        "filename": "disk-management-pbq-5.html",
+        "description": "Partition, format, and rename volumes safely."
+      }
+    ],
+    "securityPlusPBQs": [
+      {
+        "id": 1,
+        "title": "Identity Access Management",
+        "filename": "iam-pbq-1.html",
+        "description": "Assign the correct permissions based on \"Least Privilege.\""
+      },
+      {
+        "id": 2,
+        "title": "Firewall ACL Configuration",
+        "filename": "firewall-acl-pbq-2.html",
+        "description": "Secure a network by assigning correct action (allow/deny) for specific traffic flows."
+      }
+    ],
+    "aPlusExams": [
+      {
+        "id": 1,
+        "title": "Core 2 Practice Exam 1 (220-1202)",
+        "filename": "practice-exam-1.html",
+        "description": "90 Questions covering Operating Systems, Security, Software Troubleshooting, and Operational Procedures."
+      }
+    ],
+    "securityPlusExams": [
+      {
+        "id": 1,
+        "title": "Security+ SY0-701 Practice Quiz 1.1",
+        "filename": "practice-quiz-1.html",
+        "description": "15 Questions covering Objective 1.1 [Compare and contrast various types of security controls]"
+      }
+    ]
+  }
+}

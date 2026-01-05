@@ -1,23 +1,17 @@
 import { useState } from 'react';
-import { Shield, Play } from 'lucide-react';
+import { Shield, Play, AlertCircle, Loader2 } from 'lucide-react';
 import PageHeader from '../components/shared/PageHeader';
 import GridBackground from '../components/shared/GridBackground';
 import PBQSidebar from '../components/shared/PBQSidebar';
 import ContentViewer from '../components/shared/ContentViewer';
-import { convertLegacyPath } from '../utils/resourcePaths';
+import { useManifest } from '../utils/useManifest';
 
 const SecurityPlusExams = () => {
   const [selectedExam, setSelectedExam] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const exams = [
-    {
-      id: 1,
-      title: 'Security+ SY0-701 Practice Quiz 1.1',
-      file: convertLegacyPath('/security-exams/practice-quiz-1.html'),
-      description: '15 Questions covering Objective 1.1 [Compare and contrast various types of security controls]'
-    },
-  ];
+  // Load exams from manifest
+  const { resources: exams, loading, error } = useManifest('securityPlusExams');
 
   const handleOpenInNewTab = () => {
     if (selectedExam) {
@@ -41,8 +35,35 @@ const SecurityPlusExams = () => {
             description="Full-length practice exams. Select an exam or quiz from the list to begin."
           />
 
-          {/* MAIN LAYOUT GRID */}
-          <div className={`grid gap-6 transition-all duration-300 ${isFullscreen ? 'grid-cols-1' : 'lg:grid-cols-[300px_1fr]'}`}>
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <Loader2 size={48} className="mx-auto mb-4 text-blue-500 animate-spin" />
+                <div className="font-mono text-sm text-white/60">Loading exams...</div>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="border border-red-500/50 bg-red-500/10 p-6 mb-6">
+              <div className="flex items-start gap-3">
+                <AlertCircle size={24} className="text-red-500 flex-shrink-0" />
+                <div>
+                  <div className="font-bold text-red-400 mb-2">Failed to Load Resources</div>
+                  <div className="text-sm text-white/70">{error}</div>
+                  <div className="text-xs text-white/50 mt-2">
+                    Please check your connection and try refreshing the page.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* MAIN LAYOUT GRID - Only show when loaded */}
+          {!loading && !error && (
+            <div className={`grid gap-6 transition-all duration-300 ${isFullscreen ? 'grid-cols-1' : 'lg:grid-cols-[300px_1fr]'}`}>
 
             {/* SIDEBAR (Hidden in fullscreen) */}
             {!isFullscreen && (
@@ -76,7 +97,8 @@ const SecurityPlusExams = () => {
               showSandbox={true}
             />
 
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

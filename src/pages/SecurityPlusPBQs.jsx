@@ -1,29 +1,17 @@
 import { useState } from 'react';
-import { Terminal, Shield } from 'lucide-react';
+import { Terminal, Shield, AlertCircle, Loader2 } from 'lucide-react';
 import PageHeader from '../components/shared/PageHeader';
 import GridBackground from '../components/shared/GridBackground';
 import PBQSidebar from '../components/shared/PBQSidebar';
 import ContentViewer from '../components/shared/ContentViewer';
-import { convertLegacyPath } from '../utils/resourcePaths';
+import { useManifest } from '../utils/useManifest';
 
 const SecurityPlusPBQs = () => {
   const [selectedPBQ, setSelectedPBQ] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const pbqs = [
-    {
-      id: 1,
-      title: 'Identity Access Management',
-      file: convertLegacyPath('./security-pbqs/iam-pbq-1.html'),
-      description: 'Assign the correct permissions based on "Least Privilege."'
-    },
-    {
-      id: 2,
-      title: 'Firewall ACL Configuration',
-      file: convertLegacyPath('./security-pbqs/firewall-acl-pbq-2.html'),
-      description: 'Secure a network by assigning correct action (allow/deny) for specific traffic flows.'
-    },
-  ];
+  // Load PBQs from manifest
+  const { resources: pbqs, loading, error } = useManifest('securityPlusPBQs');
 
   const handleOpenInNewTab = () => {
     if (selectedPBQ) {
@@ -48,8 +36,35 @@ const SecurityPlusPBQs = () => {
             description="Select a PBQ from the list below to begin. Each simulation tests practical skills required for the Security+ exam."
           />
 
-          {/* Main Layout: Sidebar + Viewer */}
-          <div className={`grid gap-6 transition-all duration-300 ${isFullscreen ? 'grid-cols-1' : 'lg:grid-cols-[300px_1fr]'}`}>
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <Loader2 size={48} className="mx-auto mb-4 text-blue-500 animate-spin" />
+                <div className="font-mono text-sm text-white/60">Loading simulations...</div>
+              </div>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="border border-red-500/50 bg-red-500/10 p-6 mb-6">
+              <div className="flex items-start gap-3">
+                <AlertCircle size={24} className="text-red-500 flex-shrink-0" />
+                <div>
+                  <div className="font-bold text-red-400 mb-2">Failed to Load Resources</div>
+                  <div className="text-sm text-white/70">{error}</div>
+                  <div className="text-xs text-white/50 mt-2">
+                    Please check your connection and try refreshing the page.
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Main Layout: Sidebar + Viewer - Only show when loaded */}
+          {!loading && !error && (
+            <div className={`grid gap-6 transition-all duration-300 ${isFullscreen ? 'grid-cols-1' : 'lg:grid-cols-[300px_1fr]'}`}>
 
             {/* Sidebar - PBQ List */}
             {!isFullscreen && (
@@ -78,7 +93,8 @@ const SecurityPlusPBQs = () => {
               fullscreenHeight="90vh"
             />
 
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
