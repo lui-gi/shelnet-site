@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
+import { useNews } from '../../utils/useNews';
 
-const introText = `Shelnet is a free study hub for all things cybersecurity.
+const BASE_INTRO_TEXT = `Shelnet is a free study hub for all things cybersecurity.
 
 Contents:
 • Completely free, self-made practice PBQs and Exams
 • YouTube walkthroughs
 • A searchable, live-synced archive of my personal notes
 
+`;
 
-News 1/4/26:
+const FALLBACK_NEWS = `News 1/4/26:
 • Released Security+ resources and my personal notes.`;
 
 const commands = [
@@ -19,6 +21,11 @@ const commands = [
 ];
 
 const TerminalComponent = () => {
+  const { newsText, loading, error } = useNews();
+
+  // Build intro text dynamically
+  const introText = BASE_INTRO_TEXT + (newsText || FALLBACK_NEWS);
+
   const [typedCmd, setTypedCmd] = useState('');
   const [output, setOutput] = useState(null); // null = hidden, string = visible
   const [showCursor, setShowCursor] = useState(true);
