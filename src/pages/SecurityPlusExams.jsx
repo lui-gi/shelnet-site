@@ -4,20 +4,19 @@ import PageHeader from '../components/shared/PageHeader';
 import GridBackground from '../components/shared/GridBackground';
 import PBQSidebar from '../components/shared/PBQSidebar';
 import ContentViewer from '../components/shared/ContentViewer';
+import { convertLegacyPath } from '../utils/resourcePaths';
 
 const SecurityPlusExams = () => {
   const [selectedExam, setSelectedExam] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // DATA: This points to the file in your /public/sec-exams/ folder
   const exams = [
-    { 
-      id: 1, 
-      title: 'Security+ SY0-701 Practice Quiz 1.1', 
-      file: '/security-exams/practice-quiz-1.html', 
-      description: '15 Questions covering Objective 1.1 [Compare and contrast various types of security controls]' 
+    {
+      id: 1,
+      title: 'Security+ SY0-701 Practice Quiz 1.1',
+      file: convertLegacyPath('/security-exams/practice-quiz-1.html'),
+      description: '15 Questions covering Objective 1.1 [Compare and contrast various types of security controls]'
     },
-    // Plannig to add exam 1 later.. quiz will do for now
   ];
 
   const handleOpenInNewTab = () => {

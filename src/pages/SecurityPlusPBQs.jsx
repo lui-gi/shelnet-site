@@ -4,26 +4,24 @@ import PageHeader from '../components/shared/PageHeader';
 import GridBackground from '../components/shared/GridBackground';
 import PBQSidebar from '../components/shared/PBQSidebar';
 import ContentViewer from '../components/shared/ContentViewer';
+import { convertLegacyPath } from '../utils/resourcePaths';
 
 const SecurityPlusPBQs = () => {
   const [selectedPBQ, setSelectedPBQ] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // PLACEHOLDER DATA: Update these paths to match your actual files in 'public/security-pbqs'
   const pbqs = [
-    { 
-      
-      id: 1, 
-      title: 'Identity Access Management', 
-      file: './security-pbqs/iam-pbq-1.html', 
-      description: 'Assign the correct permissions based on "Least Privilege."' 
+    {
+      id: 1,
+      title: 'Identity Access Management',
+      file: convertLegacyPath('./security-pbqs/iam-pbq-1.html'),
+      description: 'Assign the correct permissions based on "Least Privilege."'
     },
-    
-    { 
-      id: 2, 
-      title: 'Firewall ACL Configuration', 
-      file: './security-pbqs/firewall-acl-pbq-2.html', 
-      description: 'Secure a network by assigning correct action (allow/deny) for specific traffic flows.' 
+    {
+      id: 2,
+      title: 'Firewall ACL Configuration',
+      file: convertLegacyPath('./security-pbqs/firewall-acl-pbq-2.html'),
+      description: 'Secure a network by assigning correct action (allow/deny) for specific traffic flows.'
     },
   ];
 

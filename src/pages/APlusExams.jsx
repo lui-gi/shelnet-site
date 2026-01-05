@@ -4,18 +4,18 @@ import PageHeader from '../components/shared/PageHeader';
 import GridBackground from '../components/shared/GridBackground';
 import PBQSidebar from '../components/shared/PBQSidebar';
 import ContentViewer from '../components/shared/ContentViewer';
+import { convertLegacyPath } from '../utils/resourcePaths';
 
 const APlusExams = () => {
   const [selectedExam, setSelectedExam] = useState(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // DATA: This points to the file in your /public/a-exams/ folder
   const exams = [
-    { 
-      id: 1, 
-      title: 'Core 2 Practice Exam 1 (220-1202)', 
-      file: '/a-exams/practice-exam-1.html', 
-      description: '90 Questions covering Operating Systems, Security, Software Troubleshooting, and Operational Procedures.' 
+    {
+      id: 1,
+      title: 'Core 2 Practice Exam 1 (220-1202)',
+      file: convertLegacyPath('/a-exams/practice-exam-1.html'),
+      description: '90 Questions covering Operating Systems, Security, Software Troubleshooting, and Operational Procedures.'
     },
   ];
 
