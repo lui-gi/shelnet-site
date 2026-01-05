@@ -24,6 +24,10 @@ const NotesSection = () => {
                 It is structured for easy navigation, where each note is titled by the date it was created
                 and the topic it covers.
               </p>
+              <p>
+                Usage: click on the title of the note you want to view. Click "all notes" to view the entire repository of notes. You can then search by note title. Notes are 
+                organized by date, so the most recent notes appear on the navbar. Any older notes should be viewed in "all notes."
+              </p>
               <div className="flex items-center gap-2 text-sm text-white/60 font-mono">
                 <BookOpen size={16} />
                 <span>Hosted on GitHub Pages</span>

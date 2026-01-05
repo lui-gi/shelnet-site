@@ -15,7 +15,7 @@ const ConnectSection = () => {
                </div>
                <h4 className="text-xl font-bold mb-2">YouTube</h4>
                <p className="text-white/50 text-sm mb-4">Video explanations of PBQs and visualizations.</p>
-               <div className="text-xs font-mono text-red-400 group-hover:underline">SUBSCRIBE / COMMENT &rarr;</div>
+               <div className="text-xs font-mono text-red-400">SUBSCRIBE / COMMENT &rarr;</div>
             </a>
 
             {/* LinkedIn */}
@@ -25,7 +25,7 @@ const ConnectSection = () => {
                </div>
                <h4 className="text-xl font-bold mb-2">LinkedIn</h4>
                <p className="text-white/50 text-sm mb-4">Connect with me.</p>
-               <div className="text-xs font-mono text-blue-400 group-hover:underline">CONNECT &rarr;</div>
+               <div className="text-xs font-mono text-blue-400">CONNECT &rarr;</div>
             </a>
 
             {/* Email */}
@@ -35,7 +35,7 @@ const ConnectSection = () => {
                </div>
                <h4 className="text-xl font-bold mb-2">Email</h4>
                <p className="text-white/50 text-sm mb-4">Resource requests or business inquiries.</p>
-               <div className="text-xs font-mono text-gray-300 group-hover:underline">SEND MESSAGE &rarr;</div>
+               <div className="text-xs font-mono text-gray-300">SEND MESSAGE &rarr;</div>
             </a>
          </div>
 
