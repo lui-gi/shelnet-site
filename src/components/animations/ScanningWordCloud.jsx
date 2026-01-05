@@ -105,7 +105,7 @@ const ScanningWordCloud = () => {
   return (
     <div className="relative w-full h-[200px] overflow-hidden">
       {/* Scan Line */}
-      <div className="scan-line absolute top-0 bottom-0 w-[3px] z-20" />
+      <div className="scan-line absolute top-0 bottom-0 w-[80px] z-20" />
 
       {/* Word Cloud */}
       <div className="absolute inset-0">
@@ -124,7 +124,7 @@ const ScanningWordCloud = () => {
         /* Scan line moves left to right every 3 seconds */
         @keyframes scan {
           0% {
-            left: -3px;
+            left: -80px;
           }
           100% {
             left: 100%;
@@ -160,16 +160,25 @@ const ScanningWordCloud = () => {
         /* Scan line pulse effect */
         @keyframes scanPulse {
           0%, 100% {
-            box-shadow: 0 0 8px rgba(168, 85, 247, 0.7);
+            box-shadow: 20px 0 15px rgba(168, 85, 247, 0.5);
           }
           50% {
-            box-shadow: 0 0 12px rgba(168, 85, 247, 0.9);
+            box-shadow: 20px 0 20px rgba(168, 85, 247, 0.7);
           }
         }
 
-        /* Scan line styling */
+        /* Scan line styling with gradient trail */
         .scan-line {
-          background: rgba(168, 85, 247, 0.9);
+          background: linear-gradient(
+            to right,
+            rgba(168, 85, 247, 0) 0%,
+            rgba(168, 85, 247, 0.1) 20%,
+            rgba(168, 85, 247, 0.3) 40%,
+            rgba(168, 85, 247, 0.5) 60%,
+            rgba(168, 85, 247, 0.7) 80%,
+            rgba(168, 85, 247, 0.95) 95%,
+            rgba(168, 85, 247, 1) 100%
+          );
           animation:
             scan 3s linear infinite,
             scanPulse 1.5s ease-in-out infinite;
