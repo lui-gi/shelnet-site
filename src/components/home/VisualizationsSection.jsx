@@ -17,8 +17,8 @@ const VisualizationsSection = () => {
             <div>
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-1">Concepts, Tools, Practice</h3>
-                  <div className="text-sm text-white/50 font-mono">Hands-on visuals for concepts, tools, and general practice.</div>
+                  <h3 className="text-2xl font-bold text-white mb-1">Core Concepts</h3>
+                  <div className="text-sm text-white/50 font-mono">Interactive modules for core cybersecurity concepts.</div>
                 </div>
                 <div className="opacity-40 group-hover:opacity-60 transition-opacity">
                   <Layers size={48} strokeWidth={1} className="text-purple-400" />
