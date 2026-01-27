@@ -1,4 +1,4 @@
-import { BookOpen } from 'lucide-react';
+import { MousePointerClick, List, Search } from 'lucide-react';
 import GridBackground from '../shared/GridBackground';
 import BrutalHeader from '../shared/BrutalHeader';
 
@@ -12,25 +12,43 @@ const NotesSection = () => {
         <div className="border border-white/10 bg-white/[0.02] p-8 md:p-12">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             {/* Left Column: Description */}
-            <div className="space-y-6 text-lg text-white/80 font-light leading-relaxed">
-              <p>
-                This is a live
-                feed of my shelnet-notes repository, which house all of my Obsidian notes. As I study for certifications
-                and explore new concepts, I consolidate my notes here in an organized, searchable format.
-                The notes contain the unfiltered and unformatted output of my study sessions.
+            <div className="space-y-6">
+              <p className="text-lg text-white/80 font-light leading-relaxed">
+                A live feed of my Obsidian notes repository. This section is continuously updated as I study for certifications, explore new concepts, and document my other projects. Use the tools below to navigate and find topics of interest.
               </p>
-              <p>
-                The repository is continuously updated as I learn, making it a real-time reflection of my progress.
-                It is structured for easy navigation, where each note is titled by the date it was created
-                and the topic it covers.
-              </p>
-              <p>
-                Usage: click on the title of the note you want to view. Click "all notes" to view the entire repository of notes. You can then search by note title. Notes are 
-                organized by date, so the most recent notes appear on the navbar. Any older notes should be viewed in "all notes."
-              </p>
-              <div className="flex items-center gap-2 text-sm text-white/60 font-mono">
-                <BookOpen size={16} />
-                <span>Hosted on GitHub Pages</span>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.02]">
+                  <div className="p-2 border border-white/10">
+                    <MousePointerClick size={18} className="text-white/60" />
+                  </div>
+                  <span className="text-sm text-white/70 font-light">Click a note title to read it</span>
+                </div>
+                <div className="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.02]">
+                  <div className="p-2 border border-white/10">
+                    <List size={18} className="text-white/60" />
+                  </div>
+                  <span className="text-sm text-white/70 font-light">Use [ all notes ] to browse the full archive</span>
+                </div>
+                <div className="flex items-center gap-4 p-4 border border-white/10 bg-white/[0.02]">
+                  <div className="p-2 border border-white/10">
+                    <Search size={18} className="text-white/60" />
+                  </div>
+                  <span className="text-sm text-white/70 font-light">Search by note title to find a topic</span>
+                </div>
+              </div>
+
+              <div className="border border-white/10 bg-black p-4 font-mono text-sm">
+                <div className="text-white/40 mb-2">root@shelnet:~# cd /notes</div>
+                <div className="text-white/50 mb-4">Syncing notes repository...</div>
+                <a
+                  href="https://lui-gi.github.io/shelnet-notes/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center uppercase"
+                >
+                  Open Notes in New Tab
+                </a>
               </div>
             </div>
 
