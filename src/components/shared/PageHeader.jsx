@@ -20,6 +20,12 @@ const PageHeader = ({ icon, iconColor, title, subtitle, description }) => {
       border: 'border-purple-500/50',
       text: 'text-purple-400',
       hover: 'hover:text-purple-400'
+    },
+    orange: {
+      bg: 'bg-orange-500/20',
+      border: 'border-orange-500/50',
+      text: 'text-orange-400',
+      hover: 'hover:text-orange-400'
     }
   };
 

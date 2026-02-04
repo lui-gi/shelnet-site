@@ -3,6 +3,7 @@ import HeroSection from './components/home/HeroSection';
 import PBQsSection from './components/home/PBQsSection';
 import ExamsSection from './components/home/ExamsSection';
 import VisualizationsSection from './components/home/VisualizationsSection';
+import LabsSection from './components/home/LabsSection';
 import NotesSection from './components/home/NotesSection';
 import AboutSection from './components/home/AboutSection';
 import ConnectSection from './components/home/ConnectSection';
@@ -20,6 +21,7 @@ export default function App() {
       <PBQsSection />
       <ExamsSection />
       <VisualizationsSection />
+      <LabsSection />
       <NotesSection />
       <AboutSection />
       <ConnectSection />

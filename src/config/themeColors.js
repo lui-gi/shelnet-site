@@ -75,5 +75,29 @@ export const themeColors = {
     // Icon box (for PageHeader compatibility)
     iconBg: 'bg-purple-500/20',
     iconBorder: 'border-purple-500/50'
+  },
+
+  orange: {
+    // Backgrounds
+    bgActive: 'bg-orange-500/10',
+    bgHover: 'bg-white/[0.05]',
+
+    // Borders
+    border: 'border-white/10',
+    borderActive: 'border-orange-500',
+    borderHover: 'border-white/30',
+    hoverBorder: 'hover:border-orange-500',
+
+    // Text colors
+    text: 'text-orange-400',
+    textMuted: 'text-orange-400/80',
+    textHover: 'hover:text-orange-400',
+
+    // Indicators
+    pulse: 'bg-orange-400',
+
+    // Icon box (for PageHeader compatibility)
+    iconBg: 'bg-orange-500/20',
+    iconBorder: 'border-orange-500/50'
   }
 };
