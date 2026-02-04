@@ -206,26 +206,50 @@ const LabDetail = () => {
                     <div className="flex flex-col items-center w-full max-w-sm">
                       {/* Host Machine */}
                       <div className="w-full border-2 border-orange-500/50 bg-orange-500/5 p-4 relative">
-                        <div className="absolute -top-3 left-4 bg-black px-2 text-[10px] text-orange-400 font-mono">
+                        <div className="absolute -top-3 left-4 bg-black px-2 text-[10px] text-orange-400 font-mono relative group cursor-help">
                           THINKPAD P53 (HOST)
+                          {/* Tooltip */}
+                          <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                          bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none z-20">
+                            <div className="bg-black/95 border border-orange-500/50 px-3 py-2 text-xs font-mono
+                                            text-white/80 max-w-[200px] whitespace-normal">
+                              Physical machine running the virtualization environment
+                            </div>
+                          </div>
                         </div>
 
                         {/* Hypervisor Label */}
                         <div className="text-center mb-4">
-                          <div className="inline-block px-3 py-1 border border-orange-500/40 bg-orange-500/10 font-mono text-xs text-orange-400">
+                          <div className="inline-block px-3 py-1 border border-orange-500/40 bg-orange-500/10 font-mono text-xs text-orange-400 relative group cursor-help">
                             {lab.hypervisor}
+                            {/* Tooltip */}
+                            <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                            bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none z-20">
+                              <div className="bg-black/95 border border-orange-500/50 px-3 py-2 text-xs font-mono
+                                              text-white/80 max-w-[200px] whitespace-normal">
+                                Software that creates and manages virtual machines
+                              </div>
+                            </div>
                           </div>
                         </div>
 
                         {/* Isolated Network Boundary */}
                         <div className="border-2 border-dashed border-blue-500/40 p-4 mb-4 relative">
-                          <div className="absolute -top-2.5 left-4 bg-black px-2 text-[9px] text-blue-400 font-mono">
+                          <div className="absolute -top-2.5 left-4 bg-black px-2 text-[9px] text-blue-400 font-mono relative group cursor-help">
                             ISOLATED NETWORK
+                            {/* Tooltip */}
+                            <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                            bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none z-20">
+                              <div className="bg-black/95 border border-blue-500/50 px-3 py-2 text-xs font-mono
+                                              text-white/80 max-w-[200px] whitespace-normal">
+                                Private network segment isolating the target from host network
+                              </div>
+                            </div>
                           </div>
 
                           <div className="flex flex-col items-center gap-3">
                             {/* pfSense */}
-                            <div className="px-6 py-3 border-2 border-blue-500/50 bg-blue-500/10 w-full max-w-[180px]">
+                            <div className="px-6 py-3 border-2 border-blue-500/50 bg-blue-500/10 w-full max-w-[180px] relative group cursor-help">
                               <div className="flex items-center justify-center gap-2">
                                 <Shield size={16} className="text-blue-400" />
                                 <div className="text-center font-mono">
@@ -236,13 +260,21 @@ const LabDetail = () => {
                               <div className="text-[8px] text-white/40 text-center mt-1 font-mono">
                                 {lab.vms.find(v => v.name === 'pfSense')?.ram} | {lab.vms.find(v => v.name === 'pfSense')?.cpu}
                               </div>
+                              {/* Tooltip */}
+                              <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                              bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none z-20">
+                                <div className="bg-black/95 border border-blue-500/50 px-3 py-2 text-xs font-mono
+                                                text-white/80 max-w-[200px] whitespace-normal">
+                                  Open-source firewall/router controlling traffic between networks
+                                </div>
+                              </div>
                             </div>
 
                             {/* Connection line */}
                             <div className="w-px h-4 bg-blue-500/30" />
 
                             {/* Metasploitable 2 */}
-                            <div className="px-6 py-3 border-2 border-green-500/50 bg-green-500/10 w-full max-w-[180px]">
+                            <div className="px-6 py-3 border-2 border-green-500/50 bg-green-500/10 w-full max-w-[180px] relative group cursor-help">
                               <div className="flex items-center justify-center gap-2">
                                 <Target size={16} className="text-green-400" />
                                 <div className="text-center font-mono">
@@ -252,6 +284,14 @@ const LabDetail = () => {
                               </div>
                               <div className="text-[8px] text-white/40 text-center mt-1 font-mono">
                                 {lab.vms.find(v => v.name === 'Metasploitable 2')?.ram} | {lab.vms.find(v => v.name === 'Metasploitable 2')?.cpu}
+                              </div>
+                              {/* Tooltip */}
+                              <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                              bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none z-20">
+                                <div className="bg-black/95 border border-green-500/50 px-3 py-2 text-xs font-mono
+                                                text-white/80 max-w-[200px] whitespace-normal">
+                                  Intentionally vulnerable Linux VM - the exploitation target
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -265,7 +305,7 @@ const LabDetail = () => {
                         </div>
 
                         {/* Kali Linux - External */}
-                        <div className="px-6 py-3 border-2 border-red-500/50 bg-red-500/10 w-full max-w-[180px] mx-auto">
+                        <div className="px-6 py-3 border-2 border-red-500/50 bg-red-500/10 w-full max-w-[180px] mx-auto relative group cursor-help">
                           <div className="flex items-center justify-center gap-2">
                             <Skull size={16} className="text-red-400" />
                             <div className="text-center font-mono">
@@ -275,6 +315,14 @@ const LabDetail = () => {
                           </div>
                           <div className="text-[8px] text-white/40 text-center mt-1 font-mono">
                             {lab.vms.find(v => v.name === 'Kali Linux')?.ram} | {lab.vms.find(v => v.name === 'Kali Linux')?.cpu}
+                          </div>
+                          {/* Tooltip */}
+                          <div className="absolute opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                                          bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none z-20">
+                            <div className="bg-black/95 border border-red-500/50 px-3 py-2 text-xs font-mono
+                                            text-white/80 max-w-[200px] whitespace-normal">
+                              Penetration testing distribution for launching attacks
+                            </div>
                           </div>
                         </div>
 
