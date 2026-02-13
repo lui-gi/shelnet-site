@@ -29,7 +29,7 @@ const APlusExams = () => {
           {/* HEADER SECTION */}
           <PageHeader
             icon={<Award size={20} />}
-            iconColor="green"
+            iconColor="red"
             title="A+ Core 2 Exams"
             subtitle="220-1202 // FULL SIMULATIONS"
             description="Full-length practice exams. Select an exam or quiz from the list to begin."
@@ -39,7 +39,7 @@ const APlusExams = () => {
           {loading && (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <Loader2 size={48} className="mx-auto mb-4 text-green-500 animate-spin" />
+                <Loader2 size={48} className="mx-auto mb-4 text-red-500 animate-spin" />
                 <div className="font-mono text-sm text-white/60">Loading exams...</div>
               </div>
             </div>
@@ -71,7 +71,7 @@ const APlusExams = () => {
                 items={exams}
                 selectedItem={selectedExam}
                 onSelectItem={setSelectedExam}
-                themeColor="green"
+                themeColor="red"
                 itemPrefix="EXAM_0"
                 sidebarTitle="Available Exams"
                 showHoverEffect={true}
@@ -84,7 +84,7 @@ const APlusExams = () => {
               isFullscreen={isFullscreen}
               onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
               onOpenInNewTab={handleOpenInNewTab}
-              themeColor="green"
+              themeColor="red"
               statusLabel="RUNNING:"
               emptyStateIcon={
                 <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4">

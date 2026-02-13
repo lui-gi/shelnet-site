@@ -3,11 +3,11 @@ import { ChevronLeft } from 'lucide-react';
 
 const PageHeader = ({ icon, iconColor, title, subtitle, description }) => {
   const colorClasses = {
-    green: {
-      bg: 'bg-green-500/20',
-      border: 'border-green-500/50',
-      text: 'text-green-400',
-      hover: 'hover:text-green-400'
+    red: {
+      bg: 'bg-red-500/20',
+      border: 'border-red-500/50',
+      text: 'text-red-400',
+      hover: 'hover:text-red-400'
     },
     blue: {
       bg: 'bg-blue-500/20',
@@ -29,7 +29,7 @@ const PageHeader = ({ icon, iconColor, title, subtitle, description }) => {
     }
   };
 
-  const colors = colorClasses[iconColor] || colorClasses.green;
+  const colors = colorClasses[iconColor] || colorClasses.red;
 
   return (
     <div className="mb-8">

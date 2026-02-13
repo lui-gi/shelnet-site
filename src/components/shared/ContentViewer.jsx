@@ -10,7 +10,7 @@ import { themeColors } from '../../config/themeColors';
  * @param {Boolean} props.isFullscreen - Fullscreen state
  * @param {Function} props.onToggleFullscreen - Fullscreen toggle handler
  * @param {Function} props.onOpenInNewTab - New tab handler
- * @param {String} props.themeColor - Theme color ('green' | 'blue')
+ * @param {String} props.themeColor - Theme color ('red' | 'blue' | 'purple' | 'orange')
  * @param {String} props.statusLabel - Status label text (e.g., 'EXECUTING:' or 'RUNNING:')
  * @param {ReactNode} props.emptyStateIcon - Icon to display in empty state
  * @param {String} props.emptyStateText - Main empty state text

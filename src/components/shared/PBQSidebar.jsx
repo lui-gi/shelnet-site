@@ -9,7 +9,7 @@ import { themeColors } from '../../config/themeColors';
  * @param {Array} props.items - Array of items [{id, title, file, description}]
  * @param {Object} props.selectedItem - Currently selected item
  * @param {Function} props.onSelectItem - Click handler for item selection
- * @param {String} props.themeColor - Theme color ('green' | 'blue')
+ * @param {String} props.themeColor - Theme color ('red' | 'blue' | 'purple' | 'orange')
  * @param {String} props.itemPrefix - Prefix for item labels (e.g., 'PBQ_0' or 'EXAM_0')
  * @param {String} props.sidebarTitle - Title for the sidebar (e.g., 'Available Simulations')
  * @param {Boolean} props.showHoverEffect - Optional: Show hover color effect on titles

@@ -12,13 +12,13 @@ const PBQsSection = () => {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* A+ Card */}
-          <div className="group border border-green-500/20 bg-green-500/[0.03] hover:bg-green-500/[0.06] p-8 transition-all duration-300 relative overflow-hidden">
+          <div className="group border border-red-500/20 bg-red-500/[0.03] hover:bg-red-500/[0.06] p-8 transition-all duration-300 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Cpu size={120} strokeWidth={1} />
             </div>
             <div className="relative z-10">
-              <div className="text-green-400 font-mono text-xs mb-4 flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <div className="text-red-400 font-mono text-xs mb-4 flex items-center gap-2">
+                <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
                 220-1202
               </div>
               <h3 className="text-3xl font-bold mb-4">A+</h3>
@@ -29,7 +29,7 @@ const PBQsSection = () => {
               {/* Replaced <button> with <Link> */}
               <Link
                 to="/a-plus-pbqs"
-                className="w-full py-4 border border-green-500 bg-green-400/10 hover:bg-green-400/20 hover:text-green-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center btn-scanline"
+                className="w-full py-4 border border-red-500 bg-red-400/10 hover:bg-red-400/20 hover:text-red-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center btn-scanline"
               >
                 <span>Load Module</span>
                 <span>./launch_a_plus.sh</span>

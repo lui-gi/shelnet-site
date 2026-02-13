@@ -1,32 +1,32 @@
 /**
  * Centralized theme color configuration for consistent theming across components.
- * Supports green (A+), blue (Security+), and purple (Visualizations) themes.
- * Can be extended with additional themes (orange, red, etc.) for future certifications.
+ * Supports red (A+), blue (Security+), and purple (Visualizations) themes.
+ * Can be extended with additional themes (orange, green, etc.) for future certifications.
  */
 
 export const themeColors = {
-  green: {
+  red: {
     // Backgrounds
-    bgActive: 'bg-green-500/10',
+    bgActive: 'bg-red-500/10',
     bgHover: 'bg-white/[0.05]',
 
     // Borders
     border: 'border-white/10',
-    borderActive: 'border-green-500',
+    borderActive: 'border-red-500',
     borderHover: 'border-white/30',
-    hoverBorder: 'hover:border-green-500',
+    hoverBorder: 'hover:border-red-500',
 
     // Text colors
-    text: 'text-green-400',
-    textMuted: 'text-green-400/80',
-    textHover: 'hover:text-green-400',
+    text: 'text-red-400',
+    textMuted: 'text-red-400/80',
+    textHover: 'hover:text-red-400',
 
     // Indicators
-    pulse: 'bg-green-400',
+    pulse: 'bg-red-400',
 
     // Icon box (for PageHeader compatibility)
-    iconBg: 'bg-green-500/20',
-    iconBorder: 'border-green-500/50'
+    iconBg: 'bg-red-500/20',
+    iconBorder: 'border-red-500/50'
   },
 
   blue: {

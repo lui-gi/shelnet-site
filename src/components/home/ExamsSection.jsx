@@ -13,7 +13,7 @@ const ExamsSection = () => {
         <div className="grid lg:grid-cols-2 gap-6">
 
            {/* A+ Exam */}
-           <div className="border border-green-500/20 bg-green-500/[0.03] p-8 flex flex-col justify-between">
+           <div className="border border-red-500/20 bg-red-500/[0.03] p-8 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -24,31 +24,31 @@ const ExamsSection = () => {
                 </div>
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center space-x-3 text-white/70">
-                     <span className="text-green-500 font-mono">01.</span>
+                     <span className="text-red-500 font-mono">01.</span>
                      <span>Operating Systems</span>
                   </div>
                   <div className="flex items-center space-x-3 text-white/70">
-                     <span className="text-green-500 font-mono">02.</span>
+                     <span className="text-red-500 font-mono">02.</span>
                      <span>Security</span>
                   </div>
                   <div className="flex items-center space-x-3 text-white/70">
-                     <span className="text-green-500 font-mono">03.</span>
+                     <span className="text-red-500 font-mono">03.</span>
                      <span>Software Troubleshooting</span>
                   </div>
                   <div className="flex items-center space-x-3 text-white/70">
-                     <span className="text-green-500 font-mono">04.</span>
+                     <span className="text-red-500 font-mono">04.</span>
                      <span>Operational Procedures</span>
                   </div>
                 </div>
               </div>
 
               {/* Terminal Action */}
-              <div className="border border-green-500/15 bg-black p-4 font-mono text-sm">
+              <div className="border border-red-500/15 bg-black p-4 font-mono text-sm">
                  <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type a-plus</div>
-                 <div className="text-green-500 mb-4">Generating question pool... Done.</div>
+                 <div className="text-red-500 mb-4">Generating question pool... Done.</div>
                  <Link
                    to="/a-plus-exams"
-                   className="block w-full border border-green-600 bg-green-500/10 text-white hover:bg-green-500/20 hover:text-green-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline"
+                   className="block w-full border border-red-600 bg-red-500/10 text-white hover:bg-red-500/20 hover:text-red-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline"
                  >
                    Launch Exams
                  </Link>

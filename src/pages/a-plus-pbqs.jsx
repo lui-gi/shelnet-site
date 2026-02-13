@@ -30,7 +30,7 @@ const APlusPBQs = () => {
           {/* Header & Back Button */}
           <PageHeader
             icon={<Monitor size={20} />}
-            iconColor="green"
+            iconColor="red"
             title="A+ Core 2 PBQs"
             subtitle="220-1202 // PERFORMANCE BASED QUESTIONS"
             description="Select a PBQ from the list below to begin. Each simulation tests practical skills required for the A+ Core 2 exam."
@@ -40,7 +40,7 @@ const APlusPBQs = () => {
           {loading && (
             <div className="flex items-center justify-center py-20">
               <div className="text-center">
-                <Loader2 size={48} className="mx-auto mb-4 text-green-500 animate-spin" />
+                <Loader2 size={48} className="mx-auto mb-4 text-red-500 animate-spin" />
                 <div className="font-mono text-sm text-white/60">Loading simulations...</div>
               </div>
             </div>
@@ -72,7 +72,7 @@ const APlusPBQs = () => {
                 items={pbqs}
                 selectedItem={selectedPBQ}
                 onSelectItem={setSelectedPBQ}
-                themeColor="green"
+                themeColor="red"
                 itemPrefix="PBQ_0"
                 sidebarTitle="Available Simulations"
               />
@@ -84,7 +84,7 @@ const APlusPBQs = () => {
               isFullscreen={isFullscreen}
               onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
               onOpenInNewTab={handleOpenInNewTab}
-              themeColor="green"
+              themeColor="red"
               statusLabel="EXECUTING:"
               emptyStateIcon={<Terminal size={48} className="mx-auto mb-4 opacity-20" />}
               emptyStateText="No PBQ selected"
