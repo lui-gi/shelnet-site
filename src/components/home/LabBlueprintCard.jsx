@@ -1,127 +1,81 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
+import LabTopologyCanvas from './LabTopologyCanvas';
 
 const LabBlueprintCard = ({ lab }) => {
-  const specs = [
-    { label: 'HOST', value: lab.host.name },
-    { label: 'RAM', value: lab.host.ram },
-    { label: 'HYPE', value: lab.hypervisor },
-    { label: 'VMs', value: `${lab.vms.length} machines` }
+  const specPills = [
+    lab.host.ram,
+    lab.host.cpu,
+    lab.hypervisor,
+    `${lab.vms.length} VMs`,
   ];
 
   return (
-    <div className="group relative border border-dashed border-orange-500/30 bg-black/50 hover:border-orange-500/60 transition-all duration-300">
-      {/* Blueprint grid overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none opacity-[0.03]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(251, 146, 60, 0.8) 1px, transparent 1px)',
-          backgroundSize: '20px 20px'
-        }}
-      />
-
-      {/* Schematic Header */}
-      <div className="border-b border-dashed border-orange-500/30 p-4 font-mono text-xs">
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="text-orange-400/60">SCHEMATIC REV {lab.revision}</div>
-            <div className="text-white font-bold text-lg mt-1 tracking-tight uppercase">{lab.name}</div>
-          </div>
-          <div className="text-right text-orange-400/40">
-            <div>SCALE: 1:1</div>
-            <div>DATE: {lab.date}</div>
-          </div>
+    <div className="w-full">
+      {/* Row 1 -- Header Bar */}
+      <div className="flex items-center justify-between flex-wrap gap-4 px-6 py-5 border border-orange-500/20 bg-orange-500/[0.03]">
+        <div className="flex items-center flex-wrap gap-x-4 gap-y-2">
+          <div className="w-3 h-3 bg-orange-500 rounded-sm flex-shrink-0" />
+          <span className="text-2xl font-bold text-white uppercase tracking-tight">
+            {lab.name}
+          </span>
+          <span className="text-sm text-white/60">
+            {lab.description}
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {specPills.map((pill) => (
+            <span
+              key={pill}
+              className="px-2.5 py-1 border border-orange-500/20 bg-orange-500/5 text-xs font-mono text-white/70"
+            >
+              {pill}
+            </span>
+          ))}
         </div>
       </div>
 
-      {/* Content Area */}
-      <div className="p-4 relative z-10">
-        <div className="grid grid-cols-2 gap-4">
-          {/* Specs Table */}
-          <div>
-            <div className="text-[10px] text-orange-400/60 font-mono mb-2 uppercase tracking-wider">Host Specs</div>
-            <div className="border border-orange-500/20">
-              {specs.map((spec, idx) => (
-                <div
-                  key={spec.label}
-                  className={`flex text-xs font-mono ${idx !== specs.length - 1 ? 'border-b border-orange-500/20' : ''}`}
-                >
-                  <div className="w-14 px-2 py-1.5 text-orange-400/70 border-r border-orange-500/20 bg-orange-500/5">
-                    {spec.label}
-                  </div>
-                  <div className="flex-1 px-2 py-1.5 text-white/80">
-                    {spec.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      {/* Row 2 -- Canvas Topology */}
+      <div className="border border-orange-500/20 border-t-0 bg-black relative overflow-hidden">
+        {/* Corner markers */}
+        <div className="absolute top-2 left-2 w-5 h-5 border-l-2 border-t-2 border-orange-500/60 z-10 pointer-events-none" />
+        <div className="absolute top-2 right-2 w-5 h-5 border-r-2 border-t-2 border-orange-500/60 z-10 pointer-events-none" />
+        <div className="absolute bottom-2 left-2 w-5 h-5 border-l-2 border-b-2 border-orange-500/60 z-10 pointer-events-none" />
+        <div className="absolute bottom-2 right-2 w-5 h-5 border-r-2 border-b-2 border-orange-500/60 z-10 pointer-events-none" />
 
-          {/* VM Topology Preview */}
-          <div className="relative">
-            <div className="text-[10px] text-orange-400/60 font-mono mb-2 uppercase tracking-wider">VM Topology</div>
-            <div className="border border-orange-500/20 bg-orange-500/5 h-[100px] relative overflow-hidden">
-              {/* Corner markers */}
-              <div className="absolute top-0 left-0 w-3 h-3 border-l-2 border-t-2 border-orange-500/40" />
-              <div className="absolute top-0 right-0 w-3 h-3 border-r-2 border-t-2 border-orange-500/40" />
-              <div className="absolute bottom-0 left-0 w-3 h-3 border-l-2 border-b-2 border-orange-500/40" />
-              <div className="absolute bottom-0 right-0 w-3 h-3 border-r-2 border-b-2 border-orange-500/40" />
-
-              {/* Simplified VM topology */}
-              <div className="flex items-center justify-center h-full">
-                <div className="flex flex-col items-center gap-1 font-mono text-[9px] text-orange-400/60">
-                  {/* Hypervisor layer */}
-                  <div className="px-2 py-0.5 border border-orange-500/40 bg-orange-500/10 text-orange-400/80">
-                    [{lab.hypervisor}]
-                  </div>
-                  <div className="w-px h-2 bg-orange-500/30" />
-
-                  {/* VMs row with isolated network indicator */}
-                  <div className="flex items-center gap-1">
-                    {/* Kali - external */}
-                    <div className="px-1.5 py-0.5 border border-orange-500/30 text-[8px]">
-                      KALI
-                    </div>
-
-                    <div className="w-2 h-px bg-orange-500/20" />
-
-                    {/* Isolated network boundary */}
-                    <div className="border border-dashed border-orange-500/40 p-1 flex items-center gap-1">
-                      <div className="px-1.5 py-0.5 border border-orange-500/30 text-[8px]">
-                        PFS
-                      </div>
-                      <div className="w-1.5 h-px bg-orange-500/30" />
-                      <div className="px-1.5 py-0.5 border border-orange-500/30 text-[8px]">
-                        MS2
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Legend */}
-                  <div className="text-[7px] text-orange-400/40 mt-1">
-                    ISOLATED NET
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        {/* Overlay labels */}
+        <div className="absolute top-4 left-4 z-10 pointer-events-none">
+          <span className="text-xs font-mono text-white/40 uppercase tracking-widest">
+            SIMULATION VIEW
+          </span>
+        </div>
+        <div className="absolute top-4 right-4 z-10 pointer-events-none flex items-center gap-2">
+          <span className="text-xs font-mono text-red-400">LIVE</span>
+          <span className="w-2 h-2 bg-red-400 rounded-full animate-pulse" />
         </div>
 
-        {/* Description */}
-        <div className="mt-4 text-xs text-white/50 font-mono">
-          {lab.description}
-        </div>
+        <LabTopologyCanvas vms={lab.vms} hypervisor={lab.hypervisor} />
       </div>
 
-      {/* Action Footer */}
-      <div className="border-t border-dashed border-orange-500/30 p-4">
-        <Link
-          to={`/labs/${lab.slug}`}
-          className="flex items-center justify-between text-xs font-mono text-orange-400 hover:text-orange-300 transition-colors group/link"
-        >
-          <span>VIEW FULL SCHEMATIC</span>
-          <ArrowRight size={14} className="group-hover/link:translate-x-1 transition-transform" />
-        </Link>
+      {/* Row 3 -- CTA Bar */}
+      <div className="border border-orange-500/20 border-t-0 bg-orange-500/[0.03] px-6 py-5">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="font-mono text-sm">
+            <div className="text-white/40">
+              root@shelnet:~# ./launch_simulation.sh
+            </div>
+            <div className="text-orange-400">
+              Initializing attack vectors... Ready.
+            </div>
+          </div>
+          <Link
+            to={`/labs/${lab.slug}`}
+            className="w-full sm:w-auto px-8 py-4 bg-orange-500 text-black font-bold text-sm uppercase hover:bg-orange-400 transition-colors flex items-center justify-center gap-3 tracking-wider flex-shrink-0 btn-scanline"
+          >
+            ENTER SIMULATION
+            <ArrowRight size={18} />
+          </Link>
+        </div>
       </div>
     </div>
   );

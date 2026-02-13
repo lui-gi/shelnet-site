@@ -13,7 +13,7 @@ const VisualizationsSection = () => {
 
         {/* Single Card */}
         <div className="max-w-3xl mx-auto">
-          <div className="border border-white/10 bg-white/[0.02] p-8 flex flex-col justify-between">
+          <div className="border border-purple-500/20 bg-purple-500/[0.03] p-8 flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-6">
                 <div>
@@ -31,12 +31,12 @@ const VisualizationsSection = () => {
             </div>
 
             {/* Terminal Action */}
-            <div className="border border-white/10 bg-black p-4 font-mono text-sm">
+            <div className="border border-purple-500/15 bg-black p-4 font-mono text-sm">
               <div className="text-white/40 mb-2">root@shelnet:~# cd /visualizations</div>
               <div className="text-purple-500 mb-4">Loading interactive learning tools...</div>
               <Link
                 to="/visualizations"
-                className="block w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center uppercase"
+                className="block w-full border border-purple-600 bg-purple-500/10 text-white hover:bg-purple-500/20 hover:text-purple-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline"
               >
                 Explore Visualizations
               </Link>

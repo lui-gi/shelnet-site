@@ -13,7 +13,7 @@ const ExamsSection = () => {
         <div className="grid lg:grid-cols-2 gap-6">
 
            {/* A+ Exam */}
-           <div className="border border-white/10 bg-white/[0.02] p-8 flex flex-col justify-between">
+           <div className="border border-green-500/20 bg-green-500/[0.03] p-8 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -43,12 +43,12 @@ const ExamsSection = () => {
               </div>
 
               {/* Terminal Action */}
-              <div className="border border-white/10 bg-black p-4 font-mono text-sm">
+              <div className="border border-green-500/15 bg-black p-4 font-mono text-sm">
                  <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type a-plus</div>
                  <div className="text-green-500 mb-4">Generating question pool... Done.</div>
                  <Link
                    to="/a-plus-exams"
-                   className="block w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center uppercase"
+                   className="block w-full border border-green-600 bg-green-500/10 text-white hover:bg-green-500/20 hover:text-green-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline"
                  >
                    Launch Exams
                  </Link>
@@ -56,7 +56,7 @@ const ExamsSection = () => {
            </div>
 
            {/* Sec+ Exam */}
-           <div className="border border-white/10 bg-white/[0.02] p-8 flex flex-col justify-between">
+           <div className="border border-blue-500/20 bg-blue-500/[0.03] p-8 flex flex-col justify-between">
               <div>
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -90,12 +90,12 @@ const ExamsSection = () => {
               </div>
 
               {/* Terminal Action */}
-              <div className="border border-white/10 bg-black p-4 font-mono text-sm">
+              <div className="border border-blue-500/15 bg-black p-4 font-mono text-sm">
                  <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type sec-plus</div>
                  <div className="text-blue-500 mb-4">Decrypting exam key... Done.</div>
                  <Link
                     to="/security-plus-exams"
-                    className="block w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center uppercase"
+                    className="block w-full border border-blue-600 bg-blue-500/10 text-white hover:bg-blue-500/20 hover:text-blue-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline"
                   >
                     Launch Exams
                   </Link>

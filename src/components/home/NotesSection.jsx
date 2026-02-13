@@ -9,7 +9,7 @@ const NotesSection = () => {
       <div className="max-w-6xl mx-auto relative z-10">
         <BrutalHeader title="NOTES" subtitle="C:\Shelnet> MY LEARNING JOURNEY" />
 
-        <div className="border border-white/10 bg-white/[0.02] p-8 md:p-12">
+        <div className="border border-white/15 bg-white/[0.03] p-8 md:p-12">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             {/* Left Column: Description */}
             <div className="space-y-6">
@@ -38,14 +38,14 @@ const NotesSection = () => {
                 </div>
               </div>
 
-              <div className="border border-white/10 bg-black p-4 font-mono text-sm">
+              <div className="border border-white/15 bg-black p-4 font-mono text-sm">
                 <div className="text-white/40 mb-2">root@shelnet:~# cd /notes</div>
                 <div className="text-white/50 mb-4">Syncing notes repository...</div>
                 <a
                   href="https://lui-gi.github.io/shelnet-notes/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full border border-white/30 text-white hover:bg-white hover:text-black font-bold py-3 px-4 transition-all text-center uppercase"
+                  className="block w-full border border-gray-600 bg-gray-500/10 text-white hover:bg-gray-500/20 hover:text-gray-300 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline"
                 >
                   Open Notes in New Tab
                 </a>

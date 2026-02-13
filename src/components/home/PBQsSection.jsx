@@ -12,7 +12,7 @@ const PBQsSection = () => {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* A+ Card */}
-          <div className="group border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] p-8 transition-all duration-300 relative overflow-hidden">
+          <div className="group border border-green-500/20 bg-green-500/[0.03] hover:bg-green-500/[0.06] p-8 transition-all duration-300 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Cpu size={120} strokeWidth={1} />
             </div>
@@ -29,7 +29,7 @@ const PBQsSection = () => {
               {/* Replaced <button> with <Link> */}
               <Link
                 to="/a-plus-pbqs"
-                className="w-full py-4 border border-white/20 hover:border-green-500 hover:text-green-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center group-hover:bg-white/[0.02]"
+                className="w-full py-4 border border-green-500 bg-green-400/10 hover:bg-green-400/20 hover:text-green-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center btn-scanline"
               >
                 <span>Load Module</span>
                 <span>./launch_a_plus.sh</span>
@@ -39,7 +39,7 @@ const PBQsSection = () => {
           </div>
 
           {/* Sec+ Card */}
-          <div className="group border border-white/10 bg-white/[0.02] hover:bg-white/[0.05] p-8 transition-all duration-300 relative overflow-hidden">
+          <div className="group border border-blue-500/20 bg-blue-500/[0.03] hover:bg-blue-500/[0.06] p-8 transition-all duration-300 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Shield size={120} strokeWidth={1} />
             </div>
@@ -56,7 +56,7 @@ const PBQsSection = () => {
               {/* Replace the Security+ <button> with this <Link> */}
               <Link
                 to="/security-plus-pbqs"
-                className="w-full py-4 border border-white/20 hover:border-blue-500 hover:text-blue-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center group-hover:bg-white/[0.02]"
+                className="w-full py-4 border border-blue-500 bg-blue-400/10 hover:bg-blue-400/20 hover:text-blue-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center btn-scanline"
               >
                 <span>Load Module</span>
                 <span>./launch_sec_plus.sh</span>
