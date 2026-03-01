@@ -12,8 +12,7 @@ const VisualizationsSection = () => {
         <BrutalHeader title="VISUALIZATIONS" subtitle="C:\Shelnet> INTERACTIVE CONCEPTS" />
 
         {/* Single Card */}
-        <div className="max-w-5xl mx-auto">
-          <div className="border border-purple-500/20 bg-purple-500/[0.03] p-8 flex flex-col justify-between">
+        <div className="border border-purple-500/20 bg-purple-500/[0.03] p-8 flex flex-col justify-between">
             <div>
               <div className="flex justify-between items-start mb-6">
                 <div>
@@ -41,7 +40,6 @@ const VisualizationsSection = () => {
                 Explore Visualizations
               </Link>
             </div>
-          </div>
         </div>
       </div>
     </section>
