@@ -6,7 +6,7 @@ export const labs = [
     revision: '1.0',
     date: '2025-01',
     description: 'Isolated penetration testing environment for security research',
-    writeupsUrl: 'https://lui-gi.github.io/shelnet-resources/writeups/metasploitable-2-lab/',
+    writeupsUrl: 'https://lui-gi.github.io/shelnet-resources/writeups/index.html',
     host: {
       name: 'Thinkpad P53',
       ram: '64GB',

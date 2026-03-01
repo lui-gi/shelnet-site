@@ -56,23 +56,13 @@ const LabBlueprintCard = ({ lab }) => {
 
       {/* Row 3 -- CTA Bar */}
       <div className="border border-orange-500/20 border-t-0 bg-orange-500/[0.03] px-6 py-5">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="font-mono text-sm">
-            <div className="text-white/40">
-              root@shelnet:~# ./launch.sh
-            </div>
-            <div className="text-orange-400">
-              Initializing attack vectors... Ready.
-            </div>
-          </div>
-          <Link
-            to={`/labs/${lab.slug}`}
-            className="w-full sm:w-auto px-8 py-4 bg-orange-500 text-black font-bold text-sm uppercase hover:bg-orange-400 transition-colors flex items-center justify-center gap-3 tracking-wider flex-shrink-0 btn-scanline"
-          >
-            READ WRITE-UPS/DOCUMENTATION
-            <ArrowRight size={18} />
-          </Link>
-        </div>
+        <Link
+          to={`/labs/${lab.slug}`}
+          className="w-full px-8 py-4 bg-orange-500 text-black font-bold text-sm uppercase hover:bg-orange-400 transition-colors flex items-center justify-center gap-3 tracking-wider btn-scanline"
+        >
+          ENTER LAB
+          <ArrowRight size={18} />
+        </Link>
       </div>
     </div>
   );
