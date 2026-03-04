@@ -2,9 +2,15 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 const roleColors = {
-  Attacker: 'border-red-400 text-red-400',
-  Firewall: 'border-blue-400 text-blue-400',
-  Target: 'border-green-400 text-green-400',
+  Attacker:    'border-red-400 text-red-400',
+  Firewall:    'border-blue-400 text-blue-400',
+  Target:      'border-green-400 text-green-400',
+  Implant:     'border-purple-400 text-purple-400',
+  Victim:      'border-amber-400 text-amber-400',
+  Monitor:     'border-cyan-400 text-cyan-400',
+  Sensor:      'border-teal-400 text-teal-400',
+  Analyzer:    'border-violet-400 text-violet-400',
+  Environment: 'border-gray-400 text-gray-400',
 };
 
 const formatDate = (dateStr) => {
@@ -36,21 +42,24 @@ const LabBlueprintCard = ({ lab }) => {
 
       {/* Row 2 -- Compact Body */}
       <div className="border border-orange-500/20 border-t-0 bg-black px-6 py-6 flex flex-col gap-4">
-        {/* VM role pills */}
+        {/* Role pills */}
         <div className="flex flex-wrap gap-3">
-          {lab.vms.map((vm) => (
+          {(lab.components ?? lab.vms).map((item) => (
             <span
-              key={vm.name}
-              className={`px-3 py-1.5 border text-xs font-mono uppercase tracking-wide ${roleColors[vm.role] ?? 'border-white/20 text-white/50'}`}
+              key={item.name}
+              className={`px-3 py-1.5 border text-xs font-mono uppercase tracking-wide ${roleColors[item.role] ?? 'border-white/20 text-white/50'}`}
             >
-              {vm.role}: {vm.name}
+              {item.role}: {item.name}
             </span>
           ))}
         </div>
 
         {/* Spec line */}
         <div className="text-xs font-mono text-white/40">
-          {lab.hypervisor}&nbsp;·&nbsp;{lab.vms.length} VMs&nbsp;·&nbsp;{lab.host.ram}&nbsp;·&nbsp;{lab.host.cpu}
+          {lab.type === 'hardware'
+            ? `${lab.host.platform} · ${lab.components.length} components · ${lab.host.interface}`
+            : `${lab.hypervisor} · ${lab.vms.length} VMs · ${lab.host.ram} · ${lab.host.cpu}`
+          }
         </div>
       </div>
 
