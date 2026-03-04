@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Server, Cpu, MemoryStick, Monitor, Shield, Target, Skull, ExternalLink, Zap } from 'lucide-react';
+import { ChevronLeft, Server, Cpu, MemoryStick, Monitor, Shield, Target, Skull, Zap } from 'lucide-react';
 import GridBackground from '../components/shared/GridBackground';
 import { labs } from '../data/labs';
 
@@ -484,35 +484,115 @@ const LabDetail = () => {
             </div>
           </div>
 
-          {/* Write-ups Section */}
+          {/* Documentation Wiki */}
+          {lab.docs && (
+            <div className="mt-6 space-y-6">
+
+              {/* Overview & Objectives */}
+              <div className="border border-dashed border-orange-500/30 bg-black/50">
+                <div className="border-b border-dashed border-orange-500/30 p-4">
+                  <div className="text-xs text-orange-400/60 font-mono uppercase tracking-wider">Overview &amp; Objectives</div>
+                </div>
+                <div className="p-4 grid md:grid-cols-[3fr_2fr] gap-6">
+                  <p className="text-sm text-white/70 leading-relaxed">{lab.docs.overview.summary}</p>
+                  <div>
+                    <div className="text-[10px] text-orange-400/60 font-mono uppercase tracking-wider mb-3">Objectives</div>
+                    <ul className="space-y-2">
+                      {lab.docs.overview.objectives.map((obj, i) => (
+                        <li key={i} className="flex gap-2 text-sm text-white/70 leading-snug">
+                          <span className="text-orange-500 font-mono flex-shrink-0 mt-0.5">›</span>
+                          {obj}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Setup + Workflow */}
+              <div className="grid lg:grid-cols-2 gap-6">
+
+                {/* Setup / Bill of Materials */}
+                <div className="border border-dashed border-orange-500/30 bg-black/50">
+                  <div className="border-b border-dashed border-orange-500/30 p-4">
+                    <div className="text-xs text-orange-400/60 font-mono uppercase tracking-wider">Setup / Bill of Materials</div>
+                  </div>
+                  <div className="p-4">
+                    <div className="border border-orange-500/20">
+                      <div className="flex text-xs font-mono border-b border-orange-500/20 bg-orange-500/10">
+                        <div className="w-28 px-3 py-2 text-orange-400/80 border-r border-orange-500/20 flex-shrink-0">Item</div>
+                        <div className="flex-1 px-3 py-2 text-orange-400/80 border-r border-orange-500/20">Detail</div>
+                        <div className="flex-1 px-3 py-2 text-orange-400/80">Notes</div>
+                      </div>
+                      {lab.docs.setup.map((row, i) => (
+                        <div key={i} className={`flex text-xs font-mono ${i !== lab.docs.setup.length - 1 ? 'border-b border-orange-500/20' : ''}`}>
+                          <div className="w-28 px-3 py-2 text-orange-400/70 border-r border-orange-500/20 flex-shrink-0 leading-snug">{row.item}</div>
+                          <div className="flex-1 px-3 py-2 text-white/80 border-r border-orange-500/20 leading-snug">{row.detail}</div>
+                          <div className="flex-1 px-3 py-2 text-white/40 leading-snug">{row.notes}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Workflow */}
+                <div className="border border-dashed border-orange-500/30 bg-black/50">
+                  <div className="border-b border-dashed border-orange-500/30 p-4">
+                    <div className="text-xs text-orange-400/60 font-mono uppercase tracking-wider">
+                      {lab.type === 'hardware' ? 'Experiment Workflow' : 'Attack Workflow'}
+                    </div>
+                  </div>
+                  <div className="p-4 space-y-3">
+                    {lab.docs.workflow.map((step) => (
+                      <div key={step.step} className="flex gap-3">
+                        <div className="w-6 h-6 bg-orange-500/20 border border-orange-500/40 flex items-center justify-center flex-shrink-0 mt-0.5">
+                          <span className="text-[10px] font-mono font-bold text-orange-400">{step.step}</span>
+                        </div>
+                        <div>
+                          <div className="text-xs font-mono font-bold text-white/80 uppercase tracking-wide mb-0.5">{step.title}</div>
+                          <div className="text-xs text-white/50 leading-relaxed">{step.body}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Findings */}
+              <div className="border border-dashed border-orange-500/30 bg-black/50">
+                <div className="border-b border-dashed border-orange-500/30 p-4">
+                  <div className="text-xs text-orange-400/60 font-mono uppercase tracking-wider">Findings &amp; Notes</div>
+                </div>
+                <div className="p-4 grid sm:grid-cols-2 gap-4">
+                  {lab.docs.findings.map((f, i) => (
+                    <div key={i} className="border border-orange-500/20 bg-orange-500/5 p-4">
+                      <div className="flex gap-2 items-start mb-2">
+                        <div className="w-1.5 h-1.5 bg-orange-500 rounded-full flex-shrink-0 mt-1.5" />
+                        <div className="text-xs font-mono font-bold text-orange-400 uppercase tracking-wide leading-snug">{f.title}</div>
+                      </div>
+                      <div className="text-xs text-white/55 leading-relaxed pl-3.5">{f.body}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          )}
+
+          {/* Writeup */}
           {lab.writeupsUrl && (
             <div className="mt-6 border border-dashed border-orange-500/30 bg-black/50">
-              <div className="border-b border-dashed border-orange-500/30 p-4 flex justify-between items-center">
-                <div className="text-xs text-orange-400/60 font-mono uppercase tracking-wider">Write-ups</div>
-                <a
-                  href={lab.writeupsUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs text-orange-400/60 hover:text-orange-400 transition-colors font-mono"
-                >
-                  Open in new tab
-                  <ExternalLink size={12} />
-                </a>
+              <div className="border-b border-dashed border-orange-500/30 p-4">
+                <div className="text-xs text-orange-400/60 font-mono uppercase tracking-wider">Writeup</div>
               </div>
-              <div className="p-4">
-                <div className="border border-orange-500/20 bg-orange-500/5">
-                  <iframe
-                    src={lab.writeupsUrl}
-                    title={`${lab.name} Write-ups`}
-                    className="w-full h-[500px] md:h-[600px]"
-                    sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="text-[10px] text-white/40 font-mono mt-3 border-t border-dashed border-orange-500/20 pt-3">
-                  Attacks and findings documented in this lab
-                </div>
-              </div>
+              <iframe
+                src={lab.writeupsUrl}
+                title={`${lab.name} — Writeup`}
+                className="w-full h-[600px]"
+                sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+                loading="lazy"
+              />
             </div>
           )}
         </div>

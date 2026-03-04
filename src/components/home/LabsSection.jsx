@@ -57,23 +57,30 @@ const LabsSection = () => {
                 </h3>
               </div>
 
-              {/* Named tab strip */}
-              <div className="flex gap-1">
+              {/* Vertical lab list */}
+              <div className="flex flex-col gap-1">
                 {labs.map((lab, i) => (
                   <button
                     key={lab.id}
                     onClick={() => setActiveIdx(i)}
-                    className={`flex-1 px-2 py-2.5 text-center transition-colors leading-tight
+                    className={`flex items-center gap-3 px-3 py-2.5 text-left transition-colors w-full
                       ${i === activeIdx
                         ? 'bg-orange-500 text-black'
-                        : 'border border-white/15 text-white/40 hover:border-orange-500/40 hover:text-white/70'
+                        : 'border border-white/15 text-white/60 hover:border-orange-500/40 hover:text-white/90'
                       }`}
                   >
-                    <span className={`block text-[9px] font-mono mb-0.5 ${i === activeIdx ? 'text-black/60' : 'text-white/25'}`}>
+                    <span className={`text-[10px] font-mono flex-shrink-0 ${i === activeIdx ? 'text-black/50' : 'text-white/30'}`}>
                       {String(i + 1).padStart(2, '0')}
                     </span>
-                    <span className="block text-[10px] font-mono font-bold uppercase tracking-wide">
-                      {lab.name.replace(/ Lab$/, '')}
+                    <span className="flex-1 text-xs font-mono font-bold uppercase tracking-wide truncate">
+                      {lab.name}
+                    </span>
+                    <span className={`text-[9px] font-mono flex-shrink-0 px-1.5 py-0.5 border
+                      ${i === activeIdx
+                        ? 'border-black/30 text-black/60'
+                        : 'border-white/20 text-white/30'
+                      }`}>
+                      {lab.type === 'hardware' ? 'HW' : 'VM'}
                     </span>
                   </button>
                 ))}
