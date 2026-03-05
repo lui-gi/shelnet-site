@@ -11,7 +11,7 @@ const LabsSection = () => {
   const next = () => setActiveIdx(i => (i + 1) % labs.length);
 
   return (
-    <section id="labs" className="py-24 px-6 relative bg-black border-t border-white/5">
+    <section id="labs" className="py-24 px-6 relative bg-black border-t border-white/5 z-[1]">
       <GridBackground />
       <div className="max-w-6xl mx-auto relative z-10">
         <BrutalHeader title="LABS" subtitle="C:\Shelnet> THREAT SIMULATION RANGE" />

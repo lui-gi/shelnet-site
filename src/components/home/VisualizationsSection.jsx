@@ -6,7 +6,7 @@ import ScanningWordCloud from '../animations/ScanningWordCloud';
 
 const VisualizationsSection = () => {
   return (
-    <section id="visualizations" className="py-24 px-6 relative bg-black border-t border-white/5">
+    <section id="visualizations" className="py-24 px-6 relative bg-black border-t border-white/5 z-[1]">
       <GridBackground />
       <div className="max-w-6xl mx-auto relative z-10">
         <BrutalHeader title="VISUALIZATIONS" subtitle="C:\Shelnet> INTERACTIVE CONCEPTS" />

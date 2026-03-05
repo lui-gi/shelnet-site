@@ -4,7 +4,7 @@ import BrutalHeader from '../shared/BrutalHeader';
 
 const ExamsSection = () => {
   return (
-    <section id="exams" className="py-24 px-6 relative bg-black border-t border-white/5">
+    <section id="exams" className="py-24 px-6 relative bg-black border-t border-white/5 z-[1]">
       <GridBackground />
       <div className="max-w-6xl mx-auto relative z-10">
         <BrutalHeader title="PRACTICE EXAMS" subtitle="C:\Shelnet> FULL LENGTH MOCK TESTS" />

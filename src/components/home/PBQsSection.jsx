@@ -5,7 +5,7 @@ import BrutalHeader from '../shared/BrutalHeader';
 
 const PBQsSection = () => {
   return (
-    <section id="pbqs" className="py-24 px-6 relative bg-black border-t border-white/5">
+    <section id="pbqs" className="py-24 px-6 relative bg-black border-t border-white/5 z-[1]">
       <GridBackground />
       <div className="max-w-6xl mx-auto relative z-10">
         <BrutalHeader title="PRACTICE PBQS" subtitle="C:\Shelnet>  PERFORMANCE BASED QUESTIONS" />

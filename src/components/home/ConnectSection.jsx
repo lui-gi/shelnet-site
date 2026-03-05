@@ -3,7 +3,7 @@ import BrutalHeader from '../shared/BrutalHeader';
 
 const ConnectSection = () => {
   return (
-    <section id="connect" className="py-24 px-6 relative bg-black border-t border-white/5">
+    <section id="connect" className="py-24 px-6 relative bg-black border-t border-white/5 z-[1]">
       <div className="max-w-6xl mx-auto relative z-10">
          <BrutalHeader title="CONNECT WITH ME" subtitle="C:\Shelnet> SOCIALS" />
 

@@ -4,7 +4,7 @@ import BrutalHeader from '../shared/BrutalHeader';
 
 const NotesSection = () => {
   return (
-    <section id="notes" className="py-24 px-6 relative bg-black border-t border-white/5">
+    <section id="notes" className="py-24 px-6 relative bg-black border-t border-white/5 z-[1]">
       <GridBackground />
       <div className="max-w-6xl mx-auto relative z-10">
         <BrutalHeader title="NOTES" subtitle="C:\Shelnet> MY LEARNING JOURNEY" />
