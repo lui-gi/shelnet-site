@@ -11,7 +11,9 @@ const ExamsSection = () => {
         <div className="grid lg:grid-cols-2 gap-6">
 
            {/* A+ Exam */}
-           <div className="border border-red-500/20 bg-red-500/[0.03] p-8 flex flex-col justify-between">
+           <div className="border border-red-500/30 bg-red-500/[0.08] backdrop-blur-sm shadow-lg shadow-red-500/15 hover:shadow-red-500/25 hover:bg-red-500/[0.13] transition-all duration-300 p-8 flex flex-col justify-between rounded-lg relative overflow-hidden cursor-pointer">
+              {/* Glass sheen */}
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-400/50 to-transparent" />
               <div>
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -41,12 +43,12 @@ const ExamsSection = () => {
               </div>
 
               {/* Terminal Action */}
-              <div className="border border-red-500/15 bg-black p-4 font-mono text-sm">
+              <div className="border border-red-500/15 bg-black/60 backdrop-blur-sm p-4 font-mono text-sm rounded">
                  <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type a-plus</div>
                  <div className="text-red-500 mb-4">Generating question pool... Done.</div>
                  <Link
                    to="/a-plus-exams"
-                   className="block w-full border border-red-600 bg-red-500/10 text-white hover:bg-red-500/20 hover:text-red-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline"
+                   className="block w-full border border-red-600 bg-red-500/10 text-white hover:bg-red-500/20 hover:text-red-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline rounded"
                  >
                    Launch Exams
                  </Link>
@@ -54,7 +56,9 @@ const ExamsSection = () => {
            </div>
 
            {/* Sec+ Exam */}
-           <div className="border border-blue-500/20 bg-blue-500/[0.03] p-8 flex flex-col justify-between">
+           <div className="border border-blue-500/30 bg-blue-500/[0.08] backdrop-blur-sm shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 hover:bg-blue-500/[0.13] transition-all duration-300 p-8 flex flex-col justify-between rounded-lg relative overflow-hidden cursor-pointer">
+              {/* Glass sheen */}
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
               <div>
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -88,12 +92,12 @@ const ExamsSection = () => {
               </div>
 
               {/* Terminal Action */}
-              <div className="border border-blue-500/15 bg-black p-4 font-mono text-sm">
+              <div className="border border-blue-500/15 bg-black/60 backdrop-blur-sm p-4 font-mono text-sm rounded">
                  <div className="text-white/40 mb-2">root@shelnet:~# exam-runner --type sec-plus</div>
                  <div className="text-blue-500 mb-4">Decrypting exam key... Done.</div>
                  <Link
                     to="/security-plus-exams"
-                    className="block w-full border border-blue-600 bg-blue-500/10 text-white hover:bg-blue-500/20 hover:text-blue-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline"
+                    className="block w-full border border-blue-600 bg-blue-500/10 text-white hover:bg-blue-500/20 hover:text-blue-400 font-bold py-3 px-4 transition-all text-center uppercase btn-scanline rounded"
                   >
                     Launch Exams
                   </Link>

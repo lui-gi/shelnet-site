@@ -10,7 +10,9 @@ const PBQsSection = () => {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* A+ Card */}
-          <div className="group border border-red-500/20 bg-red-500/[0.03] hover:bg-red-500/[0.06] p-8 transition-all duration-300 relative overflow-hidden">
+          <div className="group border border-red-500/30 bg-red-500/[0.08] backdrop-blur-sm shadow-lg shadow-red-500/15 hover:shadow-red-500/25 hover:bg-red-500/[0.13] p-8 transition-all duration-300 relative overflow-hidden rounded-lg cursor-pointer">
+            {/* Glass sheen */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-400/50 to-transparent" />
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Cpu size={120} strokeWidth={1} />
             </div>
@@ -24,10 +26,9 @@ const PBQsSection = () => {
                 Interactive simulations for OS troubleshooting, disk management, and  suspicious activity.
               </p>
 
-              {/* Replaced <button> with <Link> */}
               <Link
                 to="/a-plus-pbqs"
-                className="w-full py-4 border border-red-500 bg-red-400/10 hover:bg-red-400/20 hover:text-red-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center btn-scanline"
+                className="w-full py-4 border border-red-500 bg-red-400/10 hover:bg-red-400/20 hover:text-red-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center btn-scanline rounded"
               >
                 <span>Load Module</span>
                 <span>./launch_a_plus.sh</span>
@@ -37,7 +38,9 @@ const PBQsSection = () => {
           </div>
 
           {/* Sec+ Card */}
-          <div className="group border border-blue-500/20 bg-blue-500/[0.03] hover:bg-blue-500/[0.06] p-8 transition-all duration-300 relative overflow-hidden">
+          <div className="group border border-blue-500/30 bg-blue-500/[0.08] backdrop-blur-sm shadow-lg shadow-blue-500/15 hover:shadow-blue-500/25 hover:bg-blue-500/[0.13] p-8 transition-all duration-300 relative overflow-hidden rounded-lg cursor-pointer">
+            {/* Glass sheen */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/50 to-transparent" />
             <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
               <Shield size={120} strokeWidth={1} />
             </div>
@@ -51,10 +54,9 @@ const PBQsSection = () => {
                 Firewall configuration logs, vulnerability scanning analysis, and secure network architecture PBQs.
               </p>
 
-              {/* Replace the Security+ <button> with this <Link> */}
               <Link
                 to="/security-plus-pbqs"
-                className="w-full py-4 border border-blue-500 bg-blue-400/10 hover:bg-blue-400/20 hover:text-blue-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center btn-scanline"
+                className="w-full py-4 border border-blue-500 bg-blue-400/10 hover:bg-blue-400/20 hover:text-blue-400 transition-colors font-mono text-sm uppercase flex justify-between px-6 items-center btn-scanline rounded"
               >
                 <span>Load Module</span>
                 <span>./launch_sec_plus.sh</span>
