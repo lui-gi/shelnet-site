@@ -11,15 +11,12 @@ const HeroSection = () => {
              SYSTEM_READY: v2.0.4
            </div>
            <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6" style={{ fontFamily: 'Helvetica Neue, sans-serif' }}>
-             LEARN CYBER<br />
+             OPEN-SOURCE<br />
              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40">
-               WITH ME.
+               CYBERSECURITY.
              </span>
            </h1>
-           <p className="text-white/60 text-base md:text-base max-w-base leading-relaxed mb-8">
-             Welcome to Shelnet! My mission is to provide everyone with free cybersecurity resources with no strings attached. I just want to share what I learn with others so we all can succeed in the world of cyber.
-           </p>
-           <div className="flex flex-wrap gap-4">
+<div className="flex flex-wrap gap-4">
              <a
               href="#pbqs"
               onClick={(e) => {
