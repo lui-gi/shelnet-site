@@ -1,7 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ChevronLeft, Server, Cpu, MemoryStick, Monitor, Shield, Target, Skull, Zap } from 'lucide-react';
-import GridBackground from '../components/shared/GridBackground';
 import { labs } from '../data/labs';
 
 const roleIcons = {
@@ -33,7 +32,6 @@ const LabDetail = () => {
     return (
       <div className="min-h-screen bg-black text-white font-sans">
         <div className="pt-24 px-6 pb-12 relative">
-          <GridBackground />
           <div className="max-w-7xl mx-auto relative z-10">
             <Link to="/#labs" className="inline-flex items-center gap-2 text-white/40 hover:text-orange-400 transition-colors font-mono text-sm mb-6">
               <ChevronLeft size={16} />
@@ -52,7 +50,6 @@ const LabDetail = () => {
   return (
     <div className="min-h-screen bg-black text-white font-sans">
       <div className="pt-24 px-6 pb-12 relative">
-        <GridBackground />
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Header */}
           <div className="mb-8">

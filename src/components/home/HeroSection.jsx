@@ -1,13 +1,9 @@
 import { ChevronRight } from 'lucide-react';
-import GridBackground from '../shared/GridBackground';
 import TerminalComponent from '../animations/TerminalComponent';
 
 const HeroSection = () => {
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
-      {/* BACKGROUNDS */}
-      <GridBackground />
-
       <div className="max-w-7xl w-full mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
         {/* Left Content */}
         <div>

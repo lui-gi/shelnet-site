@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Shield, Play, AlertCircle, Loader2 } from 'lucide-react';
 import PageHeader from '../components/shared/PageHeader';
-import GridBackground from '../components/shared/GridBackground';
 import PBQSidebar from '../components/shared/PBQSidebar';
 import ContentViewer from '../components/shared/ContentViewer';
 import { useManifest } from '../utils/useManifest';
@@ -23,9 +22,8 @@ const SecurityPlusExams = () => {
     <div className="min-h-screen bg-black text-white font-sans">
       {/* PADDING-TOP: 24 (6rem) to clear the fixed navbar */}
       <div className="pt-24 px-6 pb-12 relative">
-        <GridBackground />
         <div className="max-w-7xl mx-auto relative z-10">
-          
+
           {/* HEADER SECTION */}
           <PageHeader
             icon={<Shield size={20} />}

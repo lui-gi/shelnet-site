@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Terminal, Shield, AlertCircle, Loader2 } from 'lucide-react';
 import PageHeader from '../components/shared/PageHeader';
-import GridBackground from '../components/shared/GridBackground';
 import PBQSidebar from '../components/shared/PBQSidebar';
 import ContentViewer from '../components/shared/ContentViewer';
 import { useManifest } from '../utils/useManifest';
@@ -24,9 +23,8 @@ const SecurityPlusPBQs = () => {
       {/* MAIN CONTENT */}
       {/* pt-24 ensures content clears the fixed Navbar from Layout.jsx */}
       <div className="pt-24 px-6 pb-12 relative">
-        <GridBackground />
         <div className="max-w-7xl mx-auto relative z-10">
-          
+
           {/* Header & Back Button */}
           <PageHeader
             icon={<Shield size={20} />}
