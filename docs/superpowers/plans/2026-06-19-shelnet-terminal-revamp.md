@@ -775,13 +775,14 @@ const ResourceTUI = () => {
 
   const openItem = (item) => {
     if (item.to) navigate(item.to);
-    else if (item.href) window.open(item.href, '_blank', 'noopener');
+    else if (item.href) window.open(item.href, '_blank', 'noopener,noreferrer');
   };
 
   // Keyboard nav within the tree (progressive enhancement).
   const onTreeKey = (e) => {
     if (e.key === 'ArrowDown') { e.preventDefault(); setActive((i) => (i + 1) % tree.length); }
     if (e.key === 'ArrowUp')   { e.preventDefault(); setActive((i) => (i - 1 + tree.length) % tree.length); }
+    if (e.key === 'Enter' && current.items[0]) { e.preventDefault(); openItem(current.items[0]); }
   };
 
   return (
@@ -792,7 +793,7 @@ const ResourceTUI = () => {
           accent="green"
           titleLeft="┤ shelnet · ~/resources ├"
           titleRight={`${tree.length} dirs`}
-          footerLeft="↑↓ select · enter open · / search"
+          footerLeft="↑↓ select · enter open"
           footerRight="free · open-source · no-login"
         >
           <div className="grid md:grid-cols-[230px_1fr] min-h-[320px]">
@@ -1430,7 +1431,7 @@ In `src/pages/lab-detail.jsx`, replace the existing header `<div className="mb-8
           </div>
 ```
 
-Add the import at the top: `import Prompt from '../components/tui/Prompt';` (and keep the existing `Link` import). Apply the same `Prompt` + path treatment to the 404 branch's header for consistency.
+Add the import at the top: `import Prompt from '../components/tui/Prompt';` (and keep the existing `Link` import). Apply the same `Prompt` + path treatment to the 404 branch's header for consistency. **Also change BOTH existing `<Link to="/#labs">` back-links (main header + 404 branch) to `<Link to="/#resources">`** — the `#labs` anchor no longer exists (it was replaced by the home TUI's `#resources` section in Phase 3).
 
 - [ ] **Step 2: Restyle the nav in `Layout.jsx`**
 
