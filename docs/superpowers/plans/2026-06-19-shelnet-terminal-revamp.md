@@ -21,7 +21,7 @@
   2. `npm run build` → succeeds.
   3. A **specific manual check** in `npm run dev` (stated per task).
   The one piece of pure logic (`useResourceCounts` derivation) is extracted as a pure function so it *could* be unit-tested later; we verify it by a temporary console assertion described in its task.
-- **Accent vocabulary** (used everywhere): global/home = green; A+ = red; Security+ = blue; Visualizations = purple; Labs = orange; Notes = slate.
+- **Accent vocabulary** (used everywhere): global/home = **emerald** (`emerald-*`; emerald-400 = `#34d399` = `ACCENTS.green.hex`); A+ = red; Security+ = blue; Visualizations = purple; Labs = orange; Notes = slate. (The config key is still named `green` for brevity; it renders emerald.)
 - **Prompt string**: always `shelnet:~$`. Never `C:\…`, `root@…`, or a bare `$` as a section header again.
 - **Commit after every task** on branch `redesign/terminal-native`. Commit messages use the `feat:`/`refactor:`/`style:` prefixes shown.
 - Tailwind class strings below are real and compile; visual fine-tuning during execution is expected and fine.
@@ -94,18 +94,18 @@ Add this object inside the `themeColors` export (same keys as `red`/`blue`/etc.,
 
 ```js
   green: {
-    bgActive: 'bg-green-500/10',
+    bgActive: 'bg-emerald-500/10',
     bgHover: 'bg-white/[0.05]',
     border: 'border-white/10',
-    borderActive: 'border-green-500',
+    borderActive: 'border-emerald-500',
     borderHover: 'border-white/30',
-    hoverBorder: 'hover:border-green-500',
-    text: 'text-green-400',
-    textMuted: 'text-green-400/80',
-    textHover: 'hover:text-green-400',
-    pulse: 'bg-green-400',
-    iconBg: 'bg-green-500/20',
-    iconBorder: 'border-green-500/50',
+    hoverBorder: 'hover:border-emerald-500',
+    text: 'text-emerald-400',
+    textMuted: 'text-emerald-400/80',
+    textHover: 'hover:text-emerald-400',
+    pulse: 'bg-emerald-400',
+    iconBg: 'bg-emerald-500/20',
+    iconBorder: 'border-emerald-500/50',
   },
 ```
 
@@ -189,7 +189,7 @@ body {
     );
   }
   .glow-green {
-    background-image: radial-gradient(120% 80% at 50% -10%, rgba(52, 197, 153, 0.10), transparent 60%);
+    background-image: radial-gradient(120% 80% at 50% -10%, rgba(52, 211, 153, 0.10), transparent 60%);
   }
   @media (prefers-reduced-motion: reduce) {
     .reduce-static { animation: none !important; }
@@ -331,11 +331,11 @@ import { themeColors } from '../../config/themeColors';
  * @param {ReactNode} children   - panel body
  */
 const ACCENT_BORDER = {
-  green: 'border-green-500/40', red: 'border-red-500/40', blue: 'border-blue-500/40',
+  green: 'border-emerald-500/40', red: 'border-red-500/40', blue: 'border-blue-500/40',
   purple: 'border-purple-500/40', orange: 'border-orange-500/40', slate: 'border-slate-400/40',
 };
 const ACCENT_DIV = {
-  green: 'border-green-500/25', red: 'border-red-500/25', blue: 'border-blue-500/25',
+  green: 'border-emerald-500/25', red: 'border-red-500/25', blue: 'border-blue-500/25',
   purple: 'border-purple-500/25', orange: 'border-orange-500/25', slate: 'border-slate-400/25',
 };
 
@@ -485,13 +485,13 @@ const HeroSection = () => {
   // Build boot lines from live data. `null` count renders as "—".
   const n = (v) => (v == null ? '—' : v);
   const lines = [
-    { html: <><span className="text-white/40">[ <span className="text-green-400">0.00</span> ] shelnet kernel {SITE.version} — booting userland…</span></> },
-    { html: <><span className="text-green-400">[  OK  ]</span> mounting <span className="text-red-400">/pbqs</span> <span className="text-white/20">······</span> <span className="text-white/40">{n(counts.pbqs)} simulations</span></> },
-    { html: <><span className="text-green-400">[  OK  ]</span> mounting <span className="text-blue-400">/exams</span> <span className="text-white/20">·····</span> <span className="text-white/40">{n(counts.exams)} mock tests</span></> },
-    { html: <><span className="text-green-400">[  OK  ]</span> mounting <span className="text-purple-400">/visualizations</span> <span className="text-white/40">{n(counts.viz)} modules</span></> },
-    { html: <><span className="text-green-400">[  OK  ]</span> mounting <span className="text-orange-400">/labs</span> <span className="text-white/20">······</span> <span className="text-white/40">{n(counts.labs)} writeups</span></> },
-    { html: <><span className="text-green-400">[  OK  ]</span> security: <span className="text-white">trackers=0  paywall=none  cost=$0.00</span></> },
-    { html: <><span className="text-white/40">[ <span className="text-green-400">feed</span> ] {newsText ? newsText.split('\n')[0] : 'latest updates loading…'}</span></> },
+    { html: <><span className="text-white/40">[ <span className="text-emerald-400">0.00</span> ] shelnet kernel {SITE.version} — booting userland…</span></> },
+    { html: <><span className="text-emerald-400">[  OK  ]</span> mounting <span className="text-red-400">/pbqs</span> <span className="text-white/20">······</span> <span className="text-white/40">{n(counts.pbqs)} simulations</span></> },
+    { html: <><span className="text-emerald-400">[  OK  ]</span> mounting <span className="text-blue-400">/exams</span> <span className="text-white/20">·····</span> <span className="text-white/40">{n(counts.exams)} mock tests</span></> },
+    { html: <><span className="text-emerald-400">[  OK  ]</span> mounting <span className="text-purple-400">/visualizations</span> <span className="text-white/40">{n(counts.viz)} modules</span></> },
+    { html: <><span className="text-emerald-400">[  OK  ]</span> mounting <span className="text-orange-400">/labs</span> <span className="text-white/20">······</span> <span className="text-white/40">{n(counts.labs)} writeups</span></> },
+    { html: <><span className="text-emerald-400">[  OK  ]</span> security: <span className="text-white">trackers=0  paywall=none  cost=$0.00</span></> },
+    { html: <><span className="text-white/40">[ <span className="text-emerald-400">feed</span> ] {newsText ? newsText.split('\n')[0] : 'latest updates loading…'}</span></> },
   ];
 
   const prefersReduced = typeof window !== 'undefined'
@@ -547,9 +547,9 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-scanlines pointer-events-none" aria-hidden="true" />
       <div className="max-w-3xl w-full mx-auto relative z-10 font-mono text-sm md:text-base">
         {/* Banner: ASCII on desktop, wordmark on mobile */}
-        <pre className="hidden sm:block text-green-400 text-[10px] md:text-xs leading-tight whitespace-pre"
+        <pre className="hidden sm:block text-emerald-400 text-[10px] md:text-xs leading-tight whitespace-pre"
              style={{ textShadow: '0 0 14px rgba(52,211,153,.4)' }} aria-label="SHELNET">{ASCII_BANNER}</pre>
-        <div className="sm:hidden font-display text-4xl font-bold text-green-400">SHELNET_</div>
+        <div className="sm:hidden font-display text-4xl font-bold text-emerald-400">SHELNET_</div>
         <div className="text-white/45 text-xs mt-1 mb-5">{SITE.version} · open-source cybersecurity education</div>
 
         {/* Boot log */}
@@ -563,15 +563,15 @@ const HeroSection = () => {
         {finished && (
           <>
             <div className="mt-4">
-              <span className="text-green-400">shelnet login:</span> <span className="text-white">guest</span>
+              <span className="text-emerald-400">shelnet login:</span> <span className="text-white">guest</span>
               <span className="text-white/40"> — press </span>
               <span className="border border-white/30 rounded px-1.5 text-xs">enter</span>
               <span className="text-white/40"> to start</span>
-              <span className="inline-block w-2 h-4 bg-green-400 align-text-bottom ml-1 animate-pulse" />
+              <span className="inline-block w-2 h-4 bg-emerald-400 align-text-bottom ml-1 animate-pulse" />
             </div>
             <div className="mt-5 flex flex-wrap gap-3">
               <button onClick={scrollToBrowser}
-                className="px-4 py-2 bg-green-400 text-black font-bold rounded text-sm hover:bg-green-300 transition-colors btn-scanline">
+                className="px-4 py-2 bg-emerald-400 text-black font-bold rounded text-sm hover:bg-emerald-300 transition-colors btn-scanline">
                 ▸ Try a PBQ
               </button>
               <button onClick={scrollToAbout}
@@ -586,9 +586,9 @@ const HeroSection = () => {
       {/* Scroll cue */}
       {finished && (
         <button onClick={scrollToBrowser}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/40 text-xs font-mono hover:text-green-400 transition-colors">
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/40 text-xs font-mono hover:text-emerald-400 transition-colors">
           scroll to browse the filesystem
-          <span className="block text-green-400 text-base animate-bounce reduce-static">▾</span>
+          <span className="block text-emerald-400 text-base animate-bounce reduce-static">▾</span>
         </button>
       )}
     </section>
@@ -745,7 +745,7 @@ import { labs } from '../../data/labs';
 import { themeColors } from '../../config/themeColors';
 
 const ACCENT_HL = {
-  green: 'bg-green-500/14', red: 'bg-red-500/14', blue: 'bg-blue-500/14',
+  green: 'bg-emerald-500/14', red: 'bg-red-500/14', blue: 'bg-blue-500/14',
   purple: 'bg-purple-500/14', orange: 'bg-orange-500/14', slate: 'bg-slate-500/14',
 };
 const ACCENT_BAR = {
@@ -801,7 +801,7 @@ const ResourceTUI = () => {
               ref={treeRef}
               tabIndex={0}
               onKeyDown={onTreeKey}
-              className="border-b md:border-b-0 md:border-r border-green-500/25 p-2 outline-none focus:bg-white/[0.02]"
+              className="border-b md:border-b-0 md:border-r border-emerald-500/25 p-2 outline-none focus:bg-white/[0.02]"
               aria-label="Resource directories"
             >
               {tree.map((dir, i) => (
@@ -877,7 +877,7 @@ import ConnectSection from './components/home/ConnectSection';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-black text-white font-mono selection:bg-green-500/30 selection:text-green-200">
+    <div className="min-h-screen bg-black text-white font-mono selection:bg-emerald-500/30 selection:text-emerald-200">
       <HeroSection />
       <ResourceTUI />
       <AboutSection />
@@ -986,7 +986,7 @@ const AboutSection = () => (
           <div className="pt-5 border-t border-white/10 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-xs">
             <span className="text-white/40">2024 <span className="text-white/30">private repo</span></span>
             <span className="text-white/20">→</span>
-            <span className="text-green-400">now <span className="text-white">open source</span></span>
+            <span className="text-emerald-400">now <span className="text-white">open source</span></span>
             <span className="text-white/20">→</span>
             <span className="text-white/40">next <span className="text-white/30">growing community</span></span>
           </div>
@@ -1050,7 +1050,7 @@ const ConnectSection = () => (
 
       <div className="mt-8 pt-6 border-t border-white/10 flex justify-between text-white/30 text-xs font-mono">
         <span>© {new Date().getFullYear()} {SITE.domain}</span>
-        <span className="text-green-400">{PROMPT} logout</span>
+        <span className="text-emerald-400">{PROMPT} logout</span>
       </div>
     </div>
   </section>
@@ -1090,11 +1090,11 @@ import { themeColors } from '../../config/themeColors';
 import { PROMPT } from '../../config/theme';
 
 const ACCENT_BORDER = {
-  green: 'border-green-500/40', red: 'border-red-500/40', blue: 'border-blue-500/40',
+  green: 'border-emerald-500/40', red: 'border-red-500/40', blue: 'border-blue-500/40',
   purple: 'border-purple-500/40', orange: 'border-orange-500/40', slate: 'border-slate-400/40',
 };
 const ACCENT_DIV = {
-  green: 'border-green-500/25', red: 'border-red-500/25', blue: 'border-blue-500/25',
+  green: 'border-emerald-500/25', red: 'border-red-500/25', blue: 'border-blue-500/25',
   purple: 'border-purple-500/25', orange: 'border-orange-500/25', slate: 'border-slate-400/25',
 };
 
@@ -1439,13 +1439,13 @@ In `src/Layout.jsx`, update the desktop + mobile nav link lists so labels reflec
 ```jsx
 {/* desktop links */}
 <div className="hidden md:flex gap-8 font-mono text-sm text-white/60">
-  <a href="/#resources" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">resources</a>
-  <a href="/#about" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">about</a>
-  <a href="/#connect" className="hover:text-white transition-colors hover:underline decoration-green-500 underline-offset-4">connect</a>
+  <a href="/#resources" className="hover:text-white transition-colors hover:underline decoration-emerald-500 underline-offset-4">resources</a>
+  <a href="/#about" className="hover:text-white transition-colors hover:underline decoration-emerald-500 underline-offset-4">about</a>
+  <a href="/#connect" className="hover:text-white transition-colors hover:underline decoration-emerald-500 underline-offset-4">connect</a>
 </div>
 ```
 
-Update the mobile drawer links the same way (three links: resources/about/connect). Change the logo accent hover and the hamburger hover from the old palette to `green` (`hover:text-green-500`). Keep all scroll/escape/resize logic intact.
+Update the mobile drawer links the same way (three links: resources/about/connect). Change the logo accent hover and the hamburger hover from the old palette to `green` (`hover:text-emerald-500`). Also change the Layout root `<div>` className from `font-sans` to `font-mono` so it inherits the mono body face (App.jsx and the inner pages already use `font-mono`). Keep all scroll/escape/resize logic intact.
 
 - [ ] **Step 3: Verify**
 
