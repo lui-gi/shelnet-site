@@ -1,22 +1,14 @@
+// src/App.jsx
 import HeroSection from './components/home/HeroSection';
-import PBQsSection from './components/home/PBQsSection';
-import ExamsSection from './components/home/ExamsSection';
-import VisualizationsSection from './components/home/VisualizationsSection';
-import LabsSection from './components/home/LabsSection';
-import NotesSection from './components/home/NotesSection';
+import ResourceTUI from './components/home/ResourceTUI';
 import AboutSection from './components/home/AboutSection';
 import ConnectSection from './components/home/ConnectSection';
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-black text-white font-sans selection:bg-green-500/30 selection:text-green-200 relative">
-      {/* PAGE SECTIONS */}
+    <div className="min-h-screen bg-black text-white font-mono selection:bg-emerald-500/30 selection:text-emerald-200">
       <HeroSection />
-      <PBQsSection />
-      <ExamsSection />
-      <VisualizationsSection />
-      <LabsSection />
-      <NotesSection />
+      <ResourceTUI />
       <AboutSection />
       <ConnectSection />
     </div>
