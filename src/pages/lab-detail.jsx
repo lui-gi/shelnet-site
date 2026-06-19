@@ -1,7 +1,8 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Server, Cpu, MemoryStick, Monitor, Shield, Target, Skull, Zap } from 'lucide-react';
+import { Server, Cpu, MemoryStick, Monitor, Shield, Target, Skull, Zap } from 'lucide-react';
 import { labs } from '../data/labs';
+import Prompt from '../components/tui/Prompt';
 
 const roleIcons = {
   'Attacker': Skull,
@@ -30,13 +31,17 @@ const LabDetail = () => {
 
   if (!lab) {
     return (
-      <div className="min-h-screen bg-black text-white font-sans">
+      <div className="min-h-screen bg-black text-white font-mono">
         <div className="pt-24 px-6 pb-12 relative">
           <div className="max-w-7xl mx-auto relative z-10">
-            <Link to="/#labs" className="inline-flex items-center gap-2 text-white/40 hover:text-orange-400 transition-colors font-mono text-sm mb-6">
-              <ChevronLeft size={16} />
-              ../BACK_TO_LABS
-            </Link>
+            <Prompt command="cd /labs/404" accent="orange" className="mb-3" />
+            <div className="mb-8 flex items-end justify-between border-b border-orange-500/25 pb-4">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-tight font-display">Lab Not Found</h1>
+                <div className="text-sm text-white/50 font-mono">~/labs/404</div>
+              </div>
+              <Link to="/#resources" className="text-white/40 hover:text-orange-400 font-mono text-xs whitespace-nowrap">../back</Link>
+            </div>
             <div className="text-center py-20">
               <div className="text-6xl mb-4">404</div>
               <div className="text-white/60 font-mono">Lab not found</div>
@@ -48,31 +53,17 @@ const LabDetail = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white font-sans">
+    <div className="min-h-screen bg-black text-white font-mono">
       <div className="pt-24 px-6 pb-12 relative">
         <div className="max-w-7xl mx-auto relative z-10">
           {/* Header */}
-          <div className="mb-8">
-            <Link to="/#labs" className="inline-flex items-center gap-2 text-white/40 hover:text-orange-400 transition-colors font-mono text-sm mb-6">
-              <ChevronLeft size={16} />
-              ../BACK_TO_LABS
-            </Link>
-
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-orange-500/20 border border-orange-500/50 rounded flex items-center justify-center">
-                {lab.type === 'hardware'
-                  ? <Zap size={20} className="text-orange-400" />
-                  : <Server size={20} className="text-orange-400" />
-                }
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold uppercase tracking-tight">{lab.name}</h1>
-                <div className="text-sm text-white/50 font-mono">REV {lab.revision} | {lab.date}</div>
-              </div>
+          <Prompt command={`cd /labs/${lab.slug}`} accent="orange" className="mb-3" />
+          <div className="mb-8 flex items-end justify-between border-b border-orange-500/25 pb-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-tight font-display">{lab.name}</h1>
+              <div className="text-sm text-white/50 font-mono">~/labs/{lab.slug} · REV {lab.revision} · {lab.date}</div>
             </div>
-            <div className="text-white/60 max-w-2xl">
-              {lab.description}
-            </div>
+            <Link to="/#resources" className="text-white/40 hover:text-orange-400 font-mono text-xs whitespace-nowrap">../back</Link>
           </div>
 
           {/* Main Content Grid */}
