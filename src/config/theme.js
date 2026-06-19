@@ -16,8 +16,8 @@ export const PROMPT = 'shelnet:~$';
 
 export const SITE = {
   version: 'v3.0',
-  // TODO(confirm-with-owner): real production domain. Default below.
-  domain: 'shelnet.dev',
+  // Production domain (matches public/robots.txt + public/sitemap.xml).
+  domain: 'shelnet.org',
 };
 
 // ASCII banner for the boot hero (desktop). Monospace required.
