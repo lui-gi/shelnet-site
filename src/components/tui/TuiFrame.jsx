@@ -20,18 +20,18 @@ const ACCENT_DIV = {
 };
 
 const TuiFrame = ({ accent = 'green', titleLeft, titleRight, footerLeft, footerRight, children, className = '' }) => {
-  const colors = themeColors[accent];
+  const colors = themeColors[accent] || themeColors.green;
   return (
-    <div className={`border ${ACCENT_BORDER[accent]} rounded-md font-mono bg-black/40 ${className}`}>
+    <div className={`border ${(ACCENT_BORDER[accent] || ACCENT_BORDER.green)} rounded-md font-mono bg-black/40 ${className}`}>
       {(titleLeft || titleRight) && (
-        <div className={`flex items-center justify-between px-3 py-2 border-b ${ACCENT_DIV[accent]} text-xs`}>
+        <div className={`flex items-center justify-between px-3 py-2 border-b ${(ACCENT_DIV[accent] || ACCENT_DIV.green)} text-xs`}>
           <span className={colors.text}>{titleLeft}</span>
           <span className="text-white/40">{titleRight}</span>
         </div>
       )}
       {children}
       {(footerLeft || footerRight) && (
-        <div className={`flex items-center justify-between px-3 py-2 border-t ${ACCENT_DIV[accent]} text-[10.5px]`}>
+        <div className={`flex items-center justify-between px-3 py-2 border-t ${(ACCENT_DIV[accent] || ACCENT_DIV.green)} text-[10.5px]`}>
           <span className="text-white/50">{footerLeft}</span>
           <span className={colors.text}>{footerRight}</span>
         </div>

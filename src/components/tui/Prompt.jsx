@@ -8,7 +8,7 @@ import { themeColors } from '../../config/themeColors';
  * @param {string} accent  - theme color key for the prompt glyph (default green)
  */
 const Prompt = ({ command, accent = 'green', className = '' }) => {
-  const colors = themeColors[accent];
+  const colors = themeColors[accent] || themeColors.green;
   return (
     <div className={`font-mono text-sm ${className}`}>
       <span className={colors.text}>{PROMPT}</span>{' '}

@@ -2,11 +2,10 @@
 import { useEffect, useState } from 'react';
 import { fetchManifest } from './manifestService';
 import { deriveCounts } from './resourceCounts';
-import { labs } from '../data/labs';
 
 /** Loads the manifest and returns derived counts; degrades to null counts on failure. */
 export function useResourceCounts() {
-  const [counts, setCounts] = useState({ pbqs: null, exams: null, viz: null, labs: labs.length });
+  const [counts, setCounts] = useState(() => deriveCounts(null));
   useEffect(() => {
     let alive = true;
     fetchManifest()
