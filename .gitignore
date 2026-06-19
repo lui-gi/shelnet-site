@@ -27,3 +27,4 @@ CLAUDE.md
 .claude
 .env.development
 .env.production
+.superpowers/
