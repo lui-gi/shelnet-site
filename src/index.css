@@ -23,7 +23,7 @@ body {
   /* Standard properties (Firefox 64+, Chrome 121+) */
   html {
     scrollbar-width: thin;
-    scrollbar-color: #22c55e #000000;
+    scrollbar-color: #34d399 #000000;
   }
 
   /* Webkit browsers (Chrome, Safari, Edge) */
@@ -37,15 +37,15 @@ body {
     }
 
     ::-webkit-scrollbar-thumb {
-      @apply bg-green-500 rounded;
+      @apply bg-emerald-500 rounded;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      @apply bg-green-400;
+      @apply bg-emerald-400;
     }
 
     ::-webkit-scrollbar-thumb:active {
-      @apply bg-green-600;
+      @apply bg-emerald-600;
     }
 
     ::-webkit-scrollbar-corner {
@@ -63,7 +63,7 @@ body {
     );
   }
   .glow-green {
-    background-image: radial-gradient(120% 80% at 50% -10%, rgba(52, 197, 153, 0.10), transparent 60%);
+    background-image: radial-gradient(120% 80% at 50% -10%, rgba(52, 211, 153, 0.10), transparent 60%);
   }
   @media (prefers-reduced-motion: reduce) {
     .reduce-static { animation: none !important; }

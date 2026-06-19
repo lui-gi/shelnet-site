@@ -102,18 +102,18 @@ export const themeColors = {
   },
 
   green: {
-    bgActive: 'bg-green-500/10',
+    bgActive: 'bg-emerald-500/10',
     bgHover: 'bg-white/[0.05]',
     border: 'border-white/10',
-    borderActive: 'border-green-500',
+    borderActive: 'border-emerald-500',
     borderHover: 'border-white/30',
-    hoverBorder: 'hover:border-green-500',
-    text: 'text-green-400',
-    textMuted: 'text-green-400/80',
-    textHover: 'hover:text-green-400',
-    pulse: 'bg-green-400',
-    iconBg: 'bg-green-500/20',
-    iconBorder: 'border-green-500/50',
+    hoverBorder: 'hover:border-emerald-500',
+    text: 'text-emerald-400',
+    textMuted: 'text-emerald-400/80',
+    textHover: 'hover:text-emerald-400',
+    pulse: 'bg-emerald-400',
+    iconBg: 'bg-emerald-500/20',
+    iconBorder: 'border-emerald-500/50',
   },
 
   slate: {
