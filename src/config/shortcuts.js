@@ -22,7 +22,6 @@ export function shortcutsForPath(pathname) {
     return [
       { keys: '↑↓', label: 'file' },
       { keys: 'f', label: 'full' },
-      { keys: '↵', label: 'open' },
       { keys: 'esc', label: '~' },
     ];
   }
