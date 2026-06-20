@@ -104,8 +104,7 @@ const Workspace = ({
             )}
           </div>
 
-          <div className="flex items-center justify-between py-2 text-[10.5px]">
-            <span className="text-white/50">↑↓ select · f fullscreen · esc home</span>
+          <div className="flex items-center justify-end py-2 text-[10.5px]">
             <span className={colors.text}>{items.length} files{metaRight ? ` · ${metaRight}` : ''}</span>
           </div>
         </div>
