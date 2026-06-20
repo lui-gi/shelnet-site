@@ -2,31 +2,87 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNews } from '../../utils/useNews';
 import { useResourceCounts } from '../../utils/useResourceCounts';
-import { ASCII_BANNER, SITE } from '../../config/theme';
+import { ASCII_BANNER } from '../../config/theme';
 
 const SESSION_KEY = 'shelnet_booted';
+const GREEN = '#43c08c';   // banner + numbers + cursor
+const ACCENT = '#7e9b86';  // dim phosphor: status markers + `guest`
+
+// `dir` => selects a directory in the resources TUI (via location.hash).
+// `anchor` => scrolls to a section element by id.
+const MENU = [
+  { n: '1', cmd: './pbqs',           desc: 'performance-based questions',   dir: 'pbqs' },
+  { n: '2', cmd: './exams',          desc: 'full-length mock exams',        dir: 'exams' },
+  { n: '3', cmd: './labs',           desc: 'guided lab writeups',           dir: 'labs' },
+  { n: '4', cmd: './visualizations', desc: 'interactive modules',           dir: 'visualizations' },
+  { n: '5', cmd: 'man about',        desc: 'what is shelnet?',              anchor: 'about' },
+  { n: '6', cmd: './connect',        desc: 'newsletter · github · contact', anchor: 'connect' },
+];
+
+const fmt = (v) => (v == null ? '—' : v);
+
+// Bracketed status marker, e.g. [  OK  ]. `inner` is the padded 6-char label.
+const Mark = ({ inner }) => (
+  <>
+    <span className="text-white/30">[</span>
+    <span style={{ color: ACCENT }}>{inner}</span>
+    <span className="text-white/30">]</span>
+  </>
+);
+
+// Boot/mount log as an array of nodes. `narrow` trims leaders + uname for phones.
+function buildLines(counts, newsText, narrow) {
+  const feed = newsText ? newsText.split('\n')[0] : 'latest updates loading…';
+  if (narrow) {
+    const feedShort = feed.length > 22 ? `${feed.slice(0, 21)}…` : feed;
+    return [
+      <><Mark inner=" 0.00 " /> booting userland…</>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/pbqs</span>{'   '}<span className="text-white/55">{fmt(counts.pbqs)} sims</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/exams</span>{'  '}<span className="text-white/55">{fmt(counts.exams)} exams</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/viz</span>{'    '}<span className="text-white/55">{fmt(counts.viz)} modules</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/labs</span>{'   '}<span className="text-white/55">{fmt(counts.labs)} writeups</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">trackers=0 · $0.00</span></>,
+      <><Mark inner=" feed " /> {feedShort}</>,
+    ];
+  }
+  const dots = (s) => <span className="text-white/20" aria-hidden="true">{s}</span>;
+  return [
+    <><Mark inner=" 0.00 " /> shelnet kernel v3.0 — booting userland…</>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/pbqs</span> {dots('·················')} <span className="text-white/55">{fmt(counts.pbqs)} simulations</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/exams</span> {dots('················')} <span className="text-white/55">{fmt(counts.exams)} mock tests</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/visualizations</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/labs</span> {dots('·················')} <span className="text-white/55">{fmt(counts.labs)} writeups</span></>,
+    <><Mark inner="  OK  " /> security: <span className="text-white/90">trackers=0  paywall=none  cost=$0.00</span></>,
+    <><Mark inner=" feed " /> {feed}</>,
+  ];
+}
 
 const HeroSection = () => {
   const { newsText } = useNews();
   const counts = useResourceCounts();
 
-  // Build boot lines from live data. `null` count renders as "—".
-  const n = (v) => (v == null ? '—' : v);
-  const lines = [
-    { html: <><span className="text-white/40">[ <span className="text-emerald-400">0.00</span> ] shelnet kernel {SITE.version} — booting userland…</span></> },
-    { html: <><span className="text-emerald-400">[  OK  ]</span> mounting <span className="text-red-400">/pbqs</span> <span className="text-white/20">······</span> <span className="text-white/40">{n(counts.pbqs)} simulations</span></> },
-    { html: <><span className="text-emerald-400">[  OK  ]</span> mounting <span className="text-blue-400">/exams</span> <span className="text-white/20">·····</span> <span className="text-white/40">{n(counts.exams)} mock tests</span></> },
-    { html: <><span className="text-emerald-400">[  OK  ]</span> mounting <span className="text-purple-400">/visualizations</span> <span className="text-white/40">{n(counts.viz)} modules</span></> },
-    { html: <><span className="text-emerald-400">[  OK  ]</span> mounting <span className="text-orange-400">/labs</span> <span className="text-white/20">······</span> <span className="text-white/40">{n(counts.labs)} writeups</span></> },
-    { html: <><span className="text-emerald-400">[  OK  ]</span> security: <span className="text-white">trackers=0  paywall=none  cost=$0.00</span></> },
-    { html: <><span className="text-white/40">[ <span className="text-emerald-400">feed</span> ] {newsText ? newsText.split('\n')[0] : 'latest updates loading…'}</span></> },
-  ];
-
   const prefersReduced = typeof window !== 'undefined'
     && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const alreadyBooted = typeof sessionStorage !== 'undefined' && sessionStorage.getItem(SESSION_KEY) === '1';
 
-  // visibleCount: how many boot lines are shown. Start fully shown if reduced/already booted.
+  // Responsive: condense the boot log + stats on phones.
+  const [narrow, setNarrow] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia('(max-width: 639px)').matches : false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 639px)');
+    const onChange = () => setNarrow(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  const lines = buildLines(counts, newsText, narrow);
+  const stats = narrow
+    ? ['SHELNET 3.0 LTS · tty3']
+    : ['SHELNET GNU/Linux 3.0 LTS · tty3 · 80×24',
+       'Linux shelnet 6.9.0-shelnet x86_64 · up 0:00 · load 0.00'];
+
   const [visibleCount, setVisibleCount] = useState(prefersReduced || alreadyBooted ? lines.length : 0);
   const [finished, setFinished] = useState(prefersReduced || alreadyBooted);
   const timer = useRef(null);
@@ -38,6 +94,7 @@ const HeroSection = () => {
     try { sessionStorage.setItem(SESSION_KEY, '1'); } catch { /* ignore */ }
   };
 
+  // Type the boot lines in sequence (once per session).
   useEffect(() => {
     if (prefersReduced || alreadyBooted) return;
     let i = 0;
@@ -52,7 +109,7 @@ const HeroSection = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Skip on any key/click/scroll.
+  // Skip the boot animation on any interaction.
   useEffect(() => {
     if (finished) return;
     const skip = () => finishNow();
@@ -67,66 +124,69 @@ const HeroSection = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
-  // After boot completes, Enter key scrolls to #resources.
+  const activate = (item) => {
+    if (item.dir) {
+      window.location.hash = item.dir;                 // ResourceTUI selects this directory
+      document.getElementById('resources')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      document.getElementById(item.anchor)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // After boot, keys 1–6 trigger the matching menu item.
   useEffect(() => {
     if (!finished) return;
-    const onEnter = (e) => { if (e.key === 'Enter') scrollToBrowser(); };
-    window.addEventListener('keydown', onEnter);
-    return () => window.removeEventListener('keydown', onEnter);
+    const onKey = (e) => {
+      const item = MENU.find((m) => m.n === e.key);
+      if (item) { e.preventDefault(); activate(item); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [finished]);
 
-  const scrollToBrowser = () => document.getElementById('resources')?.scrollIntoView({ behavior: 'smooth' });
-  const scrollToAbout = () => document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
-
   return (
-    <section id="hero" className="relative min-h-screen flex flex-col justify-center px-6 overflow-hidden glow-green">
-      <div className="absolute inset-0 bg-scanlines pointer-events-none" aria-hidden="true" />
-      <div className="max-w-3xl w-full mx-auto relative z-10 font-mono text-sm md:text-base">
-        {/* Banner: ASCII on desktop, wordmark on mobile */}
-        <pre className="hidden sm:block text-emerald-400 text-[10px] md:text-xs leading-tight whitespace-pre"
-             style={{ textShadow: '0 0 14px rgba(52,211,153,.4)' }} aria-label="SHELNET">{ASCII_BANNER}</pre>
-        <div className="sm:hidden font-display text-4xl font-bold text-emerald-400">SHELNET_</div>
-        <div className="text-white/45 text-xs mt-1 mb-5">{SITE.version} · open-source cybersecurity education</div>
+    <section id="hero" className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-24 glow-green">
+      <div className="w-fit max-w-full font-mono text-sm md:text-base">
+        <pre aria-label="shelnet"
+             className="mb-4 whitespace-pre text-[8px] leading-[1.1] sm:text-xs md:text-sm"
+             style={{ color: GREEN, textShadow: '0 0 8px rgba(52,211,153,.28)' }}>{ASCII_BANNER}</pre>
 
-        {/* Boot log */}
-        <div className="space-y-1 leading-relaxed min-h-[200px]">
-          {lines.slice(0, visibleCount).map((l, idx) => (
-            <div key={idx}>{l.html}</div>
-          ))}
+        <div className="mb-3 space-y-0.5 text-white/30">
+          {stats.map((s, i) => <div key={i}>{s}</div>)}
         </div>
 
-        {/* Login + CTAs (only after boot completes) */}
+        <div className="space-y-1 leading-relaxed text-white/65" style={{ minHeight: narrow ? 150 : 190 }}>
+          {lines.slice(0, visibleCount).map((node, i) => <div key={i}>{node}</div>)}
+        </div>
+
         {finished && (
           <>
-            <div className="mt-4">
-              <span className="text-emerald-400">shelnet login:</span> <span className="text-white">guest</span>
-              <span className="text-white/40"> — press </span>
-              <span className="border border-white/30 rounded px-1.5 text-xs">enter</span>
-              <span className="text-white/40"> to start</span>
-              <span className="inline-block w-2 h-4 bg-emerald-400 align-text-bottom ml-1 animate-pulse" />
+            <div className="mt-4 text-white/55">
+              shelnet login: <span style={{ color: ACCENT }}>guest</span>
+              <span className="text-white/40"> — press a key or click a destination:</span>
             </div>
-            <div className="mt-5 flex flex-wrap gap-3">
-              <button onClick={scrollToBrowser}
-                className="px-4 py-2 bg-emerald-400 text-black font-bold rounded text-sm hover:bg-emerald-300 transition-colors btn-scanline">
-                ▸ Try a PBQ
-              </button>
-              <button onClick={scrollToAbout}
-                className="px-4 py-2 border border-white/25 text-white rounded text-sm hover:bg-white/5 transition-colors">
-                $ man shelnet
-              </button>
+
+            <nav className="mt-2" aria-label="Site sections">
+              {MENU.map((item) => (
+                <button key={item.n} onClick={() => activate(item)}
+                  className="flex w-full items-start gap-3 rounded px-2 py-2 text-left transition-colors hover:bg-[#43c08c]/10 focus-visible:bg-[#43c08c]/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60">
+                  <span className="shrink-0 leading-6" style={{ color: GREEN }}>{item.n}</span>
+                  <span className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
+                    <span className="text-white/90 sm:w-44">{item.cmd}</span>
+                    <span className="text-xs text-white/40 sm:text-inherit">{item.desc}</span>
+                  </span>
+                </button>
+              ))}
+            </nav>
+
+            <div className="mt-3 text-white/60">
+              guest@shelnet:~$
+              <span className="ml-1 inline-block h-4 w-2 translate-y-0.5 animate-pulse reduce-static"
+                    style={{ backgroundColor: GREEN }} aria-hidden="true" />
             </div>
           </>
         )}
       </div>
-
-      {/* Scroll cue */}
-      {finished && (
-        <button onClick={scrollToBrowser}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/40 text-xs font-mono hover:text-emerald-400 transition-colors">
-          scroll to browse the filesystem
-          <span className="block text-emerald-400 text-base animate-bounce reduce-static">▾</span>
-        </button>
-      )}
     </section>
   );
 };
