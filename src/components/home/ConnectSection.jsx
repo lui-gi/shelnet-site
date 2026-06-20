@@ -2,6 +2,7 @@
 import { Youtube, Linkedin, Mail } from 'lucide-react';
 import TerminalShell from '../tui/TerminalShell';
 import { SITE } from '../../config/theme';
+import { useEscapeHome } from '../../utils/useEscapeHome';
 
 const LINKS = [
   { Icon: Youtube,  label: 'YouTube',  desc: 'Video explanations of PBQs & visualizations', href: 'https://youtube.com/@Shelnet',                       hover: 'hover:border-red-500/50 hover:bg-red-900/10',  cta: 'text-red-400' },
@@ -9,7 +10,9 @@ const LINKS = [
   { Icon: Mail,     label: 'Email',    desc: 'Resource requests or business inquiries',      href: 'https://forms.gle/WRM23ktXNZiupPaZA',               hover: 'hover:border-white/50 hover:bg-white/5',       cta: 'text-white/70' },
 ];
 
-const ConnectSection = () => (
+const ConnectSection = () => {
+  useEscapeHome();
+  return (
   <TerminalShell maxWidthClass="max-w-3xl">
     <div className="grid sm:grid-cols-3 gap-3">
       {LINKS.map((link) => {
@@ -31,6 +34,7 @@ const ConnectSection = () => (
       <span style={{ color: '#43c08c' }}>guest@shelnet:~$ logout</span>
     </div>
   </TerminalShell>
-);
+  );
+};
 
 export default ConnectSection;

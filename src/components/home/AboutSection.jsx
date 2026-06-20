@@ -1,7 +1,10 @@
 // src/components/home/AboutSection.jsx
 import TerminalShell from '../tui/TerminalShell';
+import { useEscapeHome } from '../../utils/useEscapeHome';
 
-const AboutSection = () => (
+const AboutSection = () => {
+  useEscapeHome();
+  return (
   <TerminalShell maxWidthClass="max-w-3xl">
     <div className="space-y-5 text-white/75 leading-relaxed text-sm md:text-[15px]">
       <p>
@@ -32,6 +35,7 @@ const AboutSection = () => (
       </div>
     </div>
   </TerminalShell>
-);
+  );
+};
 
 export default AboutSection;
