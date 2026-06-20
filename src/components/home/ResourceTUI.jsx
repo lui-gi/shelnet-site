@@ -1,59 +1,76 @@
 // src/components/home/ResourceTUI.jsx
-// The ~/resources borderless two-pane explorer, rendered at /resources/:dir.
-// Left = the directory tree; right = the active dir's children. Directory
-// children (a-plus/, security-plus/) cd deeper; leaf/app items open their route;
-// the external notes vault opens in a new tab. All inside the TerminalShell.
+// The ~/resources borderless two-pane explorer (/resources and /resources/:dir).
+// Left = the top-level dirs (certs/labs/visualizations/notes); right = the
+// highlighted dir's contents. Dir highlight is local: ↑↓ move it without
+// navigating; →/↵ activate — browsable dirs (certs/labs/notes) reveal their
+// contents pane, the visualizations destination dir opens its workspace, and an
+// item opens its route / external link.
 import { useEffect, useMemo, useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TerminalShell from '../tui/TerminalShell';
 import { RESOURCE_TREE } from '../../config/resourceTree';
-import { SUBDIR_NAME } from '../../config/resourcePaths';
 import { useResourceCounts } from '../../utils/useResourceCounts';
+import { useManifest } from '../../utils/useManifest';
+import { getCerts } from '../../utils/manifestService';
 import { labs } from '../../data/labs';
 import { themeColors } from '../../config/themeColors';
 import { ACCENTS, SHELL } from '../../config/theme';
 
 const ResourceTUI = () => {
   const counts = useResourceCounts();
+  const { manifest } = useManifest();
   const navigate = useNavigate();
   const { dir } = useParams();
 
-  // Inject live lab items into the labs directory (static otherwise).
-  const tree = useMemo(() => RESOURCE_TREE.map((d) =>
-    d.key === 'labs'
-      ? { ...d, items: labs.map((l) => ({
-          tag: l.type === 'hardware' ? 'HW' : 'VM', accent: 'orange',
-          name: l.name, desc: l.description, to: `/labs/${l.slug}`,
-        })) }
-      : d
-  ), []);
+  // Inject dynamic contents: certs from the manifest, labs from labs.js.
+  const tree = useMemo(() => {
+    const certItems = getCerts(manifest).map((c) => ({
+      tag: c.code || 'CERT', accent: c.accent || 'green',
+      name: c.label, desc: `${c.count} resource${c.count === 1 ? '' : 's'}`,
+      to: `/resources/certs/${c.slug}`, peek: c.count,
+    }));
+    const labItems = labs.map((l) => ({
+      tag: l.type === 'hardware' ? 'HW' : 'VM', accent: 'orange',
+      name: l.name, desc: l.description, to: `/resources/labs/${l.slug}`,
+    }));
+    return RESOURCE_TREE.map((d) => {
+      if (d.key === 'certs') return { ...d, items: certItems };
+      if (d.key === 'labs') return { ...d, items: labItems };
+      return d;
+    });
+  }, [manifest]);
 
-  const fromUrl = tree.findIndex((d) => d.key === dir);
-  const active = fromUrl >= 0 ? fromUrl : 0;
-  const current = tree[active];
-  const isSubdir = current.key === 'pbqs' || current.key === 'exams';
+  // Local dir highlight; the URL :dir only seeds the initial highlight.
+  const indexForDir = (key) => Math.max(0, tree.findIndex((d) => d.key === key));
+  const [dirIndex, setDirIndex] = useState(() => indexForDir(dir));
+  const [pane, setPane] = useState('dirs');
+  const [itemIndex, setItemIndex] = useState(0);
 
+  // Resync when the URL dir changes (e.g. arriving from the hero menu).
+  const [prevDir, setPrevDir] = useState(dir);
+  if (dir !== prevDir) {
+    setPrevDir(dir);
+    setDirIndex(indexForDir(dir));
+    setPane('dirs');
+    setItemIndex(0);
+  }
+
+  const current = tree[dirIndex] || tree[0];
   const countFor = (d) => (d.countKey ? counts[d.countKey] : 'live');
-  const goDir = useCallback((key) => navigate(`/resources/${key}`), [navigate]);
+
+  const activateDir = useCallback((i) => {
+    const d = tree[i];
+    if (!d) return;
+    if (d.to) { navigate(d.to); return; }              // destination dir → workspace
+    setDirIndex(i);
+    if (d.items.length) { setPane('items'); setItemIndex(0); }
+  }, [tree, navigate]);
+
   const openItem = useCallback((item) => {
     if (item.to) navigate(item.to);
     else if (item.href) window.open(item.href, '_blank', 'noopener,noreferrer');
   }, [navigate]);
 
-  // Two-pane keyboard focus: 'dirs' (left tree) or 'items' (right contents).
-  // A selected index tracks which row of the contents pane the cursor is on so
-  // any item in a multi-item list is reachable — not just the first.
-  const [pane, setPane] = useState('dirs');
-  const [itemIndex, setItemIndex] = useState(0);
-
-  // Changing directory resets the contents cursor back to the directory pane.
-  // Done during render (not an effect) per React's "adjust state on prop change".
-  const [prevDir, setPrevDir] = useState(dir);
-  if (dir !== prevDir) { setPrevDir(dir); setPane('dirs'); setItemIndex(0); }
-
-  // Keyboard nav: ↑↓ move within the focused pane · →/↵ drill into the contents
-  // pane (↵ opens once there) · ←/Esc step back out · Esc at root → home ·
-  // 1–9 jump directly to a directory.
   useEffect(() => {
     const items = current.items;
     const onKey = (e) => {
@@ -62,42 +79,42 @@ const ResourceTUI = () => {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         if (pane === 'items' && items.length) setItemIndex((n) => (n + 1) % items.length);
-        else goDir(tree[(active + 1) % tree.length].key);
+        else setDirIndex((n) => (n + 1) % tree.length);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         if (pane === 'items' && items.length) setItemIndex((n) => (n - 1 + items.length) % items.length);
-        else goDir(tree[(active - 1 + tree.length) % tree.length].key);
+        else setDirIndex((n) => (n - 1 + tree.length) % tree.length);
       } else if (e.key === 'ArrowRight') {
-        if (pane === 'dirs' && items.length) { e.preventDefault(); setPane('items'); setItemIndex(0); }
+        if (pane === 'dirs') { e.preventDefault(); activateDir(dirIndex); }
       } else if (e.key === 'ArrowLeft') {
         if (pane === 'items') { e.preventDefault(); setPane('dirs'); }
       } else if (e.key === 'Enter') {
-        if (tag === 'A') return; // let a focused link activate natively
+        if (tag === 'A') return;
         e.preventDefault();
         if (pane === 'items') { const it = items[itemIndex]; if (it) openItem(it); }
-        else if (items.length) { setPane('items'); setItemIndex(0); }
+        else activateDir(dirIndex);
       } else if (e.key === 'Escape') {
         if (pane === 'items') { e.preventDefault(); setPane('dirs'); } else navigate('/');
       } else if (/^[1-9]$/.test(e.key)) {
-        const t = tree[Number(e.key) - 1]; if (t) { e.preventDefault(); goDir(t.key); }
+        const i = Number(e.key) - 1;
+        if (tree[i]) { e.preventDefault(); setDirIndex(i); setPane('dirs'); setItemIndex(0); }
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [active, current, pane, itemIndex, tree, goDir, openItem, navigate]);
+  }, [current, pane, itemIndex, dirIndex, tree, activateDir, openItem, navigate]);
 
   return (
     <TerminalShell center>
-      {/* output-only: the bars carry the prompt/breadcrumb/exit */}
       <div className="text-white/40 text-xs mb-3">total {current.items.length} · # {current.sub}</div>
 
       <div className="grid md:grid-cols-[180px_1fr]">
-        {/* Directory tree (always the same 5 dirs; URL picks the active row) */}
+        {/* Directory tree */}
         <div className="pb-3 md:pb-0" aria-label="Resource directories">
           {tree.map((d, i) => {
-            const on = i === active;
+            const on = i === dirIndex;
             return (
-              <button key={d.key} type="button" onClick={() => goDir(d.key)}
+              <button key={d.key} type="button" onClick={() => activateDir(i)}
                 aria-current={on ? 'page' : undefined}
                 className={`flex w-full items-center justify-between gap-2 px-2 py-1.5 text-left text-sm transition-colors
                   ${on ? 'font-semibold' : 'text-white/[0.62] hover:bg-white/[0.04] hover:text-white/90'}`}
@@ -111,15 +128,13 @@ const ResourceTUI = () => {
           })}
         </div>
 
-        {/* Contents of the active directory */}
+        {/* Contents of the highlighted dir */}
         <div className="border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5"
              aria-label="Directory contents">
           {current.items.map((item, i) => {
             const c = themeColors[item.accent] || themeColors.green;
             const hex = (ACCENTS[item.accent] || ACCENTS.green).hex;
             const isExt = !!item.href;
-            const subdirName = isSubdir ? SUBDIR_NAME[item.to] : null;
-            const peek = item.to ? counts.children?.[item.to] : null;
             const on = pane === 'items' && i === itemIndex;
             return (
               <button key={item.to || item.href || item.name} type="button" onClick={() => openItem(item)}
@@ -130,18 +145,22 @@ const ResourceTUI = () => {
                 <span className={`text-xs font-bold ${c.text}`}>{item.tag}</span>
                 <span className="min-w-0 truncate">
                   <span className="text-white/90">
-                    {subdirName ?? item.name}
-                    {subdirName && <span style={{ color: hex }}>/</span>}
+                    {item.name}
                     {isExt && <span style={{ color: hex }}> ↗</span>}
                   </span>
                   <span className="text-white/45 text-xs">&nbsp; {item.desc}</span>
                 </span>
-                {subdirName
-                  ? <span className="text-white/30 text-xs whitespace-nowrap">{peek != null ? `${peek} ` : ''}<span style={{ color: hex }}>›</span></span>
-                  : <span />}
+                {item.peek != null
+                  ? <span className="text-white/30 text-xs whitespace-nowrap">{item.peek} <span style={{ color: hex }}>›</span></span>
+                  : (item.to && !isExt ? <span className="text-white/30 text-xs"><span style={{ color: hex }}>›</span></span> : <span />)}
               </button>
             );
           })}
+          {!current.items.length && (
+            <div className="text-white/30 text-xs px-2 py-2">
+              {current.to ? '// press → to open' : '// empty'}
+            </div>
+          )}
         </div>
       </div>
     </TerminalShell>
