@@ -12,6 +12,14 @@ export const ACCENTS = {
   slate:  { hex: '#cbd5e1', name: 'slate'  }, // Notes
 };
 
+// Canonical bare-TTY shell palette (matches HeroSection's GREEN / ACCENT).
+// TerminalShell + the resource chrome share these so the whole site uses one
+// green, instead of the resource pages' older emerald (#34d399).
+export const SHELL = {
+  green: '#43c08c', // prompt glyph, cursor, shell accents
+  dim:   '#7e9b86', // `guest`, secondary markers
+};
+
 export const PROMPT = 'shelnet:~$';
 
 export const SITE = {
