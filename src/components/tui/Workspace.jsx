@@ -22,7 +22,7 @@ const Workspace = ({
 
   // Flatten groups into one ordered list for keyboard nav + lookup.
   const flat = groups.flatMap((g) => g.items.map((item) => ({
-    uid: uidOf(g, item), label: `${g.prefix}${item.id}`, item,
+    uid: uidOf(g, item), item,
   })));
 
   const [selectedUid, setSelectedUid] = useState(null);
@@ -38,14 +38,13 @@ const Workspace = ({
   const selected = idx >= 0 ? flat[idx].item : null;
 
   // True fullscreen via the Fullscreen API; CSS overlay when it's unavailable.
+  // Keep side effects OUT of the state updater: under StrictMode a state
+  // updater is double-invoked in dev, which would call requestFullscreen twice.
   const toggleFullscreen = useCallback(() => {
     const el = viewerRef.current;
     if (document.fullscreenElement) { document.exitFullscreen?.(); return; }
-    setCssFs((prev) => {
-      if (prev) return false;
-      if (el?.requestFullscreen) { el.requestFullscreen().catch(() => setCssFs(true)); return false; }
-      return true;
-    });
+    if (el?.requestFullscreen) el.requestFullscreen().catch(() => setCssFs(true));
+    else setCssFs((prev) => !prev);
   }, [setCssFs]);
 
   // Keep apiFs in sync with the browser (so pressing browser Esc updates UI).
@@ -141,6 +140,10 @@ const Workspace = ({
 
       {/* body: collapsible push explorer + filling viewer */}
       <div className="flex flex-1 min-h-0">
+        {explorerOpen && (
+          <button type="button" aria-label="Close explorer" onClick={() => setExplorerOpen(false)}
+            className="md:hidden fixed inset-0 z-30 bg-black/50" />
+        )}
         {explorerOpen && (
           <aside id="ws-explorer"
             className="w-[280px] shrink-0 overflow-y-auto md:border-r border-white/10 md:pr-2
