@@ -11,7 +11,7 @@ import { SUBDIR_NAME } from '../../config/resourcePaths';
 import { useResourceCounts } from '../../utils/useResourceCounts';
 import { labs } from '../../data/labs';
 import { themeColors } from '../../config/themeColors';
-import { ACCENTS } from '../../config/theme';
+import { ACCENTS, SHELL } from '../../config/theme';
 
 const ResourceTUI = () => {
   const counts = useResourceCounts();
@@ -61,20 +61,25 @@ const ResourceTUI = () => {
   }, [active, tree, goDir, openItem, navigate]);
 
   return (
-    <TerminalShell cwd={['resources', current.key]} accent={current.accent} listCmd="ls -la">
+    <TerminalShell>
+      {/* output-only: the bars carry the prompt/breadcrumb/exit */}
+      <div className="text-white/40 text-xs mb-3">total {current.items.length} · # {current.sub}</div>
+
       <div className="grid md:grid-cols-[180px_1fr]">
-        {/* Directory tree */}
+        {/* Directory tree (always the same 5 dirs; URL picks the active row) */}
         <div className="pb-3 md:pb-0" aria-label="Resource directories">
           {tree.map((d, i) => {
             const on = i === active;
-            const hex = (ACCENTS[d.accent] || ACCENTS.green).hex;
             return (
               <button key={d.key} type="button" onClick={() => goDir(d.key)}
-                className={`flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors
-                  ${on ? 'bg-white/[0.03]' : 'text-white/65 hover:bg-white/5'}`}
-                style={on ? { boxShadow: `inset 2px 0 0 ${hex}`, color: hex } : undefined}>
-                <span><span className="inline-block w-3">{on ? '▸' : ''}</span>{d.label}</span>
-                <span className="text-white/30 text-xs">{countFor(d) ?? '—'}</span>
+                aria-current={on ? 'page' : undefined}
+                className={`flex w-full items-center justify-between gap-2 px-2 py-1.5 text-left text-sm transition-colors
+                  ${on ? 'font-semibold' : 'text-white/[0.62] hover:bg-white/[0.04] hover:text-white/90'}`}
+                style={on ? { background: SHELL.green, color: '#000' } : undefined}>
+                <span><span className="inline-block w-4">{on ? '▸' : ''}</span>{d.label}</span>
+                <span className="text-xs" style={on ? { color: 'rgba(0,0,0,0.55)' } : { color: 'rgba(255,255,255,0.3)' }}>
+                  {countFor(d) ?? '—'}
+                </span>
               </button>
             );
           })}
@@ -82,8 +87,6 @@ const ResourceTUI = () => {
 
         {/* Contents of the active directory */}
         <div className="border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5">
-          <div className="text-white/30 text-xs">total {current.items.length}</div>
-          <div className="text-white/35 text-xs mb-2"># {current.sub}</div>
           {current.items.map((item) => {
             const c = themeColors[item.accent] || themeColors.green;
             const hex = (ACCENTS[item.accent] || ACCENTS.green).hex;
@@ -92,7 +95,7 @@ const ResourceTUI = () => {
             const peek = item.to ? counts.children?.[item.to] : null;
             return (
               <button key={item.to || item.href || item.name} type="button" onClick={() => openItem(item)}
-                className="grid w-full grid-cols-[84px_1fr_auto] items-baseline gap-3 rounded px-2 py-1.5 text-left transition-colors hover:bg-white/5">
+                className="grid w-full grid-cols-[84px_1fr_auto] items-baseline gap-3 px-2 py-1.5 text-left transition-colors hover:bg-white/[0.04]">
                 <span className={`text-xs font-bold ${c.text}`}>{item.tag}</span>
                 <span className="min-w-0 truncate">
                   <span className="text-white/90">
@@ -102,13 +105,9 @@ const ResourceTUI = () => {
                   </span>
                   <span className="text-white/45 text-xs">&nbsp; {item.desc}</span>
                 </span>
-                <span className="text-white/30 text-xs whitespace-nowrap">
-                  {subdirName
-                    ? <>{peek != null ? `${peek} ` : ''}<span style={{ color: hex }}>›</span></>
-                    : isExt
-                      ? <>open <span style={{ color: hex }}>↗</span></>
-                      : <>open <span style={{ color: hex }}>↵</span></>}
-                </span>
+                {subdirName
+                  ? <span className="text-white/30 text-xs whitespace-nowrap">{peek != null ? `${peek} ` : ''}<span style={{ color: hex }}>›</span></span>
+                  : <span />}
               </button>
             );
           })}
