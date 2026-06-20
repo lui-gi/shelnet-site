@@ -3,7 +3,7 @@
 // Left = the directory tree; right = the active dir's children. Directory
 // children (a-plus/, security-plus/) cd deeper; leaf/app items open their route;
 // the external notes vault opens in a new tab. All inside the TerminalShell.
-import { useEffect, useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import TerminalShell from '../tui/TerminalShell';
 import { RESOURCE_TREE } from '../../config/resourceTree';
@@ -40,28 +40,54 @@ const ResourceTUI = () => {
     else if (item.href) window.open(item.href, '_blank', 'noopener,noreferrer');
   }, [navigate]);
 
-  // Keyboard nav: ↑↓ move dir, Enter open first child, 1–5 jump dirs, Esc → home.
+  // Two-pane keyboard focus: 'dirs' (left tree) or 'items' (right contents).
+  // A selected index tracks which row of the contents pane the cursor is on so
+  // any item in a multi-item list is reachable — not just the first.
+  const [pane, setPane] = useState('dirs');
+  const [itemIndex, setItemIndex] = useState(0);
+
+  // Changing directory resets the contents cursor back to the directory pane.
+  // Done during render (not an effect) per React's "adjust state on prop change".
+  const [prevDir, setPrevDir] = useState(dir);
+  if (dir !== prevDir) { setPrevDir(dir); setPane('dirs'); setItemIndex(0); }
+
+  // Keyboard nav: ↑↓ move within the focused pane · →/↵ drill into the contents
+  // pane (↵ opens once there) · ←/Esc step back out · Esc at root → home ·
+  // 1–9 jump directly to a directory.
   useEffect(() => {
+    const items = current.items;
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      if (e.key === 'ArrowDown') { e.preventDefault(); goDir(tree[(active + 1) % tree.length].key); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); goDir(tree[(active - 1 + tree.length) % tree.length].key); }
-      else if (e.key === 'Enter') {
-        // Let a focused tree button/link activate natively; only the bare page
-        // opens the first child on Enter (avoids a double navigate).
-        if (tag === 'BUTTON' || tag === 'A') return;
-        const it = tree[active].items[0]; if (it) { e.preventDefault(); openItem(it); }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        if (pane === 'items' && items.length) setItemIndex((n) => (n + 1) % items.length);
+        else goDir(tree[(active + 1) % tree.length].key);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (pane === 'items' && items.length) setItemIndex((n) => (n - 1 + items.length) % items.length);
+        else goDir(tree[(active - 1 + tree.length) % tree.length].key);
+      } else if (e.key === 'ArrowRight') {
+        if (pane === 'dirs' && items.length) { e.preventDefault(); setPane('items'); setItemIndex(0); }
+      } else if (e.key === 'ArrowLeft') {
+        if (pane === 'items') { e.preventDefault(); setPane('dirs'); }
+      } else if (e.key === 'Enter') {
+        if (tag === 'A') return; // let a focused link activate natively
+        e.preventDefault();
+        if (pane === 'items') { const it = items[itemIndex]; if (it) openItem(it); }
+        else if (items.length) { setPane('items'); setItemIndex(0); }
+      } else if (e.key === 'Escape') {
+        if (pane === 'items') { e.preventDefault(); setPane('dirs'); } else navigate('/');
+      } else if (/^[1-9]$/.test(e.key)) {
+        const t = tree[Number(e.key) - 1]; if (t) { e.preventDefault(); goDir(t.key); }
       }
-      else if (e.key === 'Escape') { navigate('/'); }
-      else if (/^[1-9]$/.test(e.key)) { const t = tree[Number(e.key) - 1]; if (t) { e.preventDefault(); goDir(t.key); } }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [active, tree, goDir, openItem, navigate]);
+  }, [active, current, pane, itemIndex, tree, goDir, openItem, navigate]);
 
   return (
-    <TerminalShell>
+    <TerminalShell center>
       {/* output-only: the bars carry the prompt/breadcrumb/exit */}
       <div className="text-white/40 text-xs mb-3">total {current.items.length} · # {current.sub}</div>
 
@@ -86,16 +112,21 @@ const ResourceTUI = () => {
         </div>
 
         {/* Contents of the active directory */}
-        <div className="border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5">
-          {current.items.map((item) => {
+        <div className="border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5"
+             aria-label="Directory contents">
+          {current.items.map((item, i) => {
             const c = themeColors[item.accent] || themeColors.green;
             const hex = (ACCENTS[item.accent] || ACCENTS.green).hex;
             const isExt = !!item.href;
             const subdirName = isSubdir ? SUBDIR_NAME[item.to] : null;
             const peek = item.to ? counts.children?.[item.to] : null;
+            const on = pane === 'items' && i === itemIndex;
             return (
               <button key={item.to || item.href || item.name} type="button" onClick={() => openItem(item)}
-                className="grid w-full grid-cols-[84px_1fr_auto] items-baseline gap-3 px-2 py-1.5 text-left transition-colors hover:bg-white/[0.04]">
+                onMouseEnter={() => { setPane('items'); setItemIndex(i); }}
+                aria-current={on ? 'true' : undefined}
+                className={`grid w-full grid-cols-[84px_1fr_auto] items-baseline gap-3 px-2 py-1.5 text-left transition-colors ${on ? 'bg-white/[0.06]' : 'hover:bg-white/[0.04]'}`}
+                style={on ? { boxShadow: `inset 2px 0 0 ${hex}` } : undefined}>
                 <span className={`text-xs font-bold ${c.text}`}>{item.tag}</span>
                 <span className="min-w-0 truncate">
                   <span className="text-white/90">

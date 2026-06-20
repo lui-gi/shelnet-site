@@ -126,21 +126,29 @@ const HeroSection = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
+  // Index of the menu row the keyboard cursor sits on (↑↓ move it, ↵ selects).
+  const [selected, setSelected] = useState(0);
+
   const activate = useCallback((item) => {
     if (item.dir) navigate(`/resources/${item.dir}`);  // open the file-explorer here
     else if (item.anchor) navigate(`/${item.anchor}`); // /about · /connect
   }, [navigate]);
 
-  // After boot, keys 1–6 trigger the matching menu item.
+  // After boot: ↑↓ move the cursor, ↵ opens it, and keys 1–6 jump straight in.
   useEffect(() => {
     if (!finished) return;
     const onKey = (e) => {
-      const item = MENU.find((m) => m.n === e.key);
-      if (item) { e.preventDefault(); activate(item); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); setSelected((s) => (s + 1) % MENU.length); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setSelected((s) => (s - 1 + MENU.length) % MENU.length); }
+      else if (e.key === 'Enter') { e.preventDefault(); activate(MENU[selected]); }
+      else {
+        const item = MENU.find((m) => m.n === e.key);
+        if (item) { e.preventDefault(); setSelected(MENU.indexOf(item)); activate(item); }
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [finished, activate]);
+  }, [finished, activate, selected]);
 
   return (
     <section id="hero" className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-12 pb-12 [@media(min-height:900px)]:py-16 glow-green">
@@ -161,20 +169,25 @@ const HeroSection = () => {
           <>
             <div className="mt-3 text-white/55">
               shelnet login: <span style={{ color: ACCENT }}>guest</span>
-              <span className="text-white/40"> — press a key or click a destination:</span>
+              <span className="text-white/40"> — ↑↓ + ↵, press 1–6, or click a destination:</span>
             </div>
 
             <nav className="mt-2" aria-label="Site sections">
-              {MENU.map((item) => (
+              {MENU.map((item, i) => {
+                const on = i === selected;
+                return (
                 <button key={item.n} onClick={() => activate(item)}
-                  className="flex w-full items-start gap-3 rounded px-2 py-1.5 text-left transition-colors hover:bg-[#43c08c]/10 focus-visible:bg-[#43c08c]/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60">
+                  onMouseEnter={() => setSelected(i)}
+                  aria-current={on ? 'true' : undefined}
+                  className={`flex w-full items-start gap-3 rounded px-2 py-1.5 text-left transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60 ${on ? 'bg-[#43c08c]/10 ring-1 ring-[#43c08c]/40' : 'hover:bg-[#43c08c]/10'}`}>
                   <span className="shrink-0 leading-6" style={{ color: GREEN }}>{item.n}</span>
                   <span className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
                     <span className="text-white/90 sm:w-44">{item.cmd}</span>
                     <span className="text-xs text-white/40 sm:text-inherit">{item.desc}</span>
                   </span>
                 </button>
-              ))}
+                );
+              })}
             </nav>
 
             <div className="mt-2 text-white/60">

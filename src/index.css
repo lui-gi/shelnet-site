@@ -20,6 +20,14 @@ body {
 
 /* Custom scrollbar styling - brutalist dark theme with green accents */
 @layer base {
+  /* Tailwind v4 Preflight no longer sets cursor:pointer on buttons; restore the
+     pointing-finger affordance for every clickable control. */
+  button:not(:disabled),
+  [role="button"]:not(:disabled),
+  summary {
+    cursor: pointer;
+  }
+
   /* Standard properties (Firefox 64+, Chrome 121+) */
   html {
     scrollbar-width: thin;
