@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Server, Cpu, MemoryStick, Monitor, Shield, Target, Skull, Zap } from 'lucide-react';
 import { labs } from '../data/labs';
-import Prompt from '../components/tui/Prompt';
+import TerminalShell from '../components/tui/TerminalShell';
 
 const roleIcons = {
   'Attacker': Skull,
@@ -31,39 +31,34 @@ const LabDetail = () => {
 
   if (!lab) {
     return (
-      <div className="min-h-screen bg-black text-white font-mono">
-        <div className="pt-24 px-6 pb-12 relative">
-          <div className="max-w-7xl mx-auto relative z-10">
-            <Prompt command="cd /labs/404" accent="orange" className="mb-3" />
-            <div className="mb-8 flex items-end justify-between border-b border-orange-500/25 pb-4">
+      <TerminalShell cwd={['resources', 'labs', '404']} accent="orange" maxWidthClass="max-w-7xl">
+        <div className="relative z-10">
+          <div className="mb-8 flex items-end justify-between border-b border-orange-500/25 pb-4">
               <div>
                 <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-tight font-display">Lab Not Found</h1>
                 <div className="text-sm text-white/50 font-mono">~/labs/404</div>
               </div>
-              <Link to="/#resources" className="text-white/40 hover:text-orange-400 font-mono text-xs whitespace-nowrap">../back</Link>
+              <Link to="/resources/labs" className="text-white/40 hover:text-orange-400 font-mono text-xs whitespace-nowrap">../back</Link>
             </div>
             <div className="text-center py-20">
               <div className="text-6xl mb-4">404</div>
               <div className="text-white/60 font-mono">Lab not found</div>
             </div>
-          </div>
         </div>
-      </div>
+      </TerminalShell>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white font-mono">
-      <div className="pt-24 px-6 pb-12 relative">
-        <div className="max-w-7xl mx-auto relative z-10">
-          {/* Header */}
-          <Prompt command={`cd /labs/${lab.slug}`} accent="orange" className="mb-3" />
-          <div className="mb-8 flex items-end justify-between border-b border-orange-500/25 pb-4">
+    <TerminalShell cwd={['resources', 'labs', lab.slug]} accent="orange" maxWidthClass="max-w-7xl">
+      <div className="relative z-10">
+        {/* Header */}
+        <div className="mb-8 flex items-end justify-between border-b border-orange-500/25 pb-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold uppercase tracking-tight font-display">{lab.name}</h1>
               <div className="text-sm text-white/50 font-mono">~/labs/{lab.slug} · REV {lab.revision} · {lab.date}</div>
             </div>
-            <Link to="/#resources" className="text-white/40 hover:text-orange-400 font-mono text-xs whitespace-nowrap">../back</Link>
+            <Link to="/resources/labs" className="text-white/40 hover:text-orange-400 font-mono text-xs whitespace-nowrap">../back</Link>
           </div>
 
           {/* Main Content Grid */}
@@ -583,9 +578,8 @@ const LabDetail = () => {
               />
             </div>
           )}
-        </div>
       </div>
-    </div>
+    </TerminalShell>
   );
 };
 
