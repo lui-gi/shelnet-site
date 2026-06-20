@@ -1,127 +1,120 @@
 // src/components/home/ResourceTUI.jsx
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import TuiFrame from '../tui/TuiFrame';
-import Prompt from '../tui/Prompt';
+// The ~/resources borderless two-pane explorer, rendered at /resources/:dir.
+// Left = the directory tree; right = the active dir's children. Directory
+// children (a-plus/, security-plus/) cd deeper; leaf/app items open their route;
+// the external notes vault opens in a new tab. All inside the TerminalShell.
+import { useEffect, useMemo, useCallback } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import TerminalShell from '../tui/TerminalShell';
 import { RESOURCE_TREE } from '../../config/resourceTree';
+import { SUBDIR_NAME } from '../../config/resourcePaths';
 import { useResourceCounts } from '../../utils/useResourceCounts';
 import { labs } from '../../data/labs';
 import { themeColors } from '../../config/themeColors';
-
-const ACCENT_HL = {
-  green: 'bg-emerald-500/14', red: 'bg-red-500/14', blue: 'bg-blue-500/14',
-  purple: 'bg-purple-500/14', orange: 'bg-orange-500/14', slate: 'bg-slate-500/14',
-};
-const ACCENT_BAR = {
-  green: 'shadow-[inset_2px_0_0_#34d399]', red: 'shadow-[inset_2px_0_0_#fb7185]',
-  blue: 'shadow-[inset_2px_0_0_#38bdf8]', purple: 'shadow-[inset_2px_0_0_#c084fc]',
-  orange: 'shadow-[inset_2px_0_0_#fb923c]', slate: 'shadow-[inset_2px_0_0_#cbd5e1]',
-};
+import { ACCENTS } from '../../config/theme';
 
 const ResourceTUI = () => {
   const counts = useResourceCounts();
   const navigate = useNavigate();
-  const [active, setActive] = useState(0);
-  // Inject live lab items into the labs directory.
-  const tree = RESOURCE_TREE.map((dir) =>
-    dir.key === 'labs'
-      ? { ...dir, items: labs.map((l) => ({
+  const { dir } = useParams();
+
+  // Inject live lab items into the labs directory (static otherwise).
+  const tree = useMemo(() => RESOURCE_TREE.map((d) =>
+    d.key === 'labs'
+      ? { ...d, items: labs.map((l) => ({
           tag: l.type === 'hardware' ? 'HW' : 'VM', accent: 'orange',
           name: l.name, desc: l.description, to: `/labs/${l.slug}`,
         })) }
-      : dir
-  );
+      : d
+  ), []);
 
-  const countFor = (dir) => (dir.countKey ? counts[dir.countKey] : 'live');
+  const fromUrl = tree.findIndex((d) => d.key === dir);
+  const active = fromUrl >= 0 ? fromUrl : 0;
   const current = tree[active];
+  const isSubdir = current.key === 'pbqs' || current.key === 'exams';
 
-  const openItem = (item) => {
+  const countFor = (d) => (d.countKey ? counts[d.countKey] : 'live');
+  const goDir = useCallback((key) => navigate(`/resources/${key}`), [navigate]);
+  const openItem = useCallback((item) => {
     if (item.to) navigate(item.to);
     else if (item.href) window.open(item.href, '_blank', 'noopener,noreferrer');
-  };
+  }, [navigate]);
 
-  // Select a directory + scroll here when the hero (or a deep link) sets the
-  // hash to a directory key, e.g. "#pbqs". Keys come from RESOURCE_TREE.
+  // Keyboard nav: ↑↓ move dir, Enter open first child, 1–5 jump dirs, Esc → home.
   useEffect(() => {
-    const selectFromHash = () => {
-      const key = window.location.hash.replace('#', '');
-      const idx = RESOURCE_TREE.findIndex((d) => d.key === key);
-      if (idx >= 0) {
-        setActive(idx);
-        document.getElementById('resources')?.scrollIntoView({ behavior: 'smooth' });
+    const onKey = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); goDir(tree[(active + 1) % tree.length].key); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); goDir(tree[(active - 1 + tree.length) % tree.length].key); }
+      else if (e.key === 'Enter') {
+        // Let a focused tree button/link activate natively; only the bare page
+        // opens the first child on Enter (avoids a double navigate).
+        if (tag === 'BUTTON' || tag === 'A') return;
+        const it = tree[active].items[0]; if (it) { e.preventDefault(); openItem(it); }
       }
+      else if (e.key === 'Escape') { navigate('/'); }
+      else if (/^[1-5]$/.test(e.key)) { const t = tree[Number(e.key) - 1]; if (t) { e.preventDefault(); goDir(t.key); } }
     };
-    selectFromHash();                                   // deep-link on first load
-    window.addEventListener('hashchange', selectFromHash);
-    return () => window.removeEventListener('hashchange', selectFromHash);
-  }, []);
-
-  // Keyboard nav within the tree (progressive enhancement).
-  const onTreeKey = (e) => {
-    if (e.key === 'ArrowDown') { e.preventDefault(); setActive((i) => (i + 1) % tree.length); }
-    if (e.key === 'ArrowUp')   { e.preventDefault(); setActive((i) => (i - 1 + tree.length) % tree.length); }
-    if (e.key === 'Enter' && current.items[0]) { e.preventDefault(); openItem(current.items[0]); }
-  };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [active, tree, goDir, openItem, navigate]);
 
   return (
-    <section id="resources" className="py-20 px-6">
-      <div className="max-w-6xl mx-auto">
-        <Prompt command="cd /resources && ls -la" accent="green" className="mb-4" />
-        <TuiFrame
-          accent="green"
-          titleLeft="┤ shelnet · ~/resources ├"
-          titleRight={`${tree.length} dirs`}
-          footerLeft="↑↓ select · enter open"
-          footerRight="free · open-source · no-login"
-        >
-          <div className="grid md:grid-cols-[230px_1fr] min-h-[320px]">
-            {/* Tree */}
-            <div
-              tabIndex={0}
-              onKeyDown={onTreeKey}
-              className="border-b md:border-b-0 md:border-r border-emerald-500/25 p-2 outline-none focus:bg-white/[0.02]"
-              aria-label="Resource directories"
-            >
-              {tree.map((dir, i) => (
-                <button
-                  key={dir.key}
-                  onClick={() => setActive(i)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded text-left text-sm transition-colors
-                    ${i === active ? `${ACCENT_HL[dir.accent]} text-white ${ACCENT_BAR[dir.accent]}` : 'text-white/65 hover:bg-white/5'}`}
-                >
-                  <span>{i === active ? '▸ ' : '  '}{dir.label}</span>
-                  <span className="text-white/40 text-xs">{countFor(dir) ?? '—'}</span>
-                </button>
-              ))}
-            </div>
+    <TerminalShell cwd={['resources', current.key]} accent={current.accent} listCmd="ls -la">
+      <div className="grid md:grid-cols-[180px_1fr]">
+        {/* Directory tree */}
+        <div className="pb-3 md:pb-0" aria-label="Resource directories">
+          {tree.map((d, i) => {
+            const on = i === active;
+            const hex = (ACCENTS[d.accent] || ACCENTS.green).hex;
+            return (
+              <button key={d.key} type="button" onClick={() => goDir(d.key)}
+                className={`flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-sm transition-colors
+                  ${on ? 'bg-white/[0.03]' : 'text-white/65 hover:bg-white/5'}`}
+                style={on ? { boxShadow: `inset 2px 0 0 ${hex}`, color: hex } : undefined}>
+                <span><span className="inline-block w-3">{on ? '▸' : ''}</span>{d.label}</span>
+                <span className="text-white/30 text-xs">{countFor(d) ?? '—'}</span>
+              </button>
+            );
+          })}
+        </div>
 
-            {/* Contents */}
-            <div className="p-4">
-              <div className="font-display text-lg font-bold text-white">{current.title}</div>
-              <div className="text-white/40 text-xs mb-4">~/resources/{current.label} — {current.sub}</div>
-              <div className="space-y-2">
-                {current.items.map((item, i) => {
-                  const c = themeColors[item.accent] || themeColors.green;
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => openItem(item)}
-                      className={`w-full flex items-center gap-3 text-left p-3 rounded border ${c.border} bg-white/[0.02] ${c.hoverBorder} ${c.bgHover} transition-colors`}
-                    >
-                      <span className={`text-[9px] font-bold px-2 py-1 rounded ${c.bgActive} ${c.text} min-w-[64px] text-center`}>{item.tag}</span>
-                      <span>
-                        <span className="block text-white text-sm font-bold">{item.name}</span>
-                        <span className="block text-white/45 text-xs">{item.desc}</span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </TuiFrame>
+        {/* Contents of the active directory */}
+        <div className="border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5">
+          <div className="text-white/30 text-xs">total {current.items.length}</div>
+          <div className="text-white/35 text-xs mb-2"># {current.sub}</div>
+          {current.items.map((item, i) => {
+            const c = themeColors[item.accent] || themeColors.green;
+            const hex = (ACCENTS[item.accent] || ACCENTS.green).hex;
+            const isExt = !!item.href;
+            const subdirName = isSubdir ? SUBDIR_NAME[item.to] : null;
+            const peek = item.to ? counts.children?.[item.to] : null;
+            return (
+              <button key={i} type="button" onClick={() => openItem(item)}
+                className="grid w-full grid-cols-[84px_1fr_auto] items-baseline gap-3 rounded px-2 py-1.5 text-left transition-colors hover:bg-white/5">
+                <span className={`text-xs font-bold ${c.text}`}>{item.tag}</span>
+                <span className="min-w-0 truncate">
+                  <span className="text-white/90">
+                    {subdirName ?? item.name}
+                    {subdirName && <span style={{ color: hex }}>/</span>}
+                    {isExt && <span style={{ color: hex }}> ↗</span>}
+                  </span>
+                  <span className="text-white/45 text-xs">&nbsp; {item.desc}</span>
+                </span>
+                <span className="text-white/30 text-xs whitespace-nowrap">
+                  {subdirName
+                    ? <>{peek != null ? `${peek} ` : ''}<span style={{ color: hex }}>›</span></>
+                    : isExt
+                      ? <>open <span style={{ color: hex }}>↗</span></>
+                      : <>open <span style={{ color: hex }}>↵</span></>}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </section>
+    </TerminalShell>
   );
 };
 
