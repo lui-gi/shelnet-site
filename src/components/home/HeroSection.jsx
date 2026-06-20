@@ -1,5 +1,6 @@
 // src/components/home/HeroSection.jsx
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNews } from '../../utils/useNews';
 import { useResourceCounts } from '../../utils/useResourceCounts';
 import { ASCII_BANNER } from '../../config/theme';
@@ -8,8 +9,8 @@ const SESSION_KEY = 'shelnet_booted';
 const GREEN = '#43c08c';   // banner + numbers + cursor
 const ACCENT = '#7e9b86';  // dim phosphor: status markers + `guest`
 
-// `dir` => selects a directory in the resources TUI (via location.hash).
-// `anchor` => scrolls to a section element by id.
+// `dir` => opens the file-explorer at /resources/<dir>.
+// `anchor` => opens the matching route (/about · /connect).
 const MENU = [
   { n: '1', cmd: './pbqs',           desc: 'performance-based questions',   dir: 'pbqs' },
   { n: '2', cmd: './exams',          desc: 'full-length mock exams',        dir: 'exams' },
@@ -58,6 +59,7 @@ function buildLines(counts, newsText, narrow) {
 }
 
 const HeroSection = () => {
+  const navigate = useNavigate();
   const { newsText } = useNews();
   const counts = useResourceCounts();
 
@@ -124,14 +126,10 @@ const HeroSection = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
-  const activate = (item) => {
-    if (item.dir) {
-      window.location.hash = item.dir;                 // ResourceTUI selects this directory
-      document.getElementById('resources')?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      document.getElementById(item.anchor)?.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const activate = useCallback((item) => {
+    if (item.dir) navigate(`/resources/${item.dir}`);  // open the file-explorer here
+    else if (item.anchor) navigate(`/${item.anchor}`); // /about · /connect
+  }, [navigate]);
 
   // After boot, keys 1–6 trigger the matching menu item.
   useEffect(() => {
@@ -142,26 +140,26 @@ const HeroSection = () => {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [finished]);
+  }, [finished, activate]);
 
   return (
-    <section id="hero" className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-24 glow-green">
+    <section id="hero" className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-8 [@media(min-height:900px)]:py-16 glow-green">
       <div className="w-fit max-w-full font-mono text-sm md:text-base">
         <pre aria-label="shelnet"
-             className="mb-4 whitespace-pre text-[8px] leading-[1.1] sm:text-xs md:text-sm"
+             className="mb-3 whitespace-pre text-[8px] leading-[1.1] sm:text-xs md:text-sm"
              style={{ color: GREEN, textShadow: '0 0 8px rgba(52,211,153,.28)' }}>{ASCII_BANNER}</pre>
 
-        <div className="mb-3 space-y-0.5 text-white/30">
+        <div className="mb-2 space-y-0.5 text-white/30">
           {stats.map((s, i) => <div key={i}>{s}</div>)}
         </div>
 
-        <div className="space-y-1 leading-relaxed text-white/65" style={{ minHeight: narrow ? 150 : 190 }}>
+        <div className="space-y-0.5 leading-snug text-white/65" style={{ minHeight: narrow ? 148 : 168 }}>
           {lines.slice(0, visibleCount).map((node, i) => <div key={i}>{node}</div>)}
         </div>
 
         {finished && (
           <>
-            <div className="mt-4 text-white/55">
+            <div className="mt-3 text-white/55">
               shelnet login: <span style={{ color: ACCENT }}>guest</span>
               <span className="text-white/40"> — press a key or click a destination:</span>
             </div>
@@ -169,7 +167,7 @@ const HeroSection = () => {
             <nav className="mt-2" aria-label="Site sections">
               {MENU.map((item) => (
                 <button key={item.n} onClick={() => activate(item)}
-                  className="flex w-full items-start gap-3 rounded px-2 py-2 text-left transition-colors hover:bg-[#43c08c]/10 focus-visible:bg-[#43c08c]/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60">
+                  className="flex w-full items-start gap-3 rounded px-2 py-1.5 text-left transition-colors hover:bg-[#43c08c]/10 focus-visible:bg-[#43c08c]/10 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60">
                   <span className="shrink-0 leading-6" style={{ color: GREEN }}>{item.n}</span>
                   <span className="flex flex-col sm:flex-row sm:items-baseline sm:gap-3">
                     <span className="text-white/90 sm:w-44">{item.cmd}</span>
@@ -179,7 +177,7 @@ const HeroSection = () => {
               ))}
             </nav>
 
-            <div className="mt-3 text-white/60">
+            <div className="mt-2 text-white/60">
               guest@shelnet:~$
               <span className="ml-1 inline-block h-4 w-2 translate-y-0.5 animate-pulse reduce-static"
                     style={{ backgroundColor: GREEN }} aria-hidden="true" />

@@ -1,9 +1,9 @@
 // src/components/tui/TerminalShell.jsx
 // The continuous-terminal shell shared by every resource route. Reproduces the
-// bottom of the hero (dim figlet -> `shelnet login: guest` -> command line ->
-// output -> trailing prompt with a `cd ~` exit) so each page reads as the same
-// TTY scrolled forward. The router stays flat; breadcrumb segments link via
-// resourcePaths.
+// bottom of the hero (bright glowing figlet -> `shelnet login: guest` -> command
+// line -> output -> trailing prompt with a `cd ~` exit) so each page reads as the
+// same TTY scrolled forward. The banner + glow-green background match the hero
+// exactly. The router stays flat; breadcrumb segments link via resourcePaths.
 import { Link, useNavigate } from 'react-router-dom';
 import { ASCII_BANNER, SHELL } from '../../config/theme';
 import { themeColors } from '../../config/themeColors';
@@ -27,11 +27,11 @@ const TerminalShell = ({
   const colors = themeColors[accent] || themeColors.green;
 
   return (
-    <div className="min-h-screen px-6 pt-10 pb-16">
+    <div className="min-h-screen px-6 pt-14 pb-16 glow-green">
       <div className={`mx-auto ${maxWidthClass} font-mono text-sm md:text-base`}>
-        <pre aria-hidden="true"
-             className="mb-2 whitespace-pre text-[8px] leading-[1.1] sm:text-[9px]"
-             style={{ color: SHELL.green, opacity: 0.16 }}>{ASCII_BANNER}</pre>
+        <pre aria-label="shelnet"
+             className="mb-3 whitespace-pre text-[8px] leading-[1.1] sm:text-xs md:text-sm"
+             style={{ color: SHELL.green, textShadow: '0 0 8px rgba(52,211,153,.28)' }}>{ASCII_BANNER}</pre>
 
         <div className="text-white/45">
           shelnet login: <span style={{ color: SHELL.dim }}>guest</span>

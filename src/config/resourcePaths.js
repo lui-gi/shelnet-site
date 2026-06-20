@@ -24,6 +24,31 @@ export function routeForSegments(segments) {
   return '/resources/pbqs';
 }
 
+// Reverse of the route table: the canonical ~/ path segments shown for a route.
+// Drives the global PromptBar breadcrumb. Ancestor segments resolve back through
+// routeForSegments, so the bar and the in-shell breadcrumb agree by construction.
+export const SEGMENTS_BY_ROUTE = {
+  '/':                    [],
+  '/about':               ['about'],
+  '/connect':             ['connect'],
+  '/visualizations':      ['resources', 'visualizations'],
+  '/a-plus-pbqs':         ['resources', 'pbqs', 'a-plus'],
+  '/security-plus-pbqs':  ['resources', 'pbqs', 'security-plus'],
+  '/a-plus-exams':        ['resources', 'exams', 'a-plus'],
+  '/security-plus-exams': ['resources', 'exams', 'security-plus'],
+};
+
+// ~/ path segments for the current location. Static routes come from the table;
+// /resources/:dir and /labs/:slug are matched dynamically. Unknown -> home (~).
+export function segmentsForPath(pathname) {
+  if (pathname in SEGMENTS_BY_ROUTE) return SEGMENTS_BY_ROUTE[pathname];
+  const dir = pathname.match(/^\/resources\/([^/]+)\/?$/);
+  if (dir) return ['resources', dir[1]];
+  const lab = pathname.match(/^\/labs\/([^/]+)\/?$/);
+  if (lab) return ['resources', 'labs', lab[1]];
+  return [];
+}
+
 // Real path-segment name for a workspace route, used as the drill child's display
 // name in the explorer (e.g. the A+ PBQ item renders as `a-plus/`).
 export const SUBDIR_NAME = {

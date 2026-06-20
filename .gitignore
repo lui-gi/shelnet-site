@@ -27,4 +27,7 @@ CLAUDE.md
 .claude
 .env.development
 .env.production
+
+# Claude / superpowers artifacts (brainstorm mockups + specs)
 .superpowers/
+docs/superpowers/
