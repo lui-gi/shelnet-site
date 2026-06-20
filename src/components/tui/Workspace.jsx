@@ -1,54 +1,69 @@
 // src/components/tui/Workspace.jsx
-// Borderless file workspace: a flat explorer (left) + iframe viewer (right).
-// The breadcrumb + exit live in the surrounding TerminalShell; this renders
-// only the body. Accent = cert color.
-import { useState, useEffect, useCallback } from 'react';
+// Borderless file workspace: a grouped explorer (left) + iframe viewer (right).
+// Groups render with a dim header (e.g. pbqs/, exams/); a single group with a
+// null label renders headerless. Keyboard ↑↓ flows across every group. Accent
+// = cert color. The breadcrumb + exit live in the surrounding bars.
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Maximize2, Minimize2, ExternalLink, ChevronLeft, Menu } from 'lucide-react';
 import { themeColors } from '../../config/themeColors';
 
+const uidOf = (group, item) => `${group.type}:${item.id}`;
+
 const Workspace = ({
-  accent = 'red', items = [], itemPrefix = 'PBQ_0',
+  accent = 'red', groups = [],
   statusLabel = 'EXECUTING:', loading = false, error = null, metaRight = '', showSandbox = false,
 }) => {
   const colors = themeColors[accent] || themeColors.green;
   const navigate = useNavigate();
-  const [selected, setSelected] = useState(null);
+  const [selectedUid, setSelectedUid] = useState(null);
+
+  // Flatten groups into one ordered list for keyboard nav + lookup.
+  const flat = groups.flatMap((g) => g.items.map((item) => ({
+    uid: uidOf(g, item), label: `${g.prefix}${item.id}`, item,
+  })));
+  const idx = flat.findIndex((f) => f.uid === selectedUid);
+  const selected = idx >= 0 ? flat[idx].item : null;
+
   const [fullscreen, setFullscreen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const idx = selected ? items.findIndex((i) => i.id === selected.id) : -1;
-  const select = useCallback((item) => { setSelected(item); setDrawerOpen(false); }, []);
+  const select = (uid) => { setSelectedUid(uid); setDrawerOpen(false); };
 
-  // Keyboard: ↑↓ move, f fullscreen, esc exits fullscreen then returns home.
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      if (e.key === 'ArrowDown') { e.preventDefault(); const n = items[idx < 0 ? 0 : (idx + 1) % items.length]; if (n) setSelected(n); }
-      if (e.key === 'ArrowUp')   { e.preventDefault(); const n = items[idx < 0 ? items.length - 1 : (idx - 1 + items.length) % items.length]; if (n) setSelected(n); }
+      if (e.key === 'ArrowDown' && flat.length) { e.preventDefault(); const n = flat[idx < 0 ? 0 : (idx + 1) % flat.length]; setSelectedUid(n.uid); }
+      if (e.key === 'ArrowUp' && flat.length)   { e.preventDefault(); const n = flat[idx < 0 ? flat.length - 1 : (idx - 1 + flat.length) % flat.length]; setSelectedUid(n.uid); }
       if (e.key === 'f' && selected) { setFullscreen((v) => !v); }
       if (e.key === 'Escape') { if (fullscreen) setFullscreen(false); else navigate('/'); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [idx, items, selected, fullscreen, navigate]);
+  }, [idx, flat, selected, fullscreen, navigate]);
 
   const Explorer = (
     <div className="overflow-y-auto" aria-label="File explorer">
       <div className="text-white/40 text-[10px] tracking-widest px-2 py-2">EXPLORER · AVAILABLE</div>
-      {items.map((item) => {
-        const on = selected?.id === item.id;
-        return (
-          <button type="button" key={item.id} onClick={() => select(item)}
-            className={`w-full text-left px-2 py-2 rounded mb-0.5 transition-colors ${on ? 'bg-white/[0.04] text-white' : 'text-white/65 hover:bg-white/5'}`}
-            style={on ? { boxShadow: 'inset 2px 0 0 currentColor' } : undefined}>
-            <div className={`text-[11px] font-bold ${colors.text}`}>{itemPrefix}{item.id}{on ? ' ●' : ''}</div>
-            <div className="text-xs font-semibold">{item.title}</div>
-            <div className="text-[10px] text-white/40">{item.description}</div>
-          </button>
-        );
-      })}
+      {groups.map((g) => (
+        <div key={g.type} className="mb-1">
+          {g.label && <div className="px-2 py-1 text-[10px] tracking-widest text-white/35">{g.label}</div>}
+          {g.items.map((item) => {
+            const uid = uidOf(g, item);
+            const on = selectedUid === uid;
+            return (
+              <button type="button" key={uid} onClick={() => select(uid)}
+                className={`w-full text-left px-2 py-2 rounded mb-0.5 transition-colors ${on ? 'bg-white/[0.04] text-white' : 'text-white/65 hover:bg-white/5'}`}
+                style={on ? { boxShadow: 'inset 2px 0 0 currentColor' } : undefined}>
+                <div className={`text-[11px] font-bold ${colors.text}`}>{g.prefix}{item.id}{on ? ' ●' : ''}</div>
+                <div className="text-xs font-semibold">{item.title}</div>
+                <div className="text-[10px] text-white/40">{item.description}</div>
+              </button>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 
@@ -63,12 +78,10 @@ const Workspace = ({
       </button>
 
       <div className={`grid ${fullscreen ? 'grid-cols-1' : 'md:grid-cols-[260px_1fr]'} min-h-[60vh]`}>
-        {/* Explorer (hidden in fullscreen; drawer on mobile) */}
         {!fullscreen && (
           <div className={`md:border-r border-white/10 md:pr-2 ${drawerOpen ? 'block' : 'hidden md:block'}`}>{Explorer}</div>
         )}
 
-        {/* Viewer */}
         <div className="flex flex-col md:pl-4">
           <div className="flex items-center justify-between gap-2 py-2 text-xs">
             <span className="flex items-center gap-2 min-w-0">
@@ -105,7 +118,7 @@ const Workspace = ({
           </div>
 
           <div className="flex items-center justify-end py-2 text-[10.5px]">
-            <span className={colors.text}>{items.length} files{metaRight ? ` · ${metaRight}` : ''}</span>
+            <span className={colors.text}>{flat.length} files{metaRight ? ` · ${metaRight}` : ''}</span>
           </div>
         </div>
       </div>
