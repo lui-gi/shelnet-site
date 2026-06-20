@@ -10,7 +10,7 @@ const LINKS = [
 ];
 
 const ConnectSection = () => (
-  <TerminalShell command="./connect" accent="green" maxWidthClass="max-w-3xl">
+  <TerminalShell maxWidthClass="max-w-3xl">
     <div className="grid sm:grid-cols-3 gap-3">
       {LINKS.map((link) => {
         const { Icon, label, desc, href, hover, cta } = link;

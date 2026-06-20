@@ -6,7 +6,7 @@ import { useManifest } from '../utils/useManifest';
 const SecurityPlusExams = () => {
   const { resources, loading, error } = useManifest('securityPlusExams');
   return (
-    <TerminalShell cwd={['resources', 'exams', 'security-plus']} accent="blue">
+    <TerminalShell>
       <Workspace accent="blue" items={resources} itemPrefix="EXAM_0"
         statusLabel="RUNNING:" metaRight="SY0-701" loading={loading} error={error} />
     </TerminalShell>

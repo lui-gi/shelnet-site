@@ -31,7 +31,7 @@ const LabDetail = () => {
 
   if (!lab) {
     return (
-      <TerminalShell cwd={['resources', 'labs', '404']} accent="orange" maxWidthClass="max-w-7xl">
+      <TerminalShell maxWidthClass="max-w-7xl">
         <div className="relative z-10">
           <div className="mb-8 flex items-end justify-between border-b border-orange-500/25 pb-4">
               <div>
@@ -50,7 +50,7 @@ const LabDetail = () => {
   }
 
   return (
-    <TerminalShell cwd={['resources', 'labs', lab.slug]} accent="orange" maxWidthClass="max-w-7xl">
+    <TerminalShell maxWidthClass="max-w-7xl">
       <div className="relative z-10">
         {/* Header */}
         <div className="mb-8 flex items-end justify-between border-b border-orange-500/25 pb-4">

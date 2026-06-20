@@ -2,7 +2,7 @@
 import TerminalShell from '../tui/TerminalShell';
 
 const AboutSection = () => (
-  <TerminalShell command="cat about.md" accent="green" maxWidthClass="max-w-3xl">
+  <TerminalShell maxWidthClass="max-w-3xl">
     <div className="space-y-5 text-white/75 leading-relaxed text-sm md:text-[15px]">
       <p>
         Shelnet began as a private repo where I tracked my progress as a university

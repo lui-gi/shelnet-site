@@ -6,7 +6,7 @@ import { useManifest } from '../utils/useManifest';
 const Visualizations = () => {
   const { resources, loading, error } = useManifest('visualizations');
   return (
-    <TerminalShell cwd={['resources', 'visualizations']} accent="purple">
+    <TerminalShell>
       <Workspace accent="purple" items={resources} itemPrefix="VIZ_0"
         statusLabel="VIEWING:" loading={loading} error={error} showSandbox />
     </TerminalShell>
