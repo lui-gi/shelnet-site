@@ -8,9 +8,9 @@ import { SHELL, ACCENTS } from '../../config/theme';
 import { shortcutsForPath } from '../../config/shortcuts';
 
 const CTAS = [
-  { to: '/a-plus-pbqs',        label: 'A+ Core 2', hex: ACCENTS.red.hex },
-  { to: '/security-plus-pbqs', label: 'Security+', hex: ACCENTS.blue.hex },
-  { to: '/connect',            label: 'connect',   hex: SHELL.green },
+  { to: '/resources/certs/a-plus',        label: 'A+ Core 2', hex: ACCENTS.red.hex },
+  { to: '/resources/certs/security-plus', label: 'Security+', hex: ACCENTS.blue.hex },
+  { to: '/connect',                       label: 'connect',   hex: SHELL.green },
 ];
 
 const BottomBar = () => {

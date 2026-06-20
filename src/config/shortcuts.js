@@ -3,22 +3,25 @@
 // right of the global BottomBar. Keep in sync with the real key handlers in
 // ResourceTUI / Workspace. Returns an ordered list of { keys, label } pairs.
 
-const WORKSPACE_ROUTES = new Set([
-  '/a-plus-pbqs', '/security-plus-pbqs',
-  '/a-plus-exams', '/security-plus-exams',
-  '/visualizations',
-]);
-
 export function shortcutsForPath(pathname) {
   if (pathname === '/') {
-    // '1–6' tracks HeroSection.jsx MENU (6 items); update if that menu grows
+    // '1–5' tracks HeroSection.jsx MENU (5 items); update if that menu grows
     return [
       { keys: '↑↓', label: 'move' },
       { keys: '↵', label: 'open' },
-      { keys: '1–6', label: 'jump' },
+      { keys: '1–5', label: 'jump' },
     ];
   }
-  if (/^\/resources\/[^/]+\/?$/.test(pathname)) {
+  // File viewers: cert dashboards + the visualizations workspace.
+  if (/^\/resources\/certs\/[^/]+\/?$/.test(pathname) || pathname === '/resources/visualizations') {
+    return [
+      { keys: '↑↓', label: 'file' },
+      { keys: 'f', label: 'full' },
+      { keys: 'esc', label: '~' },
+    ];
+  }
+  // Explorer: /resources root or a browsable dir (certs/labs/notes).
+  if (/^\/resources(\/(certs|labs|notes))?\/?$/.test(pathname)) {
     return [
       { keys: '↑↓', label: 'move' },
       { keys: '←→', label: 'pane' },
@@ -26,13 +29,6 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: 'back' },
     ];
   }
-  if (WORKSPACE_ROUTES.has(pathname)) {
-    return [
-      { keys: '↑↓', label: 'file' },
-      { keys: 'f', label: 'full' },
-      { keys: 'esc', label: '~' },
-    ];
-  }
-  // /labs/:slug, /about, /connect, and any fallback
+  // /resources/labs/:slug, /about, /connect, and any fallback
   return [{ keys: 'esc', label: '~' }];
 }

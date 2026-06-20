@@ -12,12 +12,11 @@ const ACCENT = '#7e9b86';  // dim phosphor: status markers + `guest`
 // `dir` => opens the file-explorer at /resources/<dir>.
 // `anchor` => opens the matching route (/about · /connect).
 const MENU = [
-  { n: '1', cmd: './pbqs',           desc: 'performance-based questions',   dir: 'pbqs' },
-  { n: '2', cmd: './exams',          desc: 'full-length mock exams',        dir: 'exams' },
-  { n: '3', cmd: './labs',           desc: 'guided lab writeups',           dir: 'labs' },
-  { n: '4', cmd: './visualizations', desc: 'interactive modules',           dir: 'visualizations' },
-  { n: '5', cmd: 'man about',        desc: 'what is shelnet?',              anchor: 'about' },
-  { n: '6', cmd: './connect',        desc: 'newsletter · github · contact', anchor: 'connect' },
+  { n: '1', cmd: './certs',          desc: 'A+ · Security+ · more',         dir: 'certs' },
+  { n: '2', cmd: './labs',           desc: 'guided lab writeups',           dir: 'labs' },
+  { n: '3', cmd: './visualizations', desc: 'interactive modules',           dir: 'visualizations' },
+  { n: '4', cmd: 'man about',        desc: 'what is shelnet?',              anchor: 'about' },
+  { n: '5', cmd: './connect',        desc: 'newsletter · github · contact', anchor: 'connect' },
 ];
 
 const fmt = (v) => (v == null ? '—' : v);
@@ -34,14 +33,15 @@ const Mark = ({ inner }) => (
 // Boot/mount log as an array of nodes. `narrow` trims leaders + uname for phones.
 function buildLines(counts, newsText, narrow) {
   const feed = newsText ? newsText.split('\n')[0] : 'latest updates loading…';
+  const sims = (counts.pbqs == null && counts.exams == null)
+    ? null : (counts.pbqs || 0) + (counts.exams || 0);
   if (narrow) {
     const feedShort = feed.length > 22 ? `${feed.slice(0, 21)}…` : feed;
     return [
       <><Mark inner=" 0.00 " /> booting userland…</>,
-      <><Mark inner="  OK  " /> <span className="text-white/90">/pbqs</span>{'   '}<span className="text-white/55">{fmt(counts.pbqs)} sims</span></>,
-      <><Mark inner="  OK  " /> <span className="text-white/90">/exams</span>{'  '}<span className="text-white/55">{fmt(counts.exams)} exams</span></>,
-      <><Mark inner="  OK  " /> <span className="text-white/90">/viz</span>{'    '}<span className="text-white/55">{fmt(counts.viz)} modules</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/certs</span>{'  '}<span className="text-white/55">{fmt(counts.certs)} tracks</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/labs</span>{'   '}<span className="text-white/55">{fmt(counts.labs)} writeups</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/viz</span>{'    '}<span className="text-white/55">{fmt(counts.viz)} modules</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">trackers=0 · $0.00</span></>,
       <><Mark inner=" feed " /> {feedShort}</>,
     ];
@@ -49,10 +49,9 @@ function buildLines(counts, newsText, narrow) {
   const dots = (s) => <span className="text-white/20" aria-hidden="true">{s}</span>;
   return [
     <><Mark inner=" 0.00 " /> shelnet kernel v3.0 — booting userland…</>,
-    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/pbqs</span> {dots('·················')} <span className="text-white/55">{fmt(counts.pbqs)} simulations</span></>,
-    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/exams</span> {dots('················')} <span className="text-white/55">{fmt(counts.exams)} mock tests</span></>,
-    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/visualizations</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/certs</span> {dots('···········')} <span className="text-white/55">{fmt(counts.certs)} tracks · {fmt(sims)} sims</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/labs</span> {dots('·················')} <span className="text-white/55">{fmt(counts.labs)} writeups</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/visualizations</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules</span></>,
     <><Mark inner="  OK  " /> security: <span className="text-white/90">trackers=0  paywall=none  cost=$0.00</span></>,
     <><Mark inner=" feed " /> {feed}</>,
   ];
@@ -169,7 +168,7 @@ const HeroSection = () => {
           <>
             <div className="mt-3 text-white/55">
               shelnet login: <span style={{ color: ACCENT }}>guest</span>
-              <span className="text-white/40"> — ↑↓ + ↵, press 1–6, or click a destination:</span>
+              <span className="text-white/40"> — ↑↓ + ↵, press 1–5, or click a destination:</span>
             </div>
 
             <nav className="mt-2" aria-label="Site sections">
