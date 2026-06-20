@@ -16,6 +16,7 @@ export function shortcutsForPath(pathname) {
   if (/^\/resources\/certs\/[^/]+\/?$/.test(pathname) || pathname === '/resources/visualizations') {
     return [
       { keys: '↑↓', label: 'file' },
+      { keys: 'e', label: 'files' },
       { keys: 'f', label: 'full' },
       { keys: 'esc', label: '~' },
     ];
