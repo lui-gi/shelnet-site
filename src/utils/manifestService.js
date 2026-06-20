@@ -1,92 +1,51 @@
 /**
- * Service for fetching and caching the resource manifest from shelnet-resources.
- *
- * Handles:
- * - Fetching manifest.json from external repository
- * - Local caching with TTL (time-to-live)
- * - Error handling and fallbacks
- * - Path construction for resources
+ * Service for fetching and caching the resource manifest from shelnet-resources,
+ * plus pure selectors that shape it for the UI.
  */
 
 const MANIFEST_CACHE_KEY = 'shelnet_manifest_cache';
 const MANIFEST_TIMESTAMP_KEY = 'shelnet_manifest_timestamp';
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
-/**
- * Fetches the manifest from shelnet-resources repository.
- * Uses sessionStorage for caching to avoid repeated fetches during a session.
- *
- * @returns {Promise<Object>} Parsed manifest object
- * @throws {Error} If fetch fails or manifest is invalid
- */
-export async function fetchManifest() {
-  const baseUrl = import.meta.env.VITE_RESOURCES_BASE_URL || 'https://lui-gi.github.io/shelnet-resources';
-  const manifestUrl = `${baseUrl}/manifest.json`;
+function resourceBaseUrl() {
+  return import.meta.env.VITE_RESOURCES_BASE_URL || 'https://lui-gi.github.io/shelnet-resources';
+}
 
-  // Check cache first
+export async function fetchManifest() {
+  const manifestUrl = `${resourceBaseUrl()}/manifest.json`;
+
   const cached = getCachedManifest();
-  if (cached) {
-    console.log('[ManifestService] Using cached manifest');
-    return cached;
-  }
+  if (cached) return cached;
 
   try {
-    console.log('[ManifestService] Fetching manifest from:', manifestUrl);
     const response = await fetch(manifestUrl, {
-      cache: 'no-cache', // Always check for updates
-      headers: {
-        'Accept': 'application/json'
-      }
+      cache: 'no-cache',
+      headers: { Accept: 'application/json' },
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
 
     const manifest = await response.json();
+    if (!manifest.certs) throw new Error('Invalid manifest structure: missing "certs" key');
 
-    // Validate manifest structure
-    if (!manifest.resources) {
-      throw new Error('Invalid manifest structure: missing "resources" key');
-    }
-
-    // Cache the manifest
     cacheManifest(manifest);
-
     return manifest;
   } catch (error) {
     console.error('[ManifestService] Failed to fetch manifest:', error);
-
-    // Try to return stale cache as fallback
     const staleCache = getStaleCache();
     if (staleCache) {
       console.warn('[ManifestService] Using stale cache as fallback');
       return staleCache;
     }
-
     throw error;
   }
 }
 
-/**
- * Gets cached manifest if it exists and is not expired.
- * @returns {Object|null} Cached manifest or null
- */
 function getCachedManifest() {
   try {
     const cached = sessionStorage.getItem(MANIFEST_CACHE_KEY);
     const timestamp = sessionStorage.getItem(MANIFEST_TIMESTAMP_KEY);
-
-    if (!cached || !timestamp) {
-      return null;
-    }
-
-    const age = Date.now() - parseInt(timestamp, 10);
-    if (age > CACHE_TTL_MS) {
-      console.log('[ManifestService] Cache expired');
-      return null;
-    }
-
+    if (!cached || !timestamp) return null;
+    if (Date.now() - parseInt(timestamp, 10) > CACHE_TTL_MS) return null;
     return JSON.parse(cached);
   } catch (error) {
     console.error('[ManifestService] Cache read error:', error);
@@ -94,10 +53,6 @@ function getCachedManifest() {
   }
 }
 
-/**
- * Gets stale cached manifest (ignoring TTL) for fallback purposes.
- * @returns {Object|null} Stale cached manifest or null
- */
 function getStaleCache() {
   try {
     const cached = sessionStorage.getItem(MANIFEST_CACHE_KEY);
@@ -107,60 +62,66 @@ function getStaleCache() {
   }
 }
 
-/**
- * Caches manifest in sessionStorage.
- * @param {Object} manifest - Manifest to cache
- */
 function cacheManifest(manifest) {
   try {
     sessionStorage.setItem(MANIFEST_CACHE_KEY, JSON.stringify(manifest));
     sessionStorage.setItem(MANIFEST_TIMESTAMP_KEY, Date.now().toString());
-    console.log('[ManifestService] Manifest cached');
   } catch (error) {
     console.error('[ManifestService] Cache write error:', error);
   }
 }
 
-/**
- * Clears the manifest cache.
- * Useful for forcing a refresh.
- */
 export function clearManifestCache() {
   sessionStorage.removeItem(MANIFEST_CACHE_KEY);
   sessionStorage.removeItem(MANIFEST_TIMESTAMP_KEY);
-  console.log('[ManifestService] Cache cleared');
 }
 
-/**
- * Transforms manifest resource entries to the format expected by components.
- * Adds the full `file` URL by constructing the path based on resource type.
- *
- * @param {Array} resources - Array of resource objects from manifest
- * @param {String} resourceType - Type of resource ('aPlusPBQs', 'securityPlusPBQs', 'aPlusExams', 'securityPlusExams')
- * @returns {Array} Transformed resources with full `file` URLs
- */
-export function transformManifestResources(resources, resourceType) {
-  const baseUrl = import.meta.env.VITE_RESOURCES_BASE_URL || 'https://lui-gi.github.io/shelnet-resources';
+// Per-resource-type display metadata for cert dashboards.
+const TYPE_META = {
+  pbqs: { label: 'pbqs/', prefix: 'PBQ_0' },
+  exams: { label: 'exams/', prefix: 'EXAM_0' },
+};
 
-  // Map resource types to their URL paths
-  const pathMap = {
-    'aPlusPBQs': 'practice-pbqs/a-plus',
-    'securityPlusPBQs': 'practice-pbqs/security-plus',
-    'aPlusExams': 'practice-exams/a-plus',
-    'securityPlusExams': 'practice-exams/security-plus',
-    'visualizations': 'visualizations'
-  };
-
-  const basePath = pathMap[resourceType];
-  if (!basePath) {
-    console.error(`[ManifestService] Unknown resource type: ${resourceType}`);
-    return [];
-  }
-
-  return resources.map(resource => ({
+function toItem(base, segments, resource) {
+  return {
     id: resource.id,
     title: resource.title,
-    file: `${baseUrl}/${basePath}/${resource.filename || resource.file}`,
-    description: resource.description
-  }));
+    description: resource.description,
+    file: `${base}/${segments.join('/')}/${resource.filename}`,
+  };
+}
+
+/** List of certs for the explorer + dashboards (manifest key order). */
+export function getCerts(manifest) {
+  const certs = manifest?.certs || {};
+  return Object.entries(certs).map(([slug, c]) => {
+    const res = c.resources || {};
+    const count = ['pbqs', 'exams'].reduce(
+      (n, t) => n + (Array.isArray(res[t]) ? res[t].length : 0), 0);
+    return { slug, label: c.label, code: c.code, accent: c.accent, count };
+  });
+}
+
+/** One cert's grouped resources, or null if the slug is unknown. Empty types omitted. */
+export function getCert(manifest, slug) {
+  const cert = manifest?.certs?.[slug];
+  if (!cert) return null;
+  const base = resourceBaseUrl();
+  const res = cert.resources || {};
+  const groups = ['pbqs', 'exams']
+    .filter((type) => Array.isArray(res[type]) && res[type].length > 0)
+    .map((type) => ({
+      type,
+      label: TYPE_META[type].label,
+      prefix: TYPE_META[type].prefix,
+      items: res[type].map((r) => toItem(base, ['certs', slug, type], r)),
+    }));
+  return { slug, label: cert.label, code: cert.code, accent: cert.accent, groups };
+}
+
+/** Global visualizations as viewer items. */
+export function getVisualizations(manifest) {
+  const list = Array.isArray(manifest?.visualizations) ? manifest.visualizations : [];
+  const base = resourceBaseUrl();
+  return list.map((r) => toItem(base, ['visualizations'], r));
 }

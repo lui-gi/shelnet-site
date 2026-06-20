@@ -3,31 +3,24 @@ import { labs } from '../data/labs';
 
 /**
  * Pure: derive display counts from a manifest object + local labs.
- * Returns { pbqs, exams, viz, labs, children }. A count is null when its source
+ * Returns { certs, pbqs, exams, viz, labs }. A count is null when its source
  * data is unavailable (unknown) — distinct from 0 (known to be empty).
  */
 export function deriveCounts(manifest) {
-  const r = (manifest && manifest.resources) || null;
-  if (!r) {
-    return { pbqs: null, exams: null, viz: null, labs: labs.length, children: {} };
+  const certs = (manifest && manifest.certs) || null;
+  if (!certs) {
+    return { certs: null, pbqs: null, exams: null, viz: null, labs: labs.length };
   }
-  const len = (k) => (Array.isArray(r[k]) ? r[k].length : null);
-  const count = (...keys) => {
-    const arrs = keys.map((k) => r[k]).filter(Array.isArray);
-    return arrs.length ? arrs.reduce((n, a) => n + a.length, 0) : null;
-  };
+  const entries = Object.values(certs);
+  const sumType = (t) => entries.reduce((n, c) => {
+    const arr = c?.resources?.[t];
+    return n + (Array.isArray(arr) ? arr.length : 0);
+  }, 0);
   return {
-    pbqs: count('aPlusPBQs', 'securityPlusPBQs'),
-    exams: count('aPlusExams', 'securityPlusExams'),
-    viz: count('visualizations'),
+    certs: Object.keys(certs).length,
+    pbqs: sumType('pbqs'),
+    exams: sumType('exams'),
+    viz: Array.isArray(manifest.visualizations) ? manifest.visualizations.length : null,
     labs: labs.length,
-    // Per-subdirectory counts for the explorer's child-count peek, keyed by the
-    // child item's route. Sourced from the same single cached manifest fetch.
-    children: {
-      '/a-plus-pbqs':        len('aPlusPBQs'),
-      '/security-plus-pbqs': len('securityPlusPBQs'),
-      '/a-plus-exams':       len('aPlusExams'),
-      '/security-plus-exams':len('securityPlusExams'),
-    },
   };
 }
