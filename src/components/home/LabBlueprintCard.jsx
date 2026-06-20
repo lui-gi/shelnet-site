@@ -66,7 +66,7 @@ const LabBlueprintCard = ({ lab }) => {
       {/* Row 3 -- CTA Bar */}
       <div className="border border-orange-500/20 border-t-0 bg-orange-500/[0.03] px-6 py-5">
         <Link
-          to={`/labs/${lab.slug}`}
+          to={`/resources/labs/${lab.slug}`}
           className="w-full px-8 py-4 bg-orange-500 text-black font-bold text-sm uppercase hover:bg-orange-400 transition-colors flex items-center justify-center gap-3 tracking-wider btn-scanline"
         >
           ENTER LAB
