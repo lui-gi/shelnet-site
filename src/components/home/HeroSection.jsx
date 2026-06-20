@@ -143,7 +143,7 @@ const HeroSection = () => {
   }, [finished, activate]);
 
   return (
-    <section id="hero" className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 py-8 [@media(min-height:900px)]:py-16 glow-green">
+    <section id="hero" className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-12 pb-12 [@media(min-height:900px)]:py-16 glow-green">
       <div className="w-fit max-w-full font-mono text-sm md:text-base">
         <pre aria-label="shelnet"
              className="mb-3 whitespace-pre text-[8px] leading-[1.1] sm:text-xs md:text-sm"
