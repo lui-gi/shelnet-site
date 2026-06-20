@@ -24,7 +24,7 @@ const BottomBar = () => {
         {/* launcher CTAs */}
         <div className="flex items-center gap-3 overflow-x-auto">
           {CTAS.map((c) => (
-            <Link key={c.to} to={c.to} className="shrink-0 whitespace-nowrap transition-opacity hover:opacity-90">
+            <Link key={c.to} to={c.to} className="shrink-0 whitespace-nowrap rounded-sm transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60">
               <span className="text-white/25">[</span>
               <span style={{ color: c.hex }}>&nbsp;▸&nbsp;</span>
               <span className="text-white/90">{c.label}</span>

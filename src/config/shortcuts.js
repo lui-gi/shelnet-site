@@ -10,7 +10,10 @@ const WORKSPACE_ROUTES = new Set([
 ]);
 
 export function shortcutsForPath(pathname) {
-  if (pathname === '/') return [{ keys: '1–6', label: 'jump' }];
+  if (pathname === '/') {
+    // '1–6' tracks HeroSection.jsx MENU (6 items); update if that menu grows
+    return [{ keys: '1–6', label: 'jump' }];
+  }
   if (/^\/resources\/[^/]+\/?$/.test(pathname)) {
     return [
       { keys: '↑↓', label: 'dir' },

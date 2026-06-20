@@ -35,7 +35,7 @@ const PromptBar = () => {
                     <span aria-current="page" style={{ color: SHELL.green, fontWeight: 600 }}>{seg}</span>
                   ) : (
                     <Link to={routeForSegments(segments.slice(0, i + 1))}
-                          className="hover:underline" style={{ color: SHELL.green }}>{seg}</Link>
+                          className="hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60" style={{ color: SHELL.green }}>{seg}</Link>
                   )}
                 </span>
               );
@@ -48,7 +48,7 @@ const PromptBar = () => {
 
         {/* home button */}
         <button type="button" onClick={() => navigate('/')} aria-label="cd ~ (home)"
-                className="group shrink-0 transition-opacity">
+                className="group shrink-0 rounded-sm transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60">
           <span className="text-white/25">[</span>
           <span style={{ color: SHELL.dim }}>&nbsp;cd&nbsp;</span>
           <span style={{ color: SHELL.green }}>~</span>
