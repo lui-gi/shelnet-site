@@ -1,66 +1,59 @@
 // src/components/tui/PromptBar.jsx
 // Global sticky tty status line pinned to the top of every page. Renders the
-// live shell prompt — `guest@shelnet:~/path$` — with the path as a clickable
-// breadcrumb (ancestors link via routeForSegments; the current segment is inert)
-// plus a `[ ~ ]` home chip on the right, echoing the hero's `[ OK ]` markers.
-// Stays shell-green chrome on every route so it reads as the constant terminal
-// frame around the page content. Mounted once in Layout, above the Outlet.
-import { Link, useLocation } from 'react-router-dom';
+// shell prompt `guest@shelnet <~/path> $` — the working directory housed in
+// green inside angle brackets, ancestor segments clickable, the current segment
+// inert. A single `[ cd ~ ]` button on the right is the only home affordance
+// (no `[ ~ ]` chip, no blinking cursor). Mounted once in Layout, above Outlet.
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { SHELL } from '../../config/theme';
 import { segmentsForPath, routeForSegments } from '../../config/resourcePaths';
 
+const SLASH = 'rgba(67,192,140,0.45)';
+
 const PromptBar = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const segments = segmentsForPath(pathname);
-  const atHome = segments.length === 0;
 
   return (
     <nav aria-label="Terminal path"
          className="fixed inset-x-0 top-0 z-50 h-9 border-b border-white/10 bg-black/90 backdrop-blur-sm">
       <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6 font-mono text-xs sm:text-sm">
-        {/* prompt + breadcrumb + cursor */}
+        {/* prompt + breadcrumb */}
         <div className="flex min-w-0 items-center">
-          <span className="hidden sm:inline text-white/40">guest@shelnet</span>
-          <span className="hidden sm:inline text-white/25">:</span>
-
+          <span className="hidden sm:inline" style={{ color: SHELL.dim }}>guest@shelnet</span>
+          <span className="hidden sm:inline">&nbsp;</span>
+          <span className="text-white/30">&lt;</span>
           <span className="min-w-0 truncate">
-            {atHome ? (
-              <span aria-current="page" style={{ color: SHELL.green }}>~</span>
-            ) : (
-              <Link to="/" aria-label="Home"
-                    className="opacity-90 transition-opacity hover:opacity-100"
-                    style={{ color: SHELL.green }}>~</Link>
-            )}
+            <span style={{ color: SHELL.green }}>~</span>
             {segments.map((seg, i) => {
               const last = i === segments.length - 1;
               return (
                 <span key={i}>
-                  <span className="text-white/30">/</span>
+                  <span style={{ color: SLASH }}>/</span>
                   {last ? (
-                    <span aria-current="page" className="text-white/90">{seg}</span>
+                    <span aria-current="page" style={{ color: SHELL.green, fontWeight: 600 }}>{seg}</span>
                   ) : (
                     <Link to={routeForSegments(segments.slice(0, i + 1))}
-                          className="text-white/55 transition-colors hover:text-white">{seg}</Link>
+                          className="hover:underline" style={{ color: SHELL.green }}>{seg}</Link>
                   )}
                 </span>
               );
             })}
           </span>
-
-          <span className="ml-px" style={{ color: SHELL.green }}>$</span>
-          <span aria-hidden="true"
-                className="ml-1 inline-block h-3.5 w-1.5 animate-pulse reduce-static"
-                style={{ backgroundColor: SHELL.green }} />
+          <span className="text-white/30">&gt;</span>
+          <span>&nbsp;</span>
+          <span style={{ color: SHELL.green }}>$</span>
         </div>
 
-        {/* home chip */}
-        <Link to="/" aria-label="Return home"
-              className="group shrink-0 transition-colors">
-          <span className="text-white/25 transition-colors group-hover:text-white/45">[</span>
-          <span className="px-1 opacity-90 transition-opacity group-hover:opacity-100"
-                style={{ color: SHELL.green }}>~</span>
-          <span className="text-white/25 transition-colors group-hover:text-white/45">]</span>
-        </Link>
+        {/* home button */}
+        <button type="button" onClick={() => navigate('/')} aria-label="cd ~ (home)"
+                className="group shrink-0 transition-opacity">
+          <span className="text-white/25">[</span>
+          <span style={{ color: SHELL.dim }}>&nbsp;cd&nbsp;</span>
+          <span style={{ color: SHELL.green }}>~</span>
+          <span className="text-white/25">&nbsp;]</span>
+        </button>
       </div>
     </nav>
   );
