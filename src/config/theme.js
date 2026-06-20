@@ -20,10 +20,10 @@ export const SITE = {
   domain: 'shelnet.org',
 };
 
-// ASCII banner for the boot hero (desktop). Monospace required.
-export const ASCII_BANNER = String.raw`
- ███████ ██   ██ ███████ ██      ███    ██ ███████ ████████
- ██      ██   ██ ██      ██      ████   ██ ██         ██
- ███████ ███████ █████   ██      ██ ██  ██ █████      ██
-      ██ ██   ██ ██      ██      ██  ██ ██ ██         ██
- ███████ ██   ██ ███████ ███████ ██   ████ ███████    ██`;
+// ASCII banner for the boot hero. Lowercase figlet (figlet "standard" font).
+// Monospace required. Rendered green + subtle glow in HeroSection.
+export const ASCII_BANNER = String.raw`     _          _            _
+ ___| |__   ___| |_ __   ___| |_
+/ __| '_ \ / _ \ | '_ \ / _ \ __|
+\__ \ | | |  __/ | | | |  __/ |_
+|___/_| |_|\___|_|_| |_|\___|\__|`;
