@@ -3,6 +3,7 @@
 // The breadcrumb + exit live in the surrounding TerminalShell; this renders
 // only the body. Accent = cert color.
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Maximize2, Minimize2, ExternalLink, ChevronLeft, Menu } from 'lucide-react';
 import { themeColors } from '../../config/themeColors';
 
@@ -11,6 +12,7 @@ const Workspace = ({
   statusLabel = 'EXECUTING:', loading = false, error = null, metaRight = '', showSandbox = false,
 }) => {
   const colors = themeColors[accent] || themeColors.green;
+  const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
   const [fullscreen, setFullscreen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -18,7 +20,7 @@ const Workspace = ({
   const idx = selected ? items.findIndex((i) => i.id === selected.id) : -1;
   const select = useCallback((item) => { setSelected(item); setDrawerOpen(false); }, []);
 
-  // Keyboard: ↑↓ move, f fullscreen, esc exits fullscreen (shell handles home).
+  // Keyboard: ↑↓ move, f fullscreen, esc exits fullscreen then returns home.
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
@@ -26,11 +28,11 @@ const Workspace = ({
       if (e.key === 'ArrowDown') { e.preventDefault(); const n = items[idx < 0 ? 0 : (idx + 1) % items.length]; if (n) setSelected(n); }
       if (e.key === 'ArrowUp')   { e.preventDefault(); const n = items[idx < 0 ? items.length - 1 : (idx - 1 + items.length) % items.length]; if (n) setSelected(n); }
       if (e.key === 'f' && selected) { setFullscreen((v) => !v); }
-      if (e.key === 'Escape' && fullscreen) { setFullscreen(false); }
+      if (e.key === 'Escape') { if (fullscreen) setFullscreen(false); else navigate('/'); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [idx, items, selected, fullscreen]);
+  }, [idx, items, selected, fullscreen, navigate]);
 
   const Explorer = (
     <div className="overflow-y-auto" aria-label="File explorer">
@@ -103,7 +105,7 @@ const Workspace = ({
           </div>
 
           <div className="flex items-center justify-between py-2 text-[10.5px]">
-            <span className="text-white/50">↑↓ select · f fullscreen · esc exit fullscreen</span>
+            <span className="text-white/50">↑↓ select · f fullscreen · esc home</span>
             <span className={colors.text}>{items.length} files{metaRight ? ` · ${metaRight}` : ''}</span>
           </div>
         </div>

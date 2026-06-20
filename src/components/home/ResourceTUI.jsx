@@ -54,7 +54,7 @@ const ResourceTUI = () => {
         const it = tree[active].items[0]; if (it) { e.preventDefault(); openItem(it); }
       }
       else if (e.key === 'Escape') { navigate('/'); }
-      else if (/^[1-5]$/.test(e.key)) { const t = tree[Number(e.key) - 1]; if (t) { e.preventDefault(); goDir(t.key); } }
+      else if (/^[1-9]$/.test(e.key)) { const t = tree[Number(e.key) - 1]; if (t) { e.preventDefault(); goDir(t.key); } }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -84,14 +84,14 @@ const ResourceTUI = () => {
         <div className="border-t md:border-t-0 md:border-l border-white/10 pt-3 md:pt-0 md:pl-5">
           <div className="text-white/30 text-xs">total {current.items.length}</div>
           <div className="text-white/35 text-xs mb-2"># {current.sub}</div>
-          {current.items.map((item, i) => {
+          {current.items.map((item) => {
             const c = themeColors[item.accent] || themeColors.green;
             const hex = (ACCENTS[item.accent] || ACCENTS.green).hex;
             const isExt = !!item.href;
             const subdirName = isSubdir ? SUBDIR_NAME[item.to] : null;
             const peek = item.to ? counts.children?.[item.to] : null;
             return (
-              <button key={i} type="button" onClick={() => openItem(item)}
+              <button key={item.to || item.href || item.name} type="button" onClick={() => openItem(item)}
                 className="grid w-full grid-cols-[84px_1fr_auto] items-baseline gap-3 rounded px-2 py-1.5 text-left transition-colors hover:bg-white/5">
                 <span className={`text-xs font-bold ${c.text}`}>{item.tag}</span>
                 <span className="min-w-0 truncate">
