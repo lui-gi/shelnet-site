@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Maximize2, Minimize2, ExternalLink, ChevronLeft, Menu } from 'lucide-react';
 import { themeColors } from '../../config/themeColors';
+import { ACCENTS } from '../../config/theme';
 
 const uidOf = (group, item) => `${group.type}:${item.id}`;
 
@@ -15,6 +16,7 @@ const Workspace = ({
   statusLabel = 'EXECUTING:', loading = false, error = null, metaRight = '', showSandbox = false,
 }) => {
   const colors = themeColors[accent] || themeColors.green;
+  const accentHex = (ACCENTS[accent] || ACCENTS.green).hex;
   const navigate = useNavigate();
   const [selectedUid, setSelectedUid] = useState(null);
 
@@ -55,7 +57,7 @@ const Workspace = ({
             return (
               <button type="button" key={uid} onClick={() => select(uid)}
                 className={`w-full text-left px-2 py-2 rounded mb-0.5 transition-colors ${on ? 'bg-white/[0.04] text-white' : 'text-white/65 hover:bg-white/5'}`}
-                style={on ? { boxShadow: 'inset 2px 0 0 currentColor' } : undefined}>
+                style={on ? { boxShadow: `inset 2px 0 0 ${accentHex}` } : undefined}>
                 <div className={`text-[11px] font-bold ${colors.text}`}>{g.prefix}{item.id}{on ? ' ●' : ''}</div>
                 <div className="text-xs font-semibold">{item.title}</div>
                 <div className="text-[10px] text-white/40">{item.description}</div>

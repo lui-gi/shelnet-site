@@ -18,7 +18,7 @@ const PromptBar = () => {
   return (
     <nav aria-label="Terminal path"
          className="fixed inset-x-0 top-0 z-50 h-9 border-b border-white/10 bg-black/90 backdrop-blur-sm">
-      <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6 font-mono text-xs sm:text-sm">
+      <div className="flex h-full items-center justify-between gap-3 px-6 font-mono text-xs sm:text-sm">
         {/* prompt + breadcrumb */}
         <div className="flex min-w-0 items-center">
           <span className="hidden sm:inline" style={{ color: SHELL.dim }}>guest@shelnet</span>

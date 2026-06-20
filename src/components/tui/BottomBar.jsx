@@ -20,7 +20,7 @@ const BottomBar = () => {
   return (
     <nav aria-label="Quick actions"
          className="fixed inset-x-0 bottom-0 z-50 h-9 border-t border-white/10 bg-black/90 backdrop-blur-sm">
-      <div className="flex h-full items-center justify-between gap-3 px-4 sm:px-6 font-mono text-xs sm:text-sm">
+      <div className="flex h-full items-center justify-between gap-3 px-6 font-mono text-xs sm:text-sm">
         {/* launcher CTAs */}
         <div className="flex items-center gap-3 overflow-x-auto">
           {CTAS.map((c) => (

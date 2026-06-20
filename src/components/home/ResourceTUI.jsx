@@ -105,7 +105,7 @@ const ResourceTUI = () => {
   }, [current, pane, itemIndex, dirIndex, tree, activateDir, openItem, navigate]);
 
   return (
-    <TerminalShell center>
+    <TerminalShell>
       <div className="text-white/40 text-xs mb-3">total {current.items.length} · # {current.sub}</div>
 
       <div className="grid md:grid-cols-[180px_1fr]">
