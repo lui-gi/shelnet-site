@@ -1,8 +1,7 @@
 // src/components/home/ConnectSection.jsx
 import { Youtube, Linkedin, Mail } from 'lucide-react';
-import TuiFrame from '../tui/TuiFrame';
-import Prompt from '../tui/Prompt';
-import { PROMPT, SITE } from '../../config/theme';
+import TerminalShell from '../tui/TerminalShell';
+import { SITE } from '../../config/theme';
 
 const LINKS = [
   { Icon: Youtube,  label: 'YouTube',  desc: 'Video explanations of PBQs & visualizations', href: 'https://youtube.com/@Shelnet',                       hover: 'hover:border-red-500/50 hover:bg-red-900/10',  cta: 'text-red-400' },
@@ -11,33 +10,27 @@ const LINKS = [
 ];
 
 const ConnectSection = () => (
-  <section id="connect" className="py-20 px-6">
-    <div className="max-w-4xl mx-auto">
-      <Prompt command="./connect" accent="green" className="mb-4" />
-      <TuiFrame accent="green" titleLeft="┤ ./connect ├" titleRight="socials">
-        <div className="grid sm:grid-cols-3 gap-px bg-white/10">
-          {LINKS.map((link) => {
-            const Icon = link.Icon;
-            const { label, desc, href, hover, cta } = link;
-            return (
-            <a key={label} href={href} target="_blank" rel="noopener noreferrer"
-               className={`group bg-black p-6 transition-colors ${hover}`}>
-              <Icon className="text-white mb-3" size={22} />
-              <div className="text-white font-bold mb-1">{label}</div>
-              <div className="text-white/50 text-xs mb-3">{desc}</div>
-              <div className={`text-[11px] font-mono ${cta}`}>open →</div>
-            </a>
-            );
-          })}
-        </div>
-      </TuiFrame>
-
-      <div className="mt-8 pt-6 border-t border-white/10 flex justify-between text-white/30 text-xs font-mono">
-        <span>© {new Date().getFullYear()} {SITE.domain}</span>
-        <span className="text-emerald-400">{PROMPT} logout</span>
-      </div>
+  <TerminalShell command="./connect" accent="green" maxWidthClass="max-w-3xl">
+    <div className="grid sm:grid-cols-3 gap-3">
+      {LINKS.map((link) => {
+        const { Icon, label, desc, href, hover, cta } = link;
+        return (
+        <a key={label} href={href} target="_blank" rel="noopener noreferrer"
+           className={`group border border-white/10 bg-white/[0.02] p-5 transition-colors ${hover}`}>
+          <Icon className="text-white mb-3" size={22} />
+          <div className="text-white font-bold mb-1">{label}</div>
+          <div className="text-white/50 text-xs mb-3">{desc}</div>
+          <div className={`text-[11px] font-mono ${cta}`}>open →</div>
+        </a>
+        );
+      })}
     </div>
-  </section>
+
+    <div className="mt-8 pt-6 border-t border-white/10 flex justify-between text-white/30 text-xs font-mono">
+      <span>© {new Date().getFullYear()} {SITE.domain}</span>
+      <span style={{ color: '#43c08c' }}>guest@shelnet:~$ logout</span>
+    </div>
+  </TerminalShell>
 );
 
 export default ConnectSection;
