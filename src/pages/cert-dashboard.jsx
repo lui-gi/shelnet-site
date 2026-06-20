@@ -18,7 +18,7 @@ const CertDashboard = () => {
   }
 
   return (
-    <TerminalShell>
+    <TerminalShell fill>
       <Workspace
         accent={cert?.accent || 'green'}
         groups={cert?.groups || []}

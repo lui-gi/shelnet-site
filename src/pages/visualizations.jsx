@@ -9,7 +9,7 @@ const Visualizations = () => {
   const items = manifest ? getVisualizations(manifest) : [];
   const groups = [{ type: 'viz', label: null, prefix: 'VIZ_0', items }];
   return (
-    <TerminalShell>
+    <TerminalShell fill>
       <Workspace accent="purple" groups={groups}
         statusLabel="VIEWING:" loading={loading} error={error} showSandbox />
     </TerminalShell>

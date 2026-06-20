@@ -1,11 +1,12 @@
 // src/components/tui/Workspace.jsx
-// Borderless file workspace: a grouped explorer (left) + iframe viewer (right).
-// Groups render with a dim header (e.g. pbqs/, exams/); a single group with a
-// null label renders headerless. Keyboard ↑↓ flows across every group. Accent
-// = cert color. The breadcrumb + exit live in the surrounding bars.
-import { useState, useEffect } from 'react';
+// Borderless file workspace that fills the viewport between the global bars:
+// a thin tty toolbar over a body of [collapsible explorer | iframe viewer].
+// The viewer fills all remaining space; `f` enters true (Fullscreen-API)
+// fullscreen with a CSS edge-to-edge fallback; the first file auto-selects on
+// load. Accent = cert color; the breadcrumb + exit live in the global bars.
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Maximize2, Minimize2, ExternalLink, ChevronLeft, Menu } from 'lucide-react';
+import { Maximize2, Minimize2, ExternalLink, PanelLeft, PanelLeftClose } from 'lucide-react';
 import { themeColors } from '../../config/themeColors';
 import { ACCENTS } from '../../config/theme';
 
@@ -18,42 +19,75 @@ const Workspace = ({
   const colors = themeColors[accent] || themeColors.green;
   const accentHex = (ACCENTS[accent] || ACCENTS.green).hex;
   const navigate = useNavigate();
-  const [selectedUid, setSelectedUid] = useState(null);
 
   // Flatten groups into one ordered list for keyboard nav + lookup.
   const flat = groups.flatMap((g) => g.items.map((item) => ({
     uid: uidOf(g, item), label: `${g.prefix}${item.id}`, item,
   })));
-  const idx = flat.findIndex((f) => f.uid === selectedUid);
+
+  const [selectedUid, setSelectedUid] = useState(null);
+  const [explorerOpen, setExplorerOpen] = useState(true);
+  const [apiFs, setApiFs] = useState(false);   // real Fullscreen API active
+  const [cssFs, setCssFs] = useState(false);   // fallback CSS overlay active
+  const fullscreen = apiFs || cssFs;
+  const viewerRef = useRef(null);
+
+  // Auto-select: if nothing chosen yet, treat the first file as selected.
+  const effectiveUid = selectedUid ?? flat[0]?.uid ?? null;
+  const idx = flat.findIndex((f) => f.uid === effectiveUid);
   const selected = idx >= 0 ? flat[idx].item : null;
 
-  const [fullscreen, setFullscreen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  // True fullscreen via the Fullscreen API; CSS overlay when it's unavailable.
+  const toggleFullscreen = useCallback(() => {
+    const el = viewerRef.current;
+    if (document.fullscreenElement) { document.exitFullscreen?.(); return; }
+    setCssFs((prev) => {
+      if (prev) return false;
+      if (el?.requestFullscreen) { el.requestFullscreen().catch(() => setCssFs(true)); return false; }
+      return true;
+    });
+  }, [setCssFs]);
 
-  const select = (uid) => { setSelectedUid(uid); setDrawerOpen(false); };
+  // Keep apiFs in sync with the browser (so pressing browser Esc updates UI).
+  useEffect(() => {
+    const onFsChange = () => setApiFs(!!document.fullscreenElement);
+    document.addEventListener('fullscreenchange', onFsChange);
+    return () => document.removeEventListener('fullscreenchange', onFsChange);
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       if (e.key === 'ArrowDown' && flat.length) { e.preventDefault(); const n = flat[idx < 0 ? 0 : (idx + 1) % flat.length]; setSelectedUid(n.uid); }
-      if (e.key === 'ArrowUp' && flat.length)   { e.preventDefault(); const n = flat[idx < 0 ? flat.length - 1 : (idx - 1 + flat.length) % flat.length]; setSelectedUid(n.uid); }
-      if (e.key === 'f' && selected) { setFullscreen((v) => !v); }
-      if (e.key === 'Escape') { if (fullscreen) setFullscreen(false); else navigate('/'); }
+      else if (e.key === 'ArrowUp' && flat.length) { e.preventDefault(); const n = flat[idx < 0 ? flat.length - 1 : (idx - 1 + flat.length) % flat.length]; setSelectedUid(n.uid); }
+      else if (e.key === 'f' && selected) { e.preventDefault(); toggleFullscreen(); }
+      else if (e.key === 'e') { e.preventDefault(); setExplorerOpen((v) => !v); }
+      else if (e.key === 'Escape') {
+        if (document.fullscreenElement) document.exitFullscreen?.();
+        else if (cssFs) setCssFs(false);
+        else navigate('/');
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [idx, flat, selected, fullscreen, navigate]);
+  }, [idx, flat, selected, cssFs, navigate, toggleFullscreen]);
+
+  // On a phone the explorer is an overlay drawer — close it once a file is picked.
+  const select = (uid) => {
+    setSelectedUid(uid);
+    if (window.matchMedia('(max-width: 767px)').matches) setExplorerOpen(false);
+  };
 
   const Explorer = (
-    <div className="overflow-y-auto" aria-label="File explorer">
+    <div aria-label="File explorer">
       <div className="text-white/40 text-[10px] tracking-widest px-2 py-2">EXPLORER · AVAILABLE</div>
       {groups.map((g) => (
         <div key={g.type} className="mb-1">
           {g.label && <div className="px-2 py-1 text-[10px] tracking-widest text-white/35">{g.label}</div>}
           {g.items.map((item) => {
             const uid = uidOf(g, item);
-            const on = selectedUid === uid;
+            const on = effectiveUid === uid;
             return (
               <button type="button" key={uid} onClick={() => select(uid)}
                 className={`w-full text-left px-2 py-2 rounded mb-0.5 transition-colors ${on ? 'bg-white/[0.04] text-white' : 'text-white/65 hover:bg-white/5'}`}
@@ -69,60 +103,68 @@ const Workspace = ({
     </div>
   );
 
-  if (loading) return <div className="p-16 text-center text-white/50 text-sm">Loading…</div>;
-  if (error) return <div className="p-8 text-red-400 text-sm">Failed to load resources: {error}</div>;
+  if (loading) return <div className="flex-1 grid place-items-center text-white/50 text-sm">Loading…</div>;
+  if (error) return <div className="flex-1 grid place-items-center text-red-400 text-sm">Failed to load resources: {error}</div>;
 
   return (
-    <div className="font-mono">
-      <button type="button" onClick={() => setDrawerOpen((v) => !v)}
-        className="md:hidden mb-2 inline-flex items-center gap-1 text-white/60 text-xs" aria-label="Toggle explorer">
-        <Menu size={14} /> explorer
-      </button>
+    <div className="flex flex-col flex-1 min-h-0 font-mono">
+      {/* tty toolbar */}
+      <div className="flex items-center justify-between gap-2 py-2 text-xs shrink-0">
+        <span className="flex items-center gap-3 min-w-0">
+          <button type="button" onClick={() => setExplorerOpen((v) => !v)}
+            aria-expanded={explorerOpen} aria-controls="ws-explorer" aria-label="Toggle file explorer"
+            className={`inline-flex shrink-0 items-center gap-1 text-white/55 ${colors.textHover}`} title="Toggle explorer (e)">
+            {explorerOpen ? <PanelLeftClose size={13} /> : <PanelLeft size={13} />} files
+          </button>
+          <span className="truncate">
+            {selected
+              ? <><span className={colors.text}>{statusLabel}</span> <span className="text-white">{selected.title}</span></>
+              : <span className="text-white/40">{statusLabel} waiting for input…</span>}
+          </span>
+        </span>
+        <span className="flex items-center gap-3 shrink-0">
+          <span className={`hidden sm:inline ${colors.text}`}>{flat.length} files{metaRight ? ` · ${metaRight}` : ''}</span>
+          {selected && (
+            <>
+              <button type="button" onClick={toggleFullscreen} aria-pressed={fullscreen}
+                className={`inline-flex items-center gap-1 text-white/55 ${colors.textHover}`} title="Fullscreen (f)">
+                {fullscreen ? <><Minimize2 size={13} /> min</> : <><Maximize2 size={13} /> full</>}
+              </button>
+              <button type="button" onClick={() => window.open(selected.file, '_blank', 'noopener,noreferrer')}
+                className={`inline-flex items-center gap-1 text-white/55 ${colors.textHover}`} title="Open in new tab">
+                <ExternalLink size={13} /> open
+              </button>
+            </>
+          )}
+        </span>
+      </div>
 
-      <div className={`grid ${fullscreen ? 'grid-cols-1' : 'md:grid-cols-[260px_1fr]'} min-h-[60vh]`}>
-        {!fullscreen && (
-          <div className={`md:border-r border-white/10 md:pr-2 ${drawerOpen ? 'block' : 'hidden md:block'}`}>{Explorer}</div>
+      {/* body: collapsible push explorer + filling viewer */}
+      <div className="flex flex-1 min-h-0">
+        {explorerOpen && (
+          <aside id="ws-explorer"
+            className="w-[280px] shrink-0 overflow-y-auto md:border-r border-white/10 md:pr-2
+                       max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-40 max-md:w-[260px] max-md:bg-black max-md:pt-12 max-md:px-3 max-md:pb-12">
+            {Explorer}
+          </aside>
         )}
-
-        <div className="flex flex-col md:pl-4">
-          <div className="flex items-center justify-between gap-2 py-2 text-xs">
-            <span className="flex items-center gap-2 min-w-0">
-              {fullscreen && <button type="button" aria-label="Exit fullscreen" onClick={() => setFullscreen(false)}><ChevronLeft size={16} className="text-white/60" /></button>}
-              {selected
-                ? <span className="truncate"><span className={colors.text}>{statusLabel}</span> <span className="text-white">{selected.title}</span></span>
-                : <span className="text-white/40">{statusLabel} waiting for input…</span>}
-            </span>
-            {selected && (
-              <span className="flex items-center gap-3 shrink-0">
-                <button type="button" onClick={() => setFullscreen((v) => !v)} className={`inline-flex items-center gap-1 text-white/55 ${colors.textHover}`} title="Fullscreen (f)">
-                  {fullscreen ? <><Minimize2 size={13} /> min</> : <><Maximize2 size={13} /> full</>}
-                </button>
-                <button type="button" onClick={() => window.open(selected.file, '_blank', 'noopener,noreferrer')} className={`inline-flex items-center gap-1 text-white/55 ${colors.textHover}`} title="Open in new tab">
-                  <ExternalLink size={13} /> open
-                </button>
-              </span>
-            )}
-          </div>
-
-          <div className="flex-1 relative rounded border border-white/10 bg-white" style={{ height: fullscreen ? '85vh' : '60vh' }}>
-            {selected ? (
-              <iframe src={selected.file} title={selected.title} className="w-full h-full border-0"
-                {...(showSandbox && { sandbox: 'allow-same-origin allow-scripts allow-forms allow-popups' })} />
-            ) : (
-              <div className="absolute inset-0 bg-black flex items-center justify-center text-center text-white/40">
-                <div>
-                  <div className="text-3xl opacity-30">▢</div>
-                  <div className="mt-2 text-sm">// no file loaded</div>
-                  <div className="text-xs mt-1 opacity-70">select a file to initialize environment</div>
-                </div>
+        <section ref={viewerRef}
+          className={cssFs
+            ? 'fixed inset-0 z-[60] bg-white'
+            : `relative flex-1 min-h-0 bg-white border border-white/10 rounded ${explorerOpen ? 'md:ml-4' : ''}`}>
+          {selected ? (
+            <iframe src={selected.file} title={selected.title} className="w-full h-full border-0"
+              {...(showSandbox && { sandbox: 'allow-same-origin allow-scripts allow-forms allow-popups' })} />
+          ) : (
+            <div className="absolute inset-0 bg-black flex items-center justify-center text-center text-white/40">
+              <div>
+                <div className="text-3xl opacity-30">▢</div>
+                <div className="mt-2 text-sm">// no file loaded</div>
+                <div className="text-xs mt-1 opacity-70">select a file to initialize environment</div>
               </div>
-            )}
-          </div>
-
-          <div className="flex items-center justify-end py-2 text-[10.5px]">
-            <span className={colors.text}>{flat.length} files{metaRight ? ` · ${metaRight}` : ''}</span>
-          </div>
-        </div>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );
