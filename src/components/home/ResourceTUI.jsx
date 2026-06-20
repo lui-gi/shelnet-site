@@ -1,5 +1,5 @@
 // src/components/home/ResourceTUI.jsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TuiFrame from '../tui/TuiFrame';
 import Prompt from '../tui/Prompt';
@@ -39,6 +39,22 @@ const ResourceTUI = () => {
     if (item.to) navigate(item.to);
     else if (item.href) window.open(item.href, '_blank', 'noopener,noreferrer');
   };
+
+  // Select a directory + scroll here when the hero (or a deep link) sets the
+  // hash to a directory key, e.g. "#pbqs". Keys come from RESOURCE_TREE.
+  useEffect(() => {
+    const selectFromHash = () => {
+      const key = window.location.hash.replace('#', '');
+      const idx = RESOURCE_TREE.findIndex((d) => d.key === key);
+      if (idx >= 0) {
+        setActive(idx);
+        document.getElementById('resources')?.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+    selectFromHash();                                   // deep-link on first load
+    window.addEventListener('hashchange', selectFromHash);
+    return () => window.removeEventListener('hashchange', selectFromHash);
+  }, []);
 
   // Keyboard nav within the tree (progressive enhancement).
   const onTreeKey = (e) => {
