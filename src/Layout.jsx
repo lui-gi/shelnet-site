@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import PromptBar from './components/tui/PromptBar';
+import BottomBar from './components/tui/BottomBar';
 
 const Layout = () => {
   const location = useLocation();
@@ -12,6 +13,7 @@ const Layout = () => {
     <div className="relative min-h-screen bg-black font-mono text-white selection:bg-emerald-500/30 selection:text-emerald-200">
       <PromptBar />
       <Outlet />
+      <BottomBar />
     </div>
   );
 };
