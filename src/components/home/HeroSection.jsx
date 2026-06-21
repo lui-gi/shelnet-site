@@ -40,7 +40,7 @@ function buildLines(counts, newsText, narrow) {
     return [
       <><Mark inner=" 0.00 " /> booting userland…</>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/certs</span>{'  '}<span className="text-white/55">{fmt(counts.certs)} tracks</span></>,
-      <><Mark inner="  OK  " /> <span className="text-white/90">/labs</span>{'   '}<span className="text-white/55">{fmt(counts.labs)} writeups</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/labs</span>{'   '}<span className="text-white/55">{fmt(counts.labs)} coming</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/viz</span>{'    '}<span className="text-white/55">{fmt(counts.viz)} modules</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">trackers=0 · $0.00</span></>,
       <><Mark inner=" feed " /> {feedShort}</>,
@@ -50,7 +50,7 @@ function buildLines(counts, newsText, narrow) {
   return [
     <><Mark inner=" 0.00 " /> shelnet kernel v3.0 — booting userland…</>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/certs</span> {dots('···········')} <span className="text-white/55">{fmt(counts.certs)} tracks · {fmt(sims)} sims</span></>,
-    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/labs</span> {dots('·················')} <span className="text-white/55">{fmt(counts.labs)} writeups</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/labs</span> {dots('·················')} <span className="text-white/55">{fmt(counts.labs)} coming</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/visualizations</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules</span></>,
     <><Mark inner="  OK  " /> security: <span className="text-white/90">trackers=0  paywall=none  cost=$0.00</span></>,
     <><Mark inner=" feed " /> {feed}</>,
