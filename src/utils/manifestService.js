@@ -71,11 +71,6 @@ function cacheManifest(manifest) {
   }
 }
 
-export function clearManifestCache() {
-  sessionStorage.removeItem(MANIFEST_CACHE_KEY);
-  sessionStorage.removeItem(MANIFEST_TIMESTAMP_KEY);
-}
-
 // Per-resource-type display metadata for cert dashboards.
 const TYPE_META = {
   pbqs: { label: 'pbqs/', prefix: 'PBQ_0' },

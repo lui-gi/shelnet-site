@@ -46,13 +46,13 @@ const ResourceTUI = () => {
 
   const cur = CATS[sel];
   const countFor = (k) =>
-    k === 'certs' ? (counts.certs ?? '—')
-    : k === 'visualizations' ? (counts.viz ?? '—')
+    k === 'certs' ? (counts.certs ?? '-')
+    : k === 'visualizations' ? (counts.viz ?? '-')
     : k === 'labs' ? 'soon'
     : 'live';
 
   const renderPeek = () => {
-    if (cur.key === 'labs') return <div className="text-white/40">soon — showcase under construction</div>;
+    if (cur.key === 'labs') return <div className="text-white/40">soon: showcase under construction</div>;
     if (cur.key === 'notes') return <div style={{ color: '#cbd5e1' }}>Obsidian Vault <span className="text-emerald-300">● LIVE</span> <span className="text-white/40">↗</span></div>;
     const rows = peeks[cur.key] || [];
     if (loading && !rows.length) return <div className="text-white/30">…</div>;
@@ -70,7 +70,7 @@ const ResourceTUI = () => {
 
   return (
     <TerminalShell>
-      <div className="text-white/40 text-xs mb-3"># pick a section — →/↵ to open</div>
+      <div className="text-white/40 text-xs mb-3"># pick a section, →/↵ to open</div>
       <div className="grid md:grid-cols-[200px_1fr] font-mono text-sm">
         {/* categories */}
         <div aria-label="Resource categories">

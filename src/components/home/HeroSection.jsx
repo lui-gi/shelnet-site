@@ -19,7 +19,7 @@ const MENU = [
   { n: '5', cmd: './connect',        desc: 'newsletter · github · contact', anchor: 'connect' },
 ];
 
-const fmt = (v) => (v == null ? '—' : v);
+const fmt = (v) => (v == null ? '-' : v);
 
 // Bracketed status marker, e.g. [  OK  ]. `inner` is the padded 6-char label.
 const Mark = ({ inner }) => (
@@ -48,7 +48,7 @@ function buildLines(counts, newsText, narrow) {
   }
   const dots = (s) => <span className="text-white/20" aria-hidden="true">{s}</span>;
   return [
-    <><Mark inner=" 0.00 " /> shelnet kernel v3.0 — booting userland…</>,
+    <><Mark inner=" 0.00 " /> shelnet kernel v3.0: booting userland…</>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/certs</span> {dots('···········')} <span className="text-white/55">{fmt(counts.certs)} tracks · {fmt(sims)} sims</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/labs</span> {dots('·················')} <span className="text-white/55">{fmt(counts.labs)} coming</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/visualizations</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules</span></>,
@@ -168,7 +168,7 @@ const HeroSection = () => {
           <>
             <div className="mt-3 text-white/55">
               shelnet login: <span style={{ color: ACCENT }}>guest</span>
-              <span className="text-white/40"> — ↑↓ + ↵, press 1–5, or click a destination:</span>
+              <span className="text-white/40">: ↑↓ + ↵, press 1–5, or click a destination:</span>
             </div>
 
             <nav className="mt-2" aria-label="Site sections">

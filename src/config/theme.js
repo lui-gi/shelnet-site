@@ -20,8 +20,6 @@ export const SHELL = {
   dim:   '#7e9b86', // `guest`, secondary markers
 };
 
-export const PROMPT = 'shelnet:~$';
-
 export const SITE = {
   version: 'v3.0',
   // Production domain (matches public/robots.txt + public/sitemap.xml).

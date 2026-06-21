@@ -10,18 +10,18 @@ const AboutSection = () => {
       <p>
         Shelnet began as a private repo where I tracked my progress as a university
         student into cybersecurity. It started as a personal tool to solidify my
-        understanding — but I realized how hard it is to find study materials that are
+        understanding; but I realized how hard it is to find study materials that are
         high-quality, current, and actually free.
       </p>
       <p>
         Every practice resource I found was outdated, untrue to the exam, or paywalled.
         So I open-sourced all of my notes and study resources, and built Shelnet to run
-        entirely client-side. No data harvesting, no hidden content — fully open-source
+        entirely client-side. No data harvesting, no hidden content: fully open-source
         and privacy-first.
       </p>
       <p>
         Shelnet is proof that learning through teaching works. By sharing the journey
-        publicly — mistakes and breakthroughs — I want a living resource that grows into
+        publicly, mistakes and breakthroughs, I want a living resource that grows into
         a barrier-free community where anyone can break into tech without paying for the
         privilege.
       </p>

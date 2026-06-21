@@ -78,7 +78,7 @@ const Workspace = ({
     return () => window.removeEventListener('keydown', onKey);
   }, [idx, flat, selected, cssFs, navigate, toggleFullscreen]);
 
-  // On a phone the explorer is an overlay drawer — close it once a file is picked.
+  // On a phone the explorer is an overlay drawer; close it once a file is picked.
   const select = (uid) => {
     setSelectedUid(uid);
     if (window.matchMedia('(max-width: 767px)').matches) setExplorerOpen(false);

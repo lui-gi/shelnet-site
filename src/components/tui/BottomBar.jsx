@@ -1,5 +1,5 @@
 // src/components/tui/BottomBar.jsx
-// Global sticky tty bar pinned to the bottom of every page — the mirror of
+// Global sticky tty bar pinned to the bottom of every page, the mirror of
 // PromptBar. Left: fixed quickstart launcher CTAs (same on every route).
 // Right: contextual keyboard shortcuts for the current route (hidden on mobile,
 // where there is no keyboard). Mounted once in Layout, below the Outlet.

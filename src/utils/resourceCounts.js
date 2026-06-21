@@ -4,7 +4,7 @@ import { COMING_LABS } from '../config/labsShowcase';
 /**
  * Pure: derive display counts from a manifest object. Returns
  * { certs, pbqs, exams, viz, labs }. A count is null when its source data is
- * unavailable (unknown) — distinct from 0 (known to be empty). `labs` reflects
+ * unavailable (unknown), distinct from 0 (known to be empty). `labs` reflects
  * the showcase labs that are coming.
  */
 export function deriveCounts(manifest) {

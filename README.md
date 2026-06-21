@@ -11,7 +11,7 @@ Shelnet is a dedicated hub for cybersecurity educational resources, built by a u
 
 Currently, the site provides comprehensive resources for **CompTIA A+** and **Security+**, but the roadmap is expanding. Future updates will encompass **CTF walkthroughs**, **concept visualizations**, and more.
 
-Shelnet is built on a simple promise: **Always free, no data collection.** There are no logins, no paywalls, and no tracking—just accessible knowledge for everyone.
+Shelnet is built on a simple promise: **Always free, no data collection.** There are no logins, no paywalls, and no tracking, just accessible knowledge for everyone.
 
 ## Key Features
 

@@ -42,7 +42,7 @@ const Labs = () => {
         </div>
 
         <div className="mt-6 pl-4" style={{ borderLeft: `2px solid ${ORANGE}` }}>
-          <div className="font-semibold" style={{ color: ORANGE }}>labs/ — under construction</div>
+          <div className="font-semibold" style={{ color: ORANGE }}>labs/: under construction</div>
           <p className="mt-2 text-white/70">A curated showcase of the labs I've built, and why each one matters if you're breaking into cybersecurity.</p>
           <div className="mt-3 text-white/40">coming&nbsp;&nbsp;<span className="text-white/60">{COMING_LABS.join(' · ')}</span></div>
         </div>

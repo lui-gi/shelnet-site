@@ -12,7 +12,7 @@ import { ACCENTS } from '../config/theme';
 const PREVIEW = 3;
 const hexOf = (accent) => (ACCENTS[accent] || ACCENTS.green).hex;
 const topicLine = (titles) => {
-  if (!titles.length) return '—';
+  if (!titles.length) return '-';
   const head = titles.slice(0, PREVIEW).join(' · ');
   const extra = titles.length - PREVIEW;
   return extra > 0 ? `${head} +${extra}` : head;
@@ -54,7 +54,7 @@ const Certs = () => {
     return (
       <TerminalShell>
         <div className="font-mono text-sm">
-          <div className="text-rose-400">! manifest unreachable — no tracks to show.</div>
+          <div className="text-rose-400">! manifest unreachable: no tracks to show.</div>
           <div className="mt-2 text-white/40">
             <button type="button" onClick={() => window.location.reload()} style={{ color: '#43c08c' }} className="hover:underline">↵ retry</button>
             &nbsp;·&nbsp;
@@ -69,7 +69,7 @@ const Certs = () => {
     <TerminalShell maxWidthClass="max-w-3xl">
       <div className="font-mono text-sm">
         <div className="text-white/40 mb-4">
-          certs/ — pick a track, jump to PBQs &amp; mock exams · {open.length} track{open.length === 1 ? '' : 's'}
+          certs/: pick a track, jump to PBQs &amp; mock exams · {open.length} track{open.length === 1 ? '' : 's'}
         </div>
 
         <div className="space-y-4">
@@ -78,7 +78,7 @@ const Certs = () => {
             if (c.locked) {
               return (
                 <div key={c.slug} className="pl-3" style={{ borderLeft: '2px solid rgba(255,255,255,0.12)' }}>
-                  <div className="text-white/40">[{c.code || '—'}] {c.label} · locked</div>
+                  <div className="text-white/40">[{c.code || '-'}] {c.label} · locked</div>
                   {c.blurb && <div className="text-white/30">{c.blurb}</div>}
                 </div>
               );

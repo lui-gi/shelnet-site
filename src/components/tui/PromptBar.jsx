@@ -1,6 +1,6 @@
 // src/components/tui/PromptBar.jsx
 // Global sticky tty status line pinned to the top of every page. Renders the
-// shell prompt `guest@shelnet <~/path> $` — the working directory housed in
+// shell prompt `guest@shelnet <~/path> $`: the working directory housed in
 // green inside angle brackets, the `~` root and ancestor segments clickable
 // (home), the current segment inert. A `[ cd ~ ]` button on the right mirrors
 // the home affordance. Mounted once in Layout, above Outlet.
