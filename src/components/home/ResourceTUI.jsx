@@ -3,7 +3,7 @@
 // to their children (certs/viz from the manifest, planned labs shown dim, notes
 // as a live external vault). Clickable leaves open the resource directly; dirs
 // open their page. Keyboard-navigable (↑↓ ↵/→ 1-4 esc); one render for all widths.
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TerminalShell from '../tui/TerminalShell';
 import { useManifest } from '../../utils/useManifest';
@@ -110,11 +110,18 @@ const ResourceTUI = () => {
 
   const open = useCallback((to) => { if (to) navigate(to); }, [navigate]);
 
+  // Keep the latest nav model in a ref so the window key handler (bound once)
+  // reads current values without taking the freshly-derived `flat`/`sel` as
+  // effect deps, which would re-bind every render and trip exhaustive-deps.
+  const navRef = useRef({ flat, sel });
+  useEffect(() => { navRef.current = { flat, sel }; });
+
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       if (e.key === 'Escape') { e.preventDefault(); navigate('/'); return; }
+      const { flat, sel } = navRef.current;
       if (!flat.length) return;
       if (e.key === 'ArrowDown') { e.preventDefault(); setSel((n) => (n + 1) % flat.length); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); setSel((n) => (n - 1 + flat.length) % flat.length); }
@@ -128,7 +135,7 @@ const ResourceTUI = () => {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [flat, sel, open, navigate]);
+  }, [open, navigate]);
 
   const leafTotal = dirs.reduce((n, d) => n + d.leaves.filter((l) => l.to).length, 0);
 
