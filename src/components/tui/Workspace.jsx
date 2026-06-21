@@ -15,6 +15,7 @@ const uidOf = (group, item) => `${group.type}:${item.id}`;
 const Workspace = ({
   accent = 'red', groups = [],
   statusLabel = 'EXECUTING:', loading = false, error = null, metaRight = '', showSandbox = false,
+  initialType = null, initialId = null,
 }) => {
   const colors = themeColors[accent] || themeColors.green;
   const accentHex = (ACCENTS[accent] || ACCENTS.green).hex;
@@ -32,8 +33,13 @@ const Workspace = ({
   const fullscreen = apiFs || cssFs;
   const viewerRef = useRef(null);
 
-  // Auto-select: if nothing chosen yet, treat the first file as selected.
-  const effectiveUid = selectedUid ?? flat[0]?.uid ?? null;
+  // Auto-select: if nothing chosen yet, prefer initialId match, then initialType match, then first file.
+  const defaultUid =
+    (initialId && flat.find((f) => f.item.id === initialId)?.uid)
+    || (initialType && flat.find((f) => f.uid.startsWith(`${initialType}:`))?.uid)
+    || flat[0]?.uid
+    || null;
+  const effectiveUid = selectedUid ?? defaultUid;
   const idx = flat.findIndex((f) => f.uid === effectiveUid);
   const selected = idx >= 0 ? flat[idx].item : null;
 
