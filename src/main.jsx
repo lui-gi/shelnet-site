@@ -5,6 +5,7 @@ import './index.css'
 import App from './App.jsx'
 import CertDashboard from './pages/cert-dashboard.jsx'
 import Visualizations from './pages/visualizations.jsx'
+import Labs from './pages/labs.jsx'
 import LabDetail from './pages/lab-detail.jsx'
 import ResourceTUI from './components/home/ResourceTUI.jsx'
 import AboutSection from './components/home/AboutSection.jsx'
@@ -24,6 +25,7 @@ createRoot(document.getElementById('root')).render(
           {/* resources (routes equal breadcrumb paths) */}
           <Route path="/resources" element={<ResourceTUI />} />
           <Route path="/resources/visualizations" element={<Visualizations />} />
+          <Route path="/resources/labs" element={<Labs />} />
           <Route path="/resources/certs/:cert" element={<CertDashboard />} />
           <Route path="/resources/labs/:slug" element={<LabDetail />} />
           <Route path="/resources/:dir" element={<ResourceTUI />} />
