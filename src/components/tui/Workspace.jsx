@@ -15,7 +15,7 @@ const uidOf = (group, item) => `${group.type}:${item.id}`;
 const Workspace = ({
   accent = 'red', groups = [],
   statusLabel = 'EXECUTING:', loading = false, error = null, metaRight = '', showSandbox = false,
-  initialType = null, initialId = null,
+  initialType = null, initialId = null, iconFor = null,
 }) => {
   const colors = themeColors[accent] || themeColors.green;
   const accentHex = (ACCENTS[accent] || ACCENTS.green).hex;
@@ -98,7 +98,9 @@ const Workspace = ({
                 className={`w-full text-left px-2 py-2 rounded mb-0.5 transition-colors ${on ? 'bg-white/[0.04] text-white' : 'text-white/65 hover:bg-white/5'}`}
                 style={on ? { boxShadow: `inset 2px 0 0 ${accentHex}` } : undefined}>
                 <div className={`text-[11px] font-bold ${colors.text}`}>{g.prefix}{item.id}{on ? ' ●' : ''}</div>
-                <div className="text-xs font-semibold">{item.title}</div>
+                <div className="text-xs font-semibold">
+                  {iconFor && <span className={colors.text}>{iconFor(item)} </span>}{item.title}
+                </div>
                 <div className="text-[10px] text-white/40">{item.description}</div>
               </button>
             );
