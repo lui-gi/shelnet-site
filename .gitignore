@@ -31,3 +31,6 @@ CLAUDE.md
 # Claude / superpowers artifacts (brainstorm mockups + specs)
 .superpowers/
 docs/superpowers/
+
+# Local-only dev fixtures (seed snippets for manual verification)
+dev-fixtures/
