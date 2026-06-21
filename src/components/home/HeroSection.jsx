@@ -9,14 +9,15 @@ const SESSION_KEY = 'shelnet_booted';
 const GREEN = '#43c08c';   // banner + numbers + cursor
 const ACCENT = '#7e9b86';  // dim phosphor: status markers + `guest`
 
+// `to` => direct path (/bytes, /resources).
 // `dir` => opens the file-explorer at /resources/<dir>.
-// `anchor` => opens the matching route (/about · /connect).
+// `anchor` => opens the matching route (/about, /connect).
 const MENU = [
-  { n: '1', cmd: './certs',          desc: 'A+ · Security+ · more',         dir: 'certs' },
-  { n: '2', cmd: './labs',           desc: 'lab showcase · soon',           dir: 'labs' },
-  { n: '3', cmd: './visualizations', desc: 'interactive modules',           dir: 'visualizations' },
-  { n: '4', cmd: 'man about',        desc: 'what is shelnet?',              anchor: 'about' },
-  { n: '5', cmd: './connect',        desc: 'newsletter · github · contact', anchor: 'connect' },
+  { n: '1', cmd: './certs',     desc: 'A+ · Security+ · more',          dir: 'certs' },
+  { n: '2', cmd: './bytes',     desc: 'rapid-fire practice · mobile',        to: '/bytes' },
+  { n: '3', cmd: './resources', desc: 'labs · viz · notes',             to: '/resources' },
+  { n: '4', cmd: 'man about',   desc: 'what is shelnet?',                         anchor: 'about' },
+  { n: '5', cmd: './connect',   desc: 'newsletter · github · contact',  anchor: 'connect' },
 ];
 
 const fmt = (v) => (v == null ? '-' : v);
@@ -38,20 +39,20 @@ function buildLines(counts, newsText, narrow) {
   if (narrow) {
     const feedShort = feed.length > 22 ? `${feed.slice(0, 21)}…` : feed;
     return [
-      <><Mark inner=" 0.00 " /> booting userland…</>,
+      <><Mark inner=" 0.00 " /> booting userland{'…'}</>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/certs</span>{'  '}<span className="text-white/55">{fmt(counts.certs)} tracks</span></>,
-      <><Mark inner="  OK  " /> <span className="text-white/90">/labs</span>{'   '}<span className="text-white/55">{fmt(counts.labs)} coming</span></>,
-      <><Mark inner="  OK  " /> <span className="text-white/90">/viz</span>{'    '}<span className="text-white/55">{fmt(counts.viz)} modules</span></>,
-      <><Mark inner="  OK  " /> <span className="text-white/90">trackers=0 · $0.00</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/bytes</span>{'  '}<span className="text-white/55">{fmt(counts.bytes)} qs</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/resrc</span>{' '}<span className="text-white/55">{fmt(counts.viz)} viz {'·'} {fmt(counts.labs)} labs</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">trackers=0 {'·'} $0.00</span></>,
       <><Mark inner=" feed " /> {feedShort}</>,
     ];
   }
   const dots = (s) => <span className="text-white/20" aria-hidden="true">{s}</span>;
   return [
-    <><Mark inner=" 0.00 " /> shelnet kernel v3.0: booting userland…</>,
-    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/certs</span> {dots('···········')} <span className="text-white/55">{fmt(counts.certs)} tracks · {fmt(sims)} sims</span></>,
-    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/labs</span> {dots('·················')} <span className="text-white/55">{fmt(counts.labs)} coming</span></>,
-    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/visualizations</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules</span></>,
+    <><Mark inner=" 0.00 " /> shelnet kernel v3.0: booting userland{'…'}</>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/certs</span> {dots('···········')} <span className="text-white/55">{fmt(counts.certs)} tracks {'·'} {fmt(sims)} sims</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/bytes</span> {dots('···········')} <span className="text-white/55">{fmt(counts.bytes)} questions</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/resources</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules {'·'} {fmt(counts.labs)} labs</span></>,
     <><Mark inner="  OK  " /> security: <span className="text-white/90">trackers=0  paywall=none  cost=$0.00</span></>,
     <><Mark inner=" feed " /> {feed}</>,
   ];
@@ -129,8 +130,9 @@ const HeroSection = () => {
   const [selected, setSelected] = useState(0);
 
   const activate = useCallback((item) => {
-    if (item.dir) navigate(`/resources/${item.dir}`);  // open the file-explorer here
-    else if (item.anchor) navigate(`/${item.anchor}`); // /about · /connect
+    if (item.to) navigate(item.to);              // direct path (/bytes, /resources)
+    else if (item.dir) navigate(`/resources/${item.dir}`); // open the file-explorer here
+    else if (item.anchor) navigate(`/${item.anchor}`);     // /about, /connect
   }, [navigate]);
 
   // After boot: ↑↓ move the cursor, ↵ opens it, and keys 1–6 jump straight in.
