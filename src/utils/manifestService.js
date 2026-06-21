@@ -91,14 +91,24 @@ function toItem(base, segments, resource) {
   };
 }
 
-/** List of certs for the explorer + dashboards (manifest key order). */
+/** List of certs for the explorer + console (manifest key order). */
 export function getCerts(manifest) {
   const certs = manifest?.certs || {};
   return Object.entries(certs).map(([slug, c]) => {
     const res = c.resources || {};
-    const count = ['pbqs', 'exams'].reduce(
-      (n, t) => n + (Array.isArray(res[t]) ? res[t].length : 0), 0);
-    return { slug, label: c.label, code: c.code, accent: c.accent, count };
+    const pbqs = Array.isArray(res.pbqs) ? res.pbqs : [];
+    const exams = Array.isArray(res.exams) ? res.exams : [];
+    return {
+      slug,
+      label: c.label,
+      code: c.code,
+      accent: c.accent || 'green',
+      blurb: c.blurb || '',
+      locked: !!c.locked,
+      count: pbqs.length + exams.length,
+      pbqTitles: pbqs.map((r) => r.title),
+      examTitles: exams.map((r) => r.title),
+    };
   });
 }
 
