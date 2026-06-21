@@ -22,17 +22,11 @@ const leafGlyph = (dirLast, leafLast) => `${dirLast ? '   ' : '│  '}${leafLast
 // interactive only when `onOpen` is provided (dim/coming rows pass none).
 const Row = ({ prefix, label, meta, labelHex, bold = false, dim = false, on = false, onOpen, onHover }) => {
   const interactive = !!onOpen;
-  return (
-    <button
-      type="button"
-      disabled={!interactive}
-      onClick={onOpen}
-      onMouseEnter={onHover}
-      aria-current={on ? 'true' : undefined}
-      className={`group flex w-full items-baseline rounded-sm -mx-1.5 px-1.5 text-left ${
-        on ? 'bg-[#43c08c]/[0.12]' : interactive ? 'hover:bg-[#43c08c]/10' : 'cursor-default'
-      }`}
-    >
+  const className = `group flex w-full items-baseline rounded-sm -mx-1.5 px-1.5 text-left ${
+    on ? 'bg-[#43c08c]/[0.12]' : interactive ? 'hover:bg-[#43c08c]/10' : 'cursor-default'
+  }`;
+  const inner = (
+    <>
       <span className="w-[2ch] shrink-0 whitespace-pre" style={{ color: GREEN }} aria-hidden="true">{on ? '▸' : ' '}</span>
       <span className="shrink-0 whitespace-pre text-white/30" aria-hidden="true">{prefix}</span>
       <span
@@ -43,6 +37,22 @@ const Row = ({ prefix, label, meta, labelHex, bold = false, dim = false, on = fa
       {interactive && (
         <span className="ml-auto pl-3 text-[#43c08c] opacity-0 transition-opacity group-hover:opacity-100 max-sm:opacity-60" aria-hidden="true">▸</span>
       )}
+    </>
+  );
+
+  // Non-interactive rows (dim "coming soon" leaves) render as a div so their
+  // text stays in the reading order instead of a skipped disabled button.
+  if (!interactive) return <div className={className}>{inner}</div>;
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      onMouseEnter={onHover}
+      aria-current={on ? 'true' : undefined}
+      className={className}
+    >
+      {inner}
     </button>
   );
 };
@@ -104,33 +114,38 @@ const ResourceTUI = () => {
     d.leaves.forEach((lf) => { if (lf.to) flat.push({ kind: 'leaf', to: lf.to }); });
   });
 
-  const [sel, setSel] = useState(0);
-  const cursorTo = flat[sel]?.to ?? null;
-  const selectTo = (to) => setSel(flat.findIndex((n) => n.to === to));
+  // Selection is keyed by path, not index, so the cursor survives `flat` being
+  // rebuilt when the manifest resolves (leaves appear) instead of drifting onto
+  // whatever node now sits at the old index. null = the first node.
+  const [selTo, setSelTo] = useState(null);
+  const rawIndex = selTo ? flat.findIndex((n) => n.to === selTo) : 0;
+  const selIndex = rawIndex >= 0 ? rawIndex : 0;
+  const cursorTo = flat[selIndex]?.to ?? null;
+  const selectTo = (to) => setSelTo(to);
 
   const open = useCallback((to) => { if (to) navigate(to); }, [navigate]);
 
   // Keep the latest nav model in a ref so the window key handler (bound once)
-  // reads current values without taking the freshly-derived `flat`/`sel` as
+  // reads current values without taking the freshly-derived `flat`/index as
   // effect deps, which would re-bind every render and trip exhaustive-deps.
-  const navRef = useRef({ flat, sel });
-  useEffect(() => { navRef.current = { flat, sel }; });
+  const navRef = useRef({ flat, index: selIndex });
+  useEffect(() => { navRef.current = { flat, index: selIndex }; });
 
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       if (e.key === 'Escape') { e.preventDefault(); navigate('/'); return; }
-      const { flat, sel } = navRef.current;
+      const { flat, index } = navRef.current;
       if (!flat.length) return;
-      if (e.key === 'ArrowDown') { e.preventDefault(); setSel((n) => (n + 1) % flat.length); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); setSel((n) => (n - 1 + flat.length) % flat.length); }
-      else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); open(flat[sel]?.to); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); setSelTo(flat[(index + 1) % flat.length].to); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setSelTo(flat[(index - 1 + flat.length) % flat.length].to); }
+      else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); open(flat[index]?.to); }
       else if (/^[1-4]$/.test(e.key)) {
         e.preventDefault();
         const di = Number(e.key) - 1;
-        const target = flat.findIndex((n) => n.kind === 'dir' && n.dirIndex === di);
-        if (target >= 0) setSel(target);
+        const node = flat.find((n) => n.kind === 'dir' && n.dirIndex === di);
+        if (node) setSelTo(node.to);
       }
     };
     window.addEventListener('keydown', onKey);
