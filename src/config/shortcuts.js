@@ -1,18 +1,26 @@
 // src/config/shortcuts.js
 // Single source of truth for the contextual keyboard-hint text shown on the
 // right of the global BottomBar. Keep in sync with the real key handlers in
-// ResourceTUI / Workspace. Returns an ordered list of { keys, label } pairs.
+// each page. Returns an ordered list of { keys, label } pairs.
 
 export function shortcutsForPath(pathname) {
   if (pathname === '/') {
-    // '1–5' tracks HeroSection.jsx MENU (5 items); update if that menu grows
     return [
       { keys: '↑↓', label: 'move' },
       { keys: '↵', label: 'open' },
       { keys: '1–5', label: 'jump' },
     ];
   }
-  // File viewers: cert dashboards + the visualizations workspace.
+  // Cert study console.
+  if (/^\/resources\/certs\/?$/.test(pathname)) {
+    return [
+      { keys: '↑↓', label: 'select' },
+      { keys: '↵', label: 'open' },
+      { keys: 'p/e', label: 'pbq/exam' },
+      { keys: 'esc', label: 'back' },
+    ];
+  }
+  // File viewers: cert dashboards + the visualizations playground.
   if (/^\/resources\/certs\/[^/]+\/?$/.test(pathname) || pathname === '/resources/visualizations') {
     return [
       { keys: '↑↓', label: 'file' },
@@ -21,15 +29,31 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: '~' },
     ];
   }
-  // Explorer: /resources root or a browsable dir (certs/labs/notes).
-  if (/^\/resources(\/(certs|labs|notes))?\/?$/.test(pathname)) {
+  // Notes reader.
+  if (pathname === '/resources/notes') {
     return [
-      { keys: '↑↓', label: 'move' },
-      { keys: '←→', label: 'pane' },
-      { keys: '↵', label: 'open' },
+      { keys: '↵', label: 'focus' },
+      { keys: 'o', label: 'open' },
+      { keys: 'f', label: 'full' },
       { keys: 'esc', label: 'back' },
     ];
   }
-  // /resources/labs/:slug, /about, /connect, and any fallback
+  // Labs WIP.
+  if (pathname === '/resources/labs') {
+    return [
+      { keys: '↵', label: 'notify' },
+      { keys: 'esc', label: 'back' },
+    ];
+  }
+  // Resources index.
+  if (/^\/resources\/?$/.test(pathname)) {
+    return [
+      { keys: '↑↓', label: 'move' },
+      { keys: '→/↵', label: 'open' },
+      { keys: '1–4', label: 'jump' },
+      { keys: 'esc', label: 'home' },
+    ];
+  }
+  // /about, /connect, and any fallback.
   return [{ keys: 'esc', label: '~' }];
 }

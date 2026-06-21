@@ -32,7 +32,6 @@ createRoot(document.getElementById('root')).render(
           <Route path="/resources/certs" element={<Certs />} />
           <Route path="/resources/certs/:cert" element={<CertDashboard />} />
           <Route path="/resources/labs/:slug" element={<LabDetail />} />
-          <Route path="/resources/:dir" element={<ResourceTUI />} />
 
           {/* redirects from the old flat routes */}
           <Route path="/a-plus-pbqs" element={<Navigate to="/resources/certs/a-plus" replace />} />
