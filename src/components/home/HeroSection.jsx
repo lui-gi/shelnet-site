@@ -13,7 +13,7 @@ const ACCENT = '#7e9b86';  // dim phosphor: status markers + `guest`
 // `anchor` => opens the matching route (/about · /connect).
 const MENU = [
   { n: '1', cmd: './certs',          desc: 'A+ · Security+ · more',         dir: 'certs' },
-  { n: '2', cmd: './labs',           desc: 'guided lab writeups',           dir: 'labs' },
+  { n: '2', cmd: './labs',           desc: 'lab showcase · soon',           dir: 'labs' },
   { n: '3', cmd: './visualizations', desc: 'interactive modules',           dir: 'visualizations' },
   { n: '4', cmd: 'man about',        desc: 'what is shelnet?',              anchor: 'about' },
   { n: '5', cmd: './connect',        desc: 'newsletter · github · contact', anchor: 'connect' },
