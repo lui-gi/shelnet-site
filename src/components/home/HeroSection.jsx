@@ -17,7 +17,7 @@ const ALL_REVEALED = 999;   // step sentinel: every element shown (skip / reduce
 const MENU = [
   { n: '1', cmd: './certs',     desc: 'A+ · Security+ · more',          dir: 'certs' },
   { n: '2', cmd: './bytes',     desc: 'rapid-fire practice · mobile',        to: '/bytes' },
-  { n: '3', cmd: './resources', desc: 'labs · viz · notes',             to: '/resources' },
+  { n: '3', cmd: './resources', desc: 'browse everything',              to: '/resources' },
   { n: '4', cmd: 'man about',   desc: 'what is shelnet?',                         anchor: 'about' },
   { n: '5', cmd: './connect',   desc: 'newsletter · github · contact',  anchor: 'connect' },
 ];
