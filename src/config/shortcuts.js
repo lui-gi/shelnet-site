@@ -62,6 +62,15 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: 'home' },
     ];
   }
+  // bytes quiz runner.
+  if (/^\/bytes\/[^/]+\/?$/.test(pathname)) {
+    return [
+      { keys: '1-4', label: 'answer' },
+      { keys: 's', label: 'skip' },
+      { keys: '↵/n', label: 'next' },
+      { keys: 'esc', label: 'bytes' },
+    ];
+  }
   // /about, /connect, and any fallback.
   return [{ keys: 'esc', label: '~' }];
 }

@@ -12,6 +12,7 @@ import ResourceTUI from './components/home/ResourceTUI.jsx'
 import AboutSection from './components/home/AboutSection.jsx'
 import ConnectSection from './components/home/ConnectSection.jsx'
 import Bytes from './pages/bytes.jsx'
+import BytesQuiz from './pages/bytes-quiz.jsx'
 import Layout from './Layout.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -24,6 +25,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/connect" element={<ConnectSection />} />
           {/* bytes: rapid-fire practice (top-level, parallel to /resources) */}
           <Route path="/bytes" element={<Bytes />} />
+          <Route path="/bytes/:cert" element={<BytesQuiz />} />
 
           {/* resources (routes equal breadcrumb paths) */}
           <Route path="/resources" element={<ResourceTUI />} />
