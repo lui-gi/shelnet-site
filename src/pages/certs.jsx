@@ -1,16 +1,30 @@
 // src/pages/certs.jsx
-// Cert study console: one study-station panel per cert (blurb + topic preview),
-// selection-driven, with a single global action bar. Locked certs render dim and
-// are not selectable. Actions open the existing CertDashboard.
+// Cert study console: one framed-ASCII study-station panel per cert (blurb +
+// topic preview), selection-driven, with a single global action bar. Locked
+// certs render dim and are not selectable. Actions open the existing CertDashboard.
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TerminalShell from '../components/tui/TerminalShell';
+import { Panel, Bracket, Rule } from '../components/tui/ascii';
 import { useManifest } from '../utils/useManifest';
 import { getCerts } from '../utils/manifestService';
-import { ACCENTS } from '../config/theme';
+import { ACCENTS, SHELL } from '../config/theme';
 
 const PREVIEW = 3;
+const GREEN = SHELL.green;
+const BOX_SEL = (hex) => hex;
+const BOX_OPEN = 'rgba(255,255,255,0.22)';
+const BOX_LOCK = 'rgba(255,255,255,0.14)';
+
 const hexOf = (accent) => (ACCENTS[accent] || ACCENTS.green).hex;
+
+// Short bracket tag from a cert label: "CompTIA A+" -> "A+", "Security+" -> "S+".
+const tagOf = (label = '') => {
+  const t = label.split(/\s+/).find((w) => w.endsWith('+'));
+  if (t) return t.length <= 2 ? t : `${t[0]}+`;
+  return label.slice(0, 2).toUpperCase();
+};
+
 const topicLine = (titles) => {
   if (!titles.length) return '-';
   const head = titles.slice(0, PREVIEW).join(' · ');
@@ -56,9 +70,9 @@ const Certs = () => {
         <div className="font-mono text-sm">
           <div className="text-rose-400">! manifest unreachable: no tracks to show.</div>
           <div className="mt-2 text-white/40">
-            <button type="button" onClick={() => window.location.reload()} style={{ color: '#43c08c' }} className="hover:underline">↵ retry</button>
+            <button type="button" onClick={() => window.location.reload()} style={{ color: GREEN }} className="hover:underline">↵ retry</button>
             &nbsp;·&nbsp;
-            <button type="button" onClick={() => navigate('/resources')} style={{ color: '#43c08c' }} className="hover:underline">esc home</button>
+            <button type="button" onClick={() => navigate('/resources')} style={{ color: GREEN }} className="hover:underline">esc home</button>
           </div>
         </div>
       </TerminalShell>
@@ -67,49 +81,65 @@ const Certs = () => {
 
   return (
     <TerminalShell maxWidthClass="max-w-3xl">
-      <div className="font-mono text-sm">
+      <div className="font-mono text-sm leading-relaxed">
         <div className="text-white/40 mb-4">
-          certs/: pick a track, jump to PBQs &amp; mock exams · {open.length} track{open.length === 1 ? '' : 's'}
+          <span style={{ color: SHELL.dim }}>guest@shelnet</span>:<span style={{ color: GREEN }}>~</span>$ cd resources/certs
+        </div>
+        <div className="flex items-baseline justify-between text-white/40 mb-3">
+          <span>certs/: pick a track, jump to PBQs &amp; mock exams</span>
+          <span className="text-white/30">{open.length} track{open.length === 1 ? '' : 's'}</span>
         </div>
 
         <div className="space-y-4">
           {certs.map((c) => {
             const hex = hexOf(c.accent);
+            const tag = tagOf(c.label);
             if (c.locked) {
               return (
-                <div key={c.slug} className="pl-3" style={{ borderLeft: '2px solid rgba(255,255,255,0.12)' }}>
-                  <div className="text-white/40">[{c.code || '-'}] {c.label} · locked</div>
-                  {c.blurb && <div className="text-white/30">{c.blurb}</div>}
-                </div>
+                <Panel
+                  key={c.slug}
+                  hex={BOX_LOCK}
+                  title={<><Bracket hex={hex} dim>{tag}</Bracket> <span className="text-white/40">{c.label}</span> <span className="text-white/20">··· locked ···</span></>}
+                  right={<span className="text-white/40">{c.code || '-'}</span>}
+                >
+                  <div className="text-white/40">{c.blurb || 'Coming soon.'}</div>
+                </Panel>
               );
             }
             const openIdx = open.indexOf(c);
             const on = openIdx === sel;
             return (
-              <button key={c.slug} type="button"
+              <button
+                key={c.slug}
+                type="button"
                 onClick={() => { setSel(openIdx); openDash(c.slug); }}
                 onMouseEnter={() => setSel(openIdx)}
-                className="block w-full text-left pl-3"
-                style={{ borderLeft: `2px solid ${on ? hex : 'rgba(255,255,255,0.12)'}`, background: on ? 'rgba(255,255,255,0.03)' : undefined }}>
-                <div className="flex items-baseline gap-2">
-                  <span style={{ color: hex }}>{on ? '▸' : ' '}</span>
-                  <span style={{ color: hex }} className="font-semibold">{c.label}</span>
-                  <span className="text-white/40 ml-auto">{c.code}</span>
-                </div>
-                {c.blurb && <div className="text-white/70 mt-1">{c.blurb}</div>}
-                <div className="text-white/55 mt-1">pbqs <span style={{ color: hex }}>▸</span> {topicLine(c.pbqTitles)}</div>
-                <div className="text-white/55">exams <span style={{ color: hex }}>▸</span> {topicLine(c.examTitles)}</div>
+                className="block w-full text-left"
+              >
+                <Panel
+                  hex={on ? BOX_SEL(hex) : BOX_OPEN}
+                  marker={on ? '▸' : null}
+                  title={<><Bracket hex={hex}>{tag}</Bracket> <span style={{ color: hex }} className="font-semibold">{c.label}</span></>}
+                  right={<span className="text-white/40">{c.code}</span>}
+                >
+                  {c.blurb && <div className="text-white/70">{c.blurb}</div>}
+                  <div className="text-white/55">pbqs <span style={{ color: GREEN }}>▸</span> {topicLine(c.pbqTitles)}</div>
+                  <div className="text-white/55">exams <span style={{ color: GREEN }}>▸</span> {topicLine(c.examTitles)}</div>
+                </Panel>
               </button>
             );
           })}
         </div>
 
         {selected && (
-          <div className="mt-6 pt-3 border-t border-white/10 text-white/60 flex flex-wrap items-center gap-x-5 gap-y-1">
-            <span className="text-white/40">sel <span style={{ color: hexOf(selected.accent) }}>[{selected.code || selected.label}]</span></span>
-            <button type="button" onClick={() => openDash(selected.slug)} className="hover:text-white"><span style={{ color: '#43c08c' }}>↵</span> dashboard</button>
-            <button type="button" onClick={() => openDash(selected.slug, 'pbqs')} className="hover:text-white"><span style={{ color: '#43c08c' }}>p</span> pbqs</button>
-            <button type="button" onClick={() => openDash(selected.slug, 'exams')} className="hover:text-white"><span style={{ color: '#43c08c' }}>e</span> mock exam</button>
+          <div className="mt-6">
+            <Rule hex="rgba(255,255,255,0.18)" />
+            <div className="mt-1 text-white/60 flex flex-wrap items-center gap-x-5 gap-y-1">
+              <span className="text-white/40">sel <span style={{ color: hexOf(selected.accent) }}>[{tagOf(selected.label)}]</span></span>
+              <button type="button" onClick={() => openDash(selected.slug)} className="hover:text-white"><span style={{ color: GREEN }}>↵</span> dashboard</button>
+              <button type="button" onClick={() => openDash(selected.slug, 'pbqs')} className="hover:text-white"><span style={{ color: GREEN }}>p</span> pbqs</button>
+              <button type="button" onClick={() => openDash(selected.slug, 'exams')} className="hover:text-white"><span style={{ color: GREEN }}>e</span> mock exam</button>
+            </div>
           </div>
         )}
       </div>

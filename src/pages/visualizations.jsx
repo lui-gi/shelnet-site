@@ -30,7 +30,7 @@ const Visualizations = () => {
     <TerminalShell fill>
       <Workspace accent="purple" groups={groups}
         statusLabel="VIEWING:" loading={loading} error={error} showSandbox
-        initialId={params.get('m')} iconFor={glyphFor} />
+        railLabel="modules" initialId={params.get('m')} iconFor={glyphFor} />
     </TerminalShell>
   );
 };

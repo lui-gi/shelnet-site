@@ -26,6 +26,7 @@ const CertDashboard = () => {
         groups={cert?.groups || []}
         statusLabel="EXECUTING:"
         metaRight={cert?.code || ''}
+        railLabel={cert ? `${cert.label} · files` : 'files'}
         initialType={focus}
         loading={loading}
         error={error}

@@ -1,39 +1,46 @@
 // src/components/tui/Workspace.jsx
-// Borderless file workspace that fills the viewport between the global bars:
-// a thin tty toolbar over a body of [collapsible explorer | iframe viewer].
-// The viewer fills all remaining space; `f` enters true (Fullscreen-API)
-// fullscreen with a CSS edge-to-edge fallback; the first file auto-selects on
-// load. Accent = cert color; the breadcrumb + exit live in the global bars.
+// Framed-ASCII file workspace that fills the viewport between the global bars:
+// a drawn ┌─ rail/┬/└─┴ box whose left pane is the annotated file rail and whose
+// right pane is the live viewer inside a dashed ╭┄╮ frame. Shared by the cert
+// dashboard and the visualizations playground. `f` enters real (Fullscreen-API)
+// fullscreen with a CSS fallback; the first file auto-selects on load.
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Maximize2, Minimize2, ExternalLink, PanelLeft, PanelLeftClose } from 'lucide-react';
-import { themeColors } from '../../config/themeColors';
-import { ACCENTS } from '../../config/theme';
+import { Frame, TwoPane } from './ascii';
+import { ACCENTS, SHELL } from '../../config/theme';
 
 const uidOf = (group, item) => `${group.type}:${item.id}`;
+const RAIL = 'rgba(255,255,255,0.3)'; // outer box / rail color (dim, per mockups)
 
 const Workspace = ({
   accent = 'red', groups = [],
   statusLabel = 'EXECUTING:', loading = false, error = null, metaRight = '', showSandbox = false,
-  initialType = null, initialId = null, iconFor = null,
+  railLabel = 'files', initialType = null, initialId = null, iconFor = null,
 }) => {
-  const colors = themeColors[accent] || themeColors.green;
   const accentHex = (ACCENTS[accent] || ACCENTS.green).hex;
   const navigate = useNavigate();
 
   // Flatten groups into one ordered list for keyboard nav + lookup.
-  const flat = groups.flatMap((g) => g.items.map((item) => ({
-    uid: uidOf(g, item), item,
-  })));
+  const flat = groups.flatMap((g) => g.items.map((item) => ({ uid: uidOf(g, item), item })));
 
   const [selectedUid, setSelectedUid] = useState(null);
   const [explorerOpen, setExplorerOpen] = useState(true);
-  const [apiFs, setApiFs] = useState(false);   // real Fullscreen API active
-  const [cssFs, setCssFs] = useState(false);   // fallback CSS overlay active
-  const fullscreen = apiFs || cssFs;
+  const [cssFs, setCssFs] = useState(false);   // fallback CSS overlay active (Fullscreen API unavailable)
+  const [reloadKey, setReloadKey] = useState(0);
   const viewerRef = useRef(null);
 
-  // Auto-select: if nothing chosen yet, prefer initialId match, then initialType match, then first file.
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia
+      ? window.matchMedia('(max-width: 767px)').matches : false);
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const mq = window.matchMedia('(max-width: 767px)');
+    const onChange = () => setIsMobile(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  // Auto-select: prefer initialId match, then initialType match, then first file.
   const defaultUid =
     (initialId && flat.find((f) => f.item.id === initialId)?.uid)
     || (initialType && flat.find((f) => f.uid.startsWith(`${initialType}:`))?.uid)
@@ -43,9 +50,6 @@ const Workspace = ({
   const idx = flat.findIndex((f) => f.uid === effectiveUid);
   const selected = idx >= 0 ? flat[idx].item : null;
 
-  // True fullscreen via the Fullscreen API; CSS overlay when it's unavailable.
-  // Keep side effects OUT of the state updater: under StrictMode a state
-  // updater is double-invoked in dev, which would call requestFullscreen twice.
   const toggleFullscreen = useCallback(() => {
     const el = viewerRef.current;
     if (document.fullscreenElement) { document.exitFullscreen?.(); return; }
@@ -53,12 +57,10 @@ const Workspace = ({
     else setCssFs((prev) => !prev);
   }, [setCssFs]);
 
-  // Keep apiFs in sync with the browser (so pressing browser Esc updates UI).
-  useEffect(() => {
-    const onFsChange = () => setApiFs(!!document.fullscreenElement);
-    document.addEventListener('fullscreenchange', onFsChange);
-    return () => document.removeEventListener('fullscreenchange', onFsChange);
-  }, []);
+  const select = (uid) => {
+    setSelectedUid(uid);
+    if (isMobile) setExplorerOpen(false);
+  };
 
   useEffect(() => {
     const onKey = (e) => {
@@ -78,30 +80,32 @@ const Workspace = ({
     return () => window.removeEventListener('keydown', onKey);
   }, [idx, flat, selected, cssFs, navigate, toggleFullscreen]);
 
-  // On a phone the explorer is an overlay drawer; close it once a file is picked.
-  const select = (uid) => {
-    setSelectedUid(uid);
-    if (window.matchMedia('(max-width: 767px)').matches) setExplorerOpen(false);
-  };
+  if (loading) return <div className="flex-1 grid place-items-center text-white/50 text-sm">… loading</div>;
+  if (error) return <div className="flex-1 grid place-items-center text-rose-400 text-sm">! failed to load: {error}</div>;
 
-  const Explorer = (
-    <div aria-label="File explorer">
-      <div className="text-white/40 text-[10px] tracking-widest px-2 py-2">EXPLORER · AVAILABLE</div>
+  // ── shared pieces ──────────────────────────────────────────────────────────
+  const fileList = (
+    <div>
       {groups.map((g) => (
-        <div key={g.type} className="mb-1">
-          {g.label && <div className="px-2 py-1 text-[10px] tracking-widest text-white/35">{g.label}</div>}
+        <div key={g.type} className="mb-1.5">
+          {g.label && <div className="text-white/35">{g.label}</div>}
           {g.items.map((item) => {
             const uid = uidOf(g, item);
             const on = effectiveUid === uid;
             return (
-              <button type="button" key={uid} onClick={() => select(uid)}
-                className={`w-full text-left px-2 py-2 rounded mb-0.5 transition-colors ${on ? 'bg-white/[0.04] text-white' : 'text-white/65 hover:bg-white/5'}`}
-                style={on ? { boxShadow: `inset 2px 0 0 ${accentHex}` } : undefined}>
-                <div className={`text-[11px] font-bold ${colors.text}`}>{g.prefix}{item.id}{on ? ' ●' : ''}</div>
-                <div className="text-xs font-semibold">
-                  {iconFor && <span className={colors.text}>{iconFor(item)} </span>}{item.title}
+              <button key={uid} type="button" onClick={() => select(uid)}
+                className="block w-full text-left hover:text-white">
+                <div className="whitespace-nowrap">
+                  <span className="inline-block w-[2ch] shrink-0" style={{ color: accentHex }} aria-hidden="true">{on ? '▸' : ''}</span>
+                  {iconFor
+                    ? <span style={{ color: accentHex }} aria-hidden="true">{iconFor(item)} </span>
+                    : <span className="text-white/35">{g.prefix}{item.id} </span>}
+                  <span className={on ? 'text-white/90 font-semibold' : 'text-white/60'}>{item.title}</span>
+                  {on && <span style={{ color: accentHex }} aria-hidden="true"> ●</span>}
                 </div>
-                <div className="text-[10px] text-white/40">{item.description}</div>
+                {item.description && (
+                  <div className="pl-[2ch] text-white/40 text-xs whitespace-nowrap max-w-[34ch] overflow-hidden text-ellipsis">{item.description}</div>
+                )}
               </button>
             );
           })}
@@ -110,73 +114,82 @@ const Workspace = ({
     </div>
   );
 
-  if (loading) return <div className="flex-1 grid place-items-center text-white/50 text-sm">Loading…</div>;
-  if (error) return <div className="flex-1 grid place-items-center text-red-400 text-sm">Failed to load resources: {error}</div>;
+  const ctrlBtn = 'hover:text-white shrink-0';
+  const controls = (
+    <div className="flex items-center w-full gap-3">
+      <button type="button" onClick={() => setExplorerOpen((v) => !v)} className={`${ctrlBtn} text-white/55`} title="Toggle explorer (e)">files</button>
+      <span className="truncate min-w-0">
+        {selected
+          ? <><span style={{ color: accentHex }}>{statusLabel}</span> <span className="text-white/90">{selected.title}</span></>
+          : <span className="text-white/40">{statusLabel} waiting for input…</span>}
+      </span>
+      <span className="ml-auto flex items-center gap-3 shrink-0 pl-2">
+        <span className="hidden sm:inline text-white/30">{flat.length} files{metaRight ? ` · ${metaRight}` : ''}</span>
+        {showSandbox && selected && <button type="button" onClick={() => setReloadKey((k) => k + 1)} className={ctrlBtn} style={{ color: accentHex }} title="Reload">⟳</button>}
+        {selected && <button type="button" onClick={toggleFullscreen} className={ctrlBtn} style={{ color: accentHex }} title="Fullscreen (f)">⛶</button>}
+        {selected && <button type="button" onClick={() => window.open(selected.file, '_blank', 'noopener,noreferrer')} className={ctrlBtn} style={{ color: accentHex }} title="Open in new tab">↗</button>}
+      </span>
+    </div>
+  );
 
-  return (
-    <div className="flex flex-col flex-1 min-h-0 font-mono">
-      {/* tty toolbar */}
-      <div className="flex items-center justify-between gap-2 py-2 text-xs shrink-0">
-        <span className="flex items-center gap-3 min-w-0">
-          <button type="button" onClick={() => setExplorerOpen((v) => !v)}
-            aria-expanded={explorerOpen} aria-controls="ws-explorer" aria-label="Toggle file explorer"
-            className={`inline-flex shrink-0 items-center gap-1 text-white/55 ${colors.textHover}`} title="Toggle explorer (e)">
-            {explorerOpen ? <PanelLeftClose size={13} /> : <PanelLeft size={13} />} files
-          </button>
-          <span className="truncate">
-            {selected
-              ? <><span className={colors.text}>{statusLabel}</span> <span className="text-white">{selected.title}</span></>
-              : <span className="text-white/40">{statusLabel} waiting for input…</span>}
-          </span>
-        </span>
-        <span className="flex items-center gap-3 shrink-0">
-          <span className={`hidden sm:inline ${colors.text}`}>{flat.length} files{metaRight ? ` · ${metaRight}` : ''}</span>
-          {selected && (
-            <>
-              <button type="button" onClick={toggleFullscreen} aria-pressed={fullscreen}
-                className={`inline-flex items-center gap-1 text-white/55 ${colors.textHover}`} title="Fullscreen (f)">
-                {fullscreen ? <><Minimize2 size={13} /> min</> : <><Maximize2 size={13} /> full</>}
-              </button>
-              <button type="button" onClick={() => window.open(selected.file, '_blank', 'noopener,noreferrer')}
-                className={`inline-flex items-center gap-1 text-white/55 ${colors.textHover}`} title="Open in new tab">
-                <ExternalLink size={13} /> open
-              </button>
-            </>
-          )}
-        </span>
+  const viewerInner = selected ? (
+    <iframe
+      key={`${selected.file}#${reloadKey}`}
+      src={selected.file}
+      title={selected.title}
+      className="w-full h-full border-0 bg-white"
+      {...(showSandbox && { sandbox: 'allow-same-origin allow-scripts allow-forms allow-popups' })}
+    />
+  ) : (
+    <div className="h-full bg-black flex items-center justify-center text-center text-white/40">
+      <div>
+        <div className="text-3xl opacity-30">▢</div>
+        <div className="mt-2 text-sm">// no file loaded</div>
+        <div className="text-xs mt-1 opacity-70">select a file to initialize environment</div>
       </div>
+    </div>
+  );
 
-      {/* body: collapsible push explorer + filling viewer */}
-      <div className="flex flex-1 min-h-0">
+  const viewer = <Frame hex={accentHex} dashed className="h-full">{viewerInner}</Frame>;
+
+  // CSS-fallback fullscreen overlay (when the Fullscreen API is unavailable).
+  if (cssFs) {
+    return (
+      <div ref={viewerRef} className="fixed inset-0 z-[60] bg-white">{viewerInner}</div>
+    );
+  }
+
+  // ── mobile: top selector + dropdown drawer + framed viewer ──────────────────
+  if (isMobile) {
+    return (
+      <div className="flex flex-col flex-1 min-h-0 font-mono text-sm">
+        <div className="shrink-0 pb-1">{controls}</div>
         {explorerOpen && (
-          <button type="button" aria-label="Close explorer" onClick={() => setExplorerOpen(false)}
-            className="md:hidden fixed inset-0 z-30 bg-black/50" />
+          <div className="shrink-0 max-h-[42vh] overflow-y-auto border border-white/10 mb-1 p-2">{fileList}</div>
         )}
-        {explorerOpen && (
-          <aside id="ws-explorer"
-            className="w-[280px] shrink-0 overflow-y-auto md:border-r border-white/10 md:pr-2
-                       max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-40 max-md:w-[260px] max-md:bg-black max-md:pt-12 max-md:px-3 max-md:pb-12">
-            {Explorer}
-          </aside>
-        )}
-        <section ref={viewerRef}
-          className={cssFs
-            ? 'fixed inset-0 z-[60] bg-white'
-            : `relative flex-1 min-h-0 bg-white border border-white/10 rounded ${explorerOpen ? 'md:ml-4' : ''}`}>
-          {selected ? (
-            <iframe src={selected.file} title={selected.title} className="w-full h-full border-0"
-              {...(showSandbox && { sandbox: 'allow-same-origin allow-scripts allow-forms allow-popups' })} />
-          ) : (
-            <div className="absolute inset-0 bg-black flex items-center justify-center text-center text-white/40">
-              <div>
-                <div className="text-3xl opacity-30">▢</div>
-                <div className="mt-2 text-sm">// no file loaded</div>
-                <div className="text-xs mt-1 opacity-70">select a file to initialize environment</div>
-              </div>
-            </div>
-          )}
-        </section>
+        <div ref={viewerRef} className="flex-1 min-h-0">{viewer}</div>
       </div>
+    );
+  }
+
+  // ── desktop: explorer-open = two-pane box; collapsed = framed viewer only ────
+  return explorerOpen ? (
+    <div className="flex-1 min-h-0 font-mono text-sm">
+      <TwoPane
+        fill
+        hex={RAIL}
+        leftTitle={railLabel}
+        rightTitle={controls}
+        bottomHints="↑↓ switch · ↵ focus · e files · f full · ↗ open · esc home"
+        left={fileList}
+        right={<div ref={viewerRef} className="h-full">{viewer}</div>}
+        className="w-full"
+      />
+    </div>
+  ) : (
+    <div className="flex flex-col flex-1 min-h-0 font-mono text-sm">
+      <div className="shrink-0 pb-1" style={{ color: RAIL }}>{controls}</div>
+      <div ref={viewerRef} className="flex-1 min-h-0">{viewer}</div>
     </div>
   );
 };
