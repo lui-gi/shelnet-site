@@ -11,6 +11,7 @@ import Certs from './pages/certs.jsx'
 import ResourceTUI from './components/home/ResourceTUI.jsx'
 import AboutSection from './components/home/AboutSection.jsx'
 import ConnectSection from './components/home/ConnectSection.jsx'
+import Bytes from './pages/bytes.jsx'
 import Layout from './Layout.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -21,6 +22,8 @@ createRoot(document.getElementById('root')).render(
           <Route path="/" element={<App />} />
           <Route path="/about" element={<AboutSection />} />
           <Route path="/connect" element={<ConnectSection />} />
+          {/* bytes: rapid-fire practice (top-level, parallel to /resources) */}
+          <Route path="/bytes" element={<Bytes />} />
 
           {/* resources (routes equal breadcrumb paths) */}
           <Route path="/resources" element={<ResourceTUI />} />

@@ -54,6 +54,14 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: 'home' },
     ];
   }
+  // bytes cert picker.
+  if (/^\/bytes\/?$/.test(pathname)) {
+    return [
+      { keys: '↑↓', label: 'select' },
+      { keys: '↵', label: 'start' },
+      { keys: 'esc', label: 'home' },
+    ];
+  }
   // /about, /connect, and any fallback.
   return [{ keys: 'esc', label: '~' }];
 }
