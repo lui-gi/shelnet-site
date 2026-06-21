@@ -84,10 +84,9 @@ const Bytes = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {banks.map((b) => {
+            {banks.map((b, idx) => {
               const hex = hexOf(b.accent);
               const tag = tagOf(b.label);
-              const idx = banks.indexOf(b);
               const on = idx === sel;
               return (
                 <button key={b.slug} type="button" onClick={() => { setSel(idx); start(b.slug); }} onMouseEnter={() => setSel(idx)} className="block w-full text-left">
