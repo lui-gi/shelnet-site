@@ -180,7 +180,6 @@ const Workspace = ({
         hex={RAIL}
         leftTitle={railLabel}
         rightTitle={controls}
-        bottomHints="↑↓ switch · ↵ focus · e files · f full · ↗ open · esc home"
         left={fileList}
         right={<div ref={viewerRef} className="h-full">{viewer}</div>}
         className="w-full"

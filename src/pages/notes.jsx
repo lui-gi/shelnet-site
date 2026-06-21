@@ -60,14 +60,10 @@ const Notes = () => {
     </div>
   );
 
-  const footer = (
-    <div className="py-2 text-xs text-white/30">esc back · ↵ focus reader · o open · f fullscreen</div>
-  );
-
   return (
     <TerminalShell fill>
       <div ref={boxRef} className="flex flex-col flex-1 min-h-0 font-mono text-sm">
-        <Frame hex={SLATE} header={header} footer={footer} className="flex-1">
+        <Frame hex={SLATE} header={header} className="flex-1">
           {status !== 'blocked' ? (
             <iframe
               key={reloadKey}

@@ -112,7 +112,6 @@ const ResourceTUI = () => {
             hex="rgba(255,255,255,0.3)"
             leftTitle="resources"
             rightTitle={rightTitle}
-            bottomHints="→/↵ open · ↑↓ move · ← back · 1–4 jump · esc home"
             left={<div className="space-y-0.5">{catRows}</div>}
             right={renderPeek()}
           />
