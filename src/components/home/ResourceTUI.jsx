@@ -1,139 +1,186 @@
 // src/components/home/ResourceTUI.jsx
-// The ~/resources hub: a framed-ASCII two-pane index. Left = the four
-// categories; right = a peek into the highlighted one (certs/viz from the
-// manifest; labs "soon"; notes "● LIVE"). Open (→/↵/click) routes to the
-// bespoke page. On phones it collapses to a single tappable list.
+// The ~/resources hub rendered as a `tree`: the four category dirs each expanded
+// to their children (certs/viz from the manifest, planned labs shown dim, notes
+// as a live external vault). Clickable leaves open the resource directly; dirs
+// open their page. Keyboard-navigable (↑↓ ↵/→ 1-4 esc); one render for all widths.
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TerminalShell from '../tui/TerminalShell';
-import { TwoPane } from '../tui/ascii';
 import { useManifest } from '../../utils/useManifest';
-import { useResourceCounts } from '../../utils/useResourceCounts';
 import { getCerts, getVisualizations } from '../../utils/manifestService';
+import { COMING_LABS } from '../../config/labsShowcase';
 import { ACCENTS, SHELL } from '../../config/theme';
 
 const GREEN = SHELL.green;
-
-const CATS = [
-  { key: 'certs',          label: 'certs/',          to: '/resources/certs' },
-  { key: 'labs',           label: 'labs/',           to: '/resources/labs' },
-  { key: 'visualizations', label: 'visualizations/', to: '/resources/visualizations' },
-  { key: 'notes',          label: 'notes/',          to: '/resources/notes' },
-];
-
 const accentHex = (a) => (ACCENTS[a] || ACCENTS.green).hex;
+
+// Glyph prefixes from a node's position in the tree.
+const dirGlyph = (isLast) => (isLast ? '└─ ' : '├─ ');
+const leafGlyph = (dirLast, leafLast) => `${dirLast ? '   ' : '│  '}${leafLast ? '└─ ' : '├─ '}`;
+
+// One tree row: [▸ cursor gutter][tree glyphs][label][meta][hover ▸]. A row is
+// interactive only when `onOpen` is provided (dim/coming rows pass none).
+const Row = ({ prefix, label, meta, labelHex, bold = false, dim = false, on = false, onOpen, onHover }) => {
+  const interactive = !!onOpen;
+  return (
+    <button
+      type="button"
+      disabled={!interactive}
+      onClick={onOpen}
+      onMouseEnter={onHover}
+      aria-current={on ? 'true' : undefined}
+      className={`group flex w-full items-baseline rounded-sm -mx-1.5 px-1.5 text-left ${
+        on ? 'bg-[#43c08c]/[0.12]' : interactive ? 'hover:bg-[#43c08c]/10' : 'cursor-default'
+      }`}
+    >
+      <span className="w-[2ch] shrink-0 whitespace-pre" style={{ color: GREEN }} aria-hidden="true">{on ? '▸' : ' '}</span>
+      <span className="shrink-0 whitespace-pre text-white/30" aria-hidden="true">{prefix}</span>
+      <span
+        className={dim ? 'text-white/30' : bold ? 'font-semibold' : 'text-white/70'}
+        style={labelHex && !dim ? { color: labelHex } : undefined}
+      >{label}</span>
+      {meta && <span className="ml-2 text-white/40">{meta}</span>}
+      {interactive && (
+        <span className="ml-auto pl-3 text-[#43c08c] opacity-0 transition-opacity group-hover:opacity-100 max-sm:opacity-60" aria-hidden="true">▸</span>
+      )}
+    </button>
+  );
+};
+
+// Inline retry row shown under a dynamic dir when the manifest is unreachable.
+const ErrorRow = ({ prefix }) => (
+  <button
+    type="button"
+    onClick={() => window.location.reload()}
+    className="group flex w-full items-baseline rounded-sm -mx-1.5 px-1.5 text-left hover:bg-rose-500/10"
+  >
+    <span className="w-[2ch] shrink-0" aria-hidden="true">{' '}</span>
+    <span className="shrink-0 whitespace-pre text-white/30" aria-hidden="true">{prefix}</span>
+    <span className="text-rose-400">! offline</span>
+    <span className="ml-2 text-white/40"><span style={{ color: GREEN }}>↵</span> retry</span>
+  </button>
+);
+
+// Ordered directory model from the manifest + local config.
+function buildDirs(manifest, loading, error) {
+  const certs = getCerts(manifest).filter((c) => !c.locked);
+  const viz = getVisualizations(manifest);
+  const dyn = (rows, mapFn) => (error ? [{ error: true }] : rows.map(mapFn));
+  const countMeta = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+  return [
+    {
+      key: 'certs', label: 'certs/', to: '/resources/certs', accent: 'red',
+      meta: loading && !certs.length ? '…' : countMeta(certs.length, 'track'),
+      leaves: dyn(certs, (c) => ({ label: c.label, meta: c.code, to: `/resources/certs/${c.slug}` })),
+    },
+    {
+      key: 'labs', label: 'labs/', to: '/resources/labs', accent: 'orange',
+      meta: `soon · ${COMING_LABS.length} planned`,
+      leaves: COMING_LABS.map((name) => ({ label: name, dim: true })),
+    },
+    {
+      key: 'visualizations', label: 'visualizations/', to: '/resources/visualizations', accent: 'purple',
+      meta: loading && !viz.length ? '…' : countMeta(viz.length, 'module'),
+      leaves: dyn(viz, (v) => ({ label: v.title, to: `/resources/visualizations?m=${v.id}` })),
+    },
+    {
+      key: 'notes', label: 'notes/', to: '/resources/notes', accent: 'slate',
+      meta: null, live: true, leaves: [],
+    },
+  ];
+}
 
 const ResourceTUI = () => {
   const navigate = useNavigate();
-  const counts = useResourceCounts();
   const { manifest, loading, error } = useManifest();
+
+  const dirs = buildDirs(manifest, loading, error);
+
+  // Flat, render-ordered list of focusable nodes: each dir then its openable leaves.
+  const flat = [];
+  dirs.forEach((d, di) => {
+    flat.push({ kind: 'dir', dirIndex: di, to: d.to });
+    d.leaves.forEach((lf) => { if (lf.to) flat.push({ kind: 'leaf', to: lf.to }); });
+  });
+
   const [sel, setSel] = useState(0);
+  const cursorTo = flat[sel]?.to ?? null;
+  const selectTo = (to) => setSel(flat.findIndex((n) => n.to === to));
 
-  const peeks = {
-    certs: getCerts(manifest).filter((c) => !c.locked).map((c) => ({ name: c.label, meta: c.code || '', accent: c.accent })),
-    visualizations: getVisualizations(manifest).map((v) => ({ name: v.title, meta: '', accent: 'purple' })),
-  };
-
-  const open = useCallback((i) => { const c = CATS[i]; if (c) navigate(c.to); }, [navigate]);
+  const open = useCallback((to) => { if (to) navigate(to); }, [navigate]);
 
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      if (e.key === 'ArrowDown') { e.preventDefault(); setSel((n) => (n + 1) % CATS.length); }
-      else if (e.key === 'ArrowUp') { e.preventDefault(); setSel((n) => (n - 1 + CATS.length) % CATS.length); }
-      else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); open(sel); }
-      else if (e.key === 'Escape') { e.preventDefault(); navigate('/'); }
-      else if (/^[1-4]$/.test(e.key)) { e.preventDefault(); setSel(Number(e.key) - 1); }
+      if (e.key === 'Escape') { e.preventDefault(); navigate('/'); return; }
+      if (!flat.length) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); setSel((n) => (n + 1) % flat.length); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setSel((n) => (n - 1 + flat.length) % flat.length); }
+      else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); open(flat[sel]?.to); }
+      else if (/^[1-4]$/.test(e.key)) {
+        e.preventDefault();
+        const di = Number(e.key) - 1;
+        const target = flat.findIndex((n) => n.kind === 'dir' && n.dirIndex === di);
+        if (target >= 0) setSel(target);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [sel, open, navigate]);
+  }, [flat, sel, open, navigate]);
 
-  const cur = CATS[sel];
-  const countFor = (k) =>
-    k === 'certs' ? (counts.certs ?? '-')
-    : k === 'visualizations' ? (counts.viz ?? '-')
-    : k === 'labs' ? 'soon'
-    : 'live';
-
-  const rightTitle =
-    cur.key === 'certs' ? `certs/ · ${countFor('certs')} tracks`
-    : cur.key === 'visualizations' ? `visualizations/ · ${countFor('visualizations')} modules`
-    : cur.key === 'labs' ? 'labs/ · soon'
-    : 'notes/ · ● LIVE';
-
-  const renderPeek = () => {
-    if (cur.key === 'labs') return <div className="text-white/40">soon: showcase under construction</div>;
-    if (cur.key === 'notes') return <div style={{ color: '#cbd5e1' }}>Obsidian Vault <span className="text-emerald-300">● LIVE</span> <span className="text-white/40">↗</span></div>;
-    if (error) return <div className="text-white/50">! peek offline <button type="button" onClick={() => window.location.reload()} style={{ color: GREEN }} className="hover:underline">↵ retry</button></div>;
-    const rows = peeks[cur.key] || [];
-    if (loading && !rows.length) return <div className="text-white/30">…</div>;
-    if (!rows.length) return <div className="text-white/30">// nothing here yet</div>;
-    return rows.map((r, i) => {
-      const hex = accentHex(r.accent);
-      return (
-        <div key={i} className="flex items-baseline gap-2 whitespace-nowrap">
-          <span className="inline-block w-[2ch] shrink-0" style={{ color: GREEN }} aria-hidden="true">{i === 0 ? '▸' : ''}</span>
-          <span style={{ color: hex }}>{r.name}</span>
-          {r.meta && <span className="text-white/40 ml-auto pl-3">{r.meta}</span>}
-        </div>
-      );
-    });
-  };
-
-  const catRows = CATS.map((c, i) => {
-    const on = i === sel;
-    return (
-      <button
-        key={c.key}
-        type="button"
-        onClick={() => open(i)}
-        onMouseEnter={() => setSel(i)}
-        aria-current={on ? 'page' : undefined}
-        className="block w-full text-left whitespace-nowrap pr-[2ch] hover:text-white/90"
-      >
-        <span className="inline-block w-[2ch]" style={{ color: GREEN }} aria-hidden="true">{on ? '▸' : ''}</span>
-        <span className={on ? 'text-white/90 font-semibold' : 'text-white/55'}>{c.label}</span>
-      </button>
-    );
-  });
+  const leafTotal = dirs.reduce((n, d) => n + d.leaves.filter((l) => l.to).length, 0);
 
   return (
     <TerminalShell>
       <div className="font-mono text-sm leading-relaxed">
-        <div className="text-white/40 mb-2">
-          <span style={{ color: SHELL.dim }}>guest@shelnet</span>:<span style={{ color: GREEN }}>~</span>$ cd resources
+        <div className="text-white/40 mb-3">
+          <span style={{ color: SHELL.dim }}>guest@shelnet</span>:<span style={{ color: GREEN }}>~</span>$ tree resources/
         </div>
 
-        {/* desktop: two-pane tree */}
-        <div className="hidden md:block">
-          <TwoPane
-            hex="rgba(255,255,255,0.3)"
-            leftTitle="resources"
-            rightTitle={rightTitle}
-            left={<div className="space-y-0.5">{catRows}</div>}
-            right={renderPeek()}
-          />
-        </div>
+        <div style={{ color: GREEN }}>resources/</div>
 
-        {/* mobile: single tappable list */}
-        <div className="md:hidden">
-          <div className="text-white/30 mb-1">~/resources</div>
-          {CATS.map((c, i) => (
-            <button
-              key={c.key}
-              type="button"
-              onClick={() => open(i)}
-              className="flex w-full items-baseline justify-between gap-2 py-2 text-left border-b border-white/[0.06]"
-            >
-              <span className="text-white/80">{c.label}</span>
-              <span className="flex items-baseline gap-3">
-                <span className="text-white/40 text-xs">{countFor(c.key)}</span>
-                <span style={{ color: GREEN }}>›</span>
-              </span>
-            </button>
-          ))}
+        {dirs.map((d, di) => {
+          const dirLast = di === dirs.length - 1;
+          return (
+            <div key={d.key}>
+              <Row
+                prefix={dirGlyph(dirLast)}
+                on={cursorTo === d.to}
+                bold
+                labelHex={accentHex(d.accent)}
+                label={d.label}
+                meta={d.live
+                  ? (<><span style={{ color: GREEN }}>● LIVE</span> <span className="text-white/40">Obsidian vault ↗</span></>)
+                  : d.meta}
+                onOpen={() => { selectTo(d.to); open(d.to); }}
+                onHover={() => selectTo(d.to)}
+              />
+              {d.leaves.map((lf, li) => {
+                const leafLast = li === d.leaves.length - 1;
+                if (lf.error) return <ErrorRow key={li} prefix={leafGlyph(dirLast, leafLast)} />;
+                return (
+                  <Row
+                    key={li}
+                    prefix={leafGlyph(dirLast, leafLast)}
+                    on={cursorTo === lf.to}
+                    dim={lf.dim}
+                    label={lf.label}
+                    meta={lf.meta}
+                    onOpen={lf.to ? () => { selectTo(lf.to); open(lf.to); } : undefined}
+                    onHover={lf.to ? () => selectTo(lf.to) : undefined}
+                  />
+                );
+              })}
+            </div>
+          );
+        })}
+
+        <div className="mt-3 text-white/25">{leafTotal} resources · {dirs.length} directories · all free, no signup</div>
+        <div className="mt-1 text-white/55">
+          <span style={{ color: SHELL.dim }}>guest@shelnet</span>:<span style={{ color: GREEN }}>~/resources</span>$
+          <span className="ml-1 inline-block h-3.5 w-2 translate-y-0.5 animate-pulse reduce-static" style={{ backgroundColor: GREEN }} aria-hidden="true" />
         </div>
       </div>
     </TerminalShell>
