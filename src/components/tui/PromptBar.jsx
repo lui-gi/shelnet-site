@@ -1,9 +1,9 @@
 // src/components/tui/PromptBar.jsx
 // Global sticky tty status line pinned to the top of every page. Renders the
 // shell prompt `guest@shelnet <~/path> $` — the working directory housed in
-// green inside angle brackets, ancestor segments clickable, the current segment
-// inert. A single `[ cd ~ ]` button on the right is the only home affordance
-// (no `[ ~ ]` chip, no blinking cursor). Mounted once in Layout, above Outlet.
+// green inside angle brackets, the `~` root and ancestor segments clickable
+// (home), the current segment inert. A `[ cd ~ ]` button on the right mirrors
+// the home affordance. Mounted once in Layout, above Outlet.
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { SHELL } from '../../config/theme';
 import { segmentsForPath, routeForSegments } from '../../config/resourcePaths';
@@ -25,7 +25,12 @@ const PromptBar = () => {
           <span className="hidden sm:inline">&nbsp;</span>
           <span className="text-white/30">&lt;</span>
           <span className="min-w-0 truncate">
-            <span style={{ color: SHELL.green }}>~</span>
+            {segments.length === 0 ? (
+              <span aria-current="page" style={{ color: SHELL.green, fontWeight: 600 }}>~</span>
+            ) : (
+              <Link to="/" aria-label="cd ~ (home)"
+                    className="hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60" style={{ color: SHELL.green }}>~</Link>
+            )}
             {segments.map((seg, i) => {
               const last = i === segments.length - 1;
               return (
