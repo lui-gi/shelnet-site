@@ -130,3 +130,18 @@ export function getVisualizations(manifest) {
   const base = resourceBaseUrl();
   return list.map((r) => toItem(base, ['visualizations'], r));
 }
+
+/** Certs that expose a bytes question bank, with display metadata for the picker. */
+export function getBytesCerts(manifest) {
+  const certs = manifest?.certs || {};
+  return Object.entries(certs)
+    .filter(([, c]) => c && c.bytes && typeof c.bytes.count === 'number')
+    .map(([slug, c]) => ({
+      slug,
+      label: c.label,
+      code: c.code,
+      accent: c.accent || 'green',
+      blurb: c.blurb || '',
+      count: c.bytes.count,
+    }));
+}
