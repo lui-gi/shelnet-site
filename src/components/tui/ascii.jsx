@@ -61,24 +61,26 @@ export const ProgressBar = ({ pct = 0, hex, width = 24 }) => {
 // A single open-right ascii box with a left rail. `title` is the header content
 // (drawn after `┌─ `), `right` overlays at the top-right (e.g. an exam code),
 // `marker` sits in a 2ch gutter so selected/unselected boxes stay aligned.
-export const Panel = ({ hex, title, right = null, marker = null, children, className = '' }) => (
-  <div className={`flex ${className}`}>
+// `fill` makes the body flex to its parent's height and clip overflow, with the
+// newest content bottom-aligned (used by the scrolling ping log).
+export const Panel = ({ hex, title, right = null, marker = null, children, fill = false, className = '' }) => (
+  <div className={`flex ${fill ? 'min-h-0 h-full' : ''} ${className}`}>
     <span className="shrink-0 w-[2ch]" style={{ color: hex }} aria-hidden="true">{marker}</span>
-    <div className="relative flex-1 min-w-0">
+    <div className={`relative flex-1 min-w-0 ${fill ? 'flex flex-col min-h-0' : ''}`}>
       {/* top rule: corner + title + fill */}
-      <div className="relative overflow-hidden whitespace-nowrap" style={{ color: hex }}>
+      <div className="relative overflow-hidden whitespace-nowrap shrink-0" style={{ color: hex }}>
         <span aria-hidden="true">┌─ </span>{title} {FILL('─')}
       </div>
       {right && (
         <div className="absolute right-0 top-0 pl-2 bg-black" style={{ color: hex }}>{right}</div>
       )}
       {/* body: rail + content */}
-      <div className="relative pl-[1.8ch]">
-        <VRail hex={hex} match />
+      <div className={`relative pl-[1.8ch] ${fill ? 'flex-1 min-h-0 overflow-hidden flex flex-col justify-end' : ''}`}>
+        <VRail hex={hex} match={!fill} />
         {children}
       </div>
       {/* bottom rule */}
-      <Rule lead={<span aria-hidden="true">└</span>} hex={hex} />
+      <Rule lead={<span aria-hidden="true">└</span>} hex={hex} className="shrink-0" />
     </div>
   </div>
 );
