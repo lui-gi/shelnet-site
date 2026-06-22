@@ -8,8 +8,8 @@ import { useEffect, useRef, useState } from 'react';
 
 const TICK_MS = 600;
 const HISTORY = 8;     // sparkline samples kept per channel
-const LOG_CAP = 40;    // reply lines retained (older ones clip off-screen)
-const SEED_ROUNDS = 6; // static-frame reply rounds (fills the log on first paint)
+const LOG_CAP = 60;     // reply lines retained (older ones clip off-screen)
+const SEED_ROUNDS = 16; // static-frame reply rounds: enough to fill a tall viewport on first paint and under reduced motion (extra lines clip)
 const SPARK = ' ▁▂▃▄▅▆▇';
 
 // Map a round-trip time (ms) onto a spark glyph across a fixed 4..40ms range.
