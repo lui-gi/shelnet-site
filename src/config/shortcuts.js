@@ -71,6 +71,14 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: 'bytes' },
     ];
   }
-  // /about, /connect, and any fallback.
+  // Connect identity card.
+  if (pathname === '/connect') {
+    return [
+      { keys: '↑↓', label: 'select' },
+      { keys: '↵', label: 'open' },
+      { keys: 'esc', label: '~' },
+    ];
+  }
+  // /about and any fallback.
   return [{ keys: 'esc', label: '~' }];
 }
