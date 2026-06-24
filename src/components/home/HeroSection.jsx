@@ -13,12 +13,12 @@ const ALL_REVEALED = 999;   // step sentinel: every element shown (skip / reduce
 
 // `to` => direct path (/bytes, /resources).
 // `dir` => opens the file-explorer at /resources/<dir>.
-// `anchor` => opens the matching route (/about, /connect).
+// `anchor` => opens the matching route (/connect).
 const MENU = [
   { n: '1', cmd: './certs',     desc: 'A+ · Security+ · more',          dir: 'certs' },
   { n: '2', cmd: './bytes',     desc: 'rapid-fire practice · mobile',        to: '/bytes' },
   { n: '3', cmd: './resources', desc: 'browse everything',              to: '/resources' },
-  { n: '4', cmd: 'man about',   desc: 'what is shelnet?',                         anchor: 'about' },
+  { n: '4', cmd: './wiki',      desc: 'writeups, guides, and more',         to: '/wiki' },
   { n: '5', cmd: './connect',   desc: 'newsletter · github · contact',  anchor: 'connect' },
 ];
 
@@ -157,7 +157,7 @@ const HeroSection = () => {
   const activate = useCallback((item) => {
     if (item.to) navigate(item.to);              // direct path (/bytes, /resources)
     else if (item.dir) navigate(`/resources/${item.dir}`); // open the file-explorer here
-    else if (item.anchor) navigate(`/${item.anchor}`);     // /about, /connect
+    else if (item.anchor) navigate(`/${item.anchor}`);     // /connect
   }, [navigate]);
 
   // After boot: ↑↓ move the cursor, ↵ opens it, and keys 1–6 jump straight in.

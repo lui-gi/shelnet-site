@@ -79,6 +79,13 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: '~' },
     ];
   }
-  // /about and any fallback.
+  // Wiki WIP.
+  if (pathname === '/wiki') {
+    return [
+      { keys: '↵', label: 'notify' },
+      { keys: 'esc', label: '~' },
+    ];
+  }
+  // Any fallback.
   return [{ keys: 'esc', label: '~' }];
 }

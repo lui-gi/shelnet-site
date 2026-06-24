@@ -9,7 +9,7 @@ import Labs from './pages/labs.jsx'
 import Notes from './pages/notes.jsx'
 import Certs from './pages/certs.jsx'
 import ResourceTUI from './components/home/ResourceTUI.jsx'
-import AboutSection from './components/home/AboutSection.jsx'
+import Wiki from './pages/wiki.jsx'
 import ConnectSection from './components/home/ConnectSection.jsx'
 import Bytes from './pages/bytes.jsx'
 import BytesQuiz from './pages/bytes-quiz.jsx'
@@ -21,7 +21,7 @@ createRoot(document.getElementById('root')).render(
       <Routes>
         <Route element={<Layout />}>
           <Route path="/" element={<App />} />
-          <Route path="/about" element={<AboutSection />} />
+          <Route path="/wiki" element={<Wiki />} />
           <Route path="/connect" element={<ConnectSection />} />
           {/* bytes: rapid-fire practice (top-level, parallel to /resources) */}
           <Route path="/bytes" element={<Bytes />} />
