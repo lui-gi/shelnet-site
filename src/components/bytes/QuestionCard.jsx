@@ -13,6 +13,7 @@ const QuestionCard = ({ title, tally, hex, q, answered, selected, onAnswer, onSk
   const isCorrect = (i) => Array.isArray(q.correct) && q.correct.includes(i);
   return (
     <Panel
+      flush
       hex={hex}
       title={<span className="text-white/80">{title}</span>}
       right={<span className="text-white/50">{tally}</span>}

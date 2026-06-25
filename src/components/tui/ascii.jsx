@@ -61,11 +61,13 @@ export const ProgressBar = ({ pct = 0, hex, width = 24 }) => {
 // A single open-right ascii box with a left rail. `title` is the header content
 // (drawn after `┌─ `), `right` overlays at the top-right (e.g. an exam code),
 // `marker` sits in a 2ch gutter so selected/unselected boxes stay aligned.
+// `flush` drops that gutter so the box border sits flush-left with the container
+// (used by the bytes quiz card, which has no marker and lines up with the prompt).
 // `fill` makes the body flex to its parent's height and clip overflow, with the
 // newest content bottom-aligned (used by the scrolling ping log).
-export const Panel = ({ hex, title, right = null, marker = null, children, fill = false, className = '' }) => (
+export const Panel = ({ hex, title, right = null, marker = null, children, fill = false, flush = false, className = '' }) => (
   <div className={`flex ${fill ? 'min-h-0 h-full' : ''} ${className}`}>
-    <span className="shrink-0 w-[2ch]" style={{ color: hex }} aria-hidden="true">{marker}</span>
+    {!flush && <span className="shrink-0 w-[2ch]" style={{ color: hex }} aria-hidden="true">{marker}</span>}
     <div className={`relative flex-1 min-w-0 ${fill ? 'flex flex-col min-h-0' : ''}`}>
       {/* top rule: corner + title + fill */}
       <div className="relative overflow-hidden whitespace-nowrap shrink-0" style={{ color: hex }}>
