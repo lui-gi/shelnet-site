@@ -1,9 +1,13 @@
 // src/components/terminal/Terminal.jsx
-// The interactive modules shell: a scrolling output buffer above a focused input
-// line. In 'shell' mode, submitted lines run global commands (commands.js); when a
-// module is loaded ('module' mode), lines route to that module's kind runner until
-// `exit`. The terminal owns a focused <input>, so the site's global window keydown
-// handlers (which bail on INPUT focus) do not interfere.
+// The interactive modules shell: a bare-TTY header (uname line + figlet title +
+// greyed blurbs, matching the sibling /resources pages) above a single scrolling
+// column where submitted commands echo `$ cmd`, their output stacks beneath, and
+// the live input is the last row, so the prompt always follows the latest output
+// instead of floating against the viewport bottom. In 'shell' mode submitted
+// lines run global commands (commands.js); when a module is loaded ('module'
+// mode), lines route to that module's kind runner until `exit`. The terminal owns
+// a focused <input>, so the site's global window keydown handlers (which bail on
+// INPUT focus) do not interfere.
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { runCommand } from './commands';
@@ -14,23 +18,40 @@ const GREEN = SHELL.green;
 const DIM = SHELL.dim;
 const norm = (s) => s.trim().replace(/\s+/g, ' ').toLowerCase();
 
-// tone -> Tailwind class. 'accent' is colored inline with the active accent.
+// figlet "standard" font, matching the hero banner + sibling page titles. Kept as
+// an array (the glyphs carry backticks, which a template literal can't hold raw).
+const MODULES_ART = [
+  '                     _       _           ',
+  ' _ __ ___   ___   __| |_   _| | ___  ___ ',
+  "| '_ ` _ \\ / _ \\ / _` | | | | |/ _ \\/ __|",
+  '| | | | | | (_) | (_| | |_| | |  __/\\__ \\',
+  '|_| |_| |_|\\___/ \\__,_|\\__,_|_|\\___||___/',
+].join('\n');
+
+// tone -> Tailwind class. 'accent' is colored inline with the active accent;
+// 'cmd' is a structured prompt echo rendered by <PromptLine>, not via this map.
 const TONE = {
   out: 'text-white/75',
   sys: 'text-white/45',
   ok: 'text-emerald-400',
   warn: 'text-amber-400',
   err: 'text-rose-400',
-  prompt: 'text-white/55',
 };
+
+// The colored prompt segments, shared by command echoes and the live input row so
+// scrollback lines up pixel-for-pixel under the cursor.
+const Prompt = ({ path }) => (
+  <span className="shrink-0 whitespace-pre">
+    <span style={{ color: DIM }}>guest@shelnet</span>
+    <span className="text-white/40">:</span>
+    <span style={{ color: GREEN }}>{path}</span>
+    <span className="text-white/40">$</span>
+  </span>
+);
 
 const Terminal = ({ manifest }) => {
   const navigate = useNavigate();
-  const [buffer, setBuffer] = useState(() => ([
-    { text: 'shelnet modules · interactive skill terminal', tone: 'accent' },
-    { text: 'type `help` for commands, `list` to browse modules.', tone: 'sys' },
-    { text: '', tone: 'out' },
-  ]));
+  const [buffer, setBuffer] = useState([]);      // output lines, oldest first
   const [value, setValue] = useState('');
   const [mode, setMode] = useState('shell');     // 'shell' | 'module'
   const [active, setActive] = useState(null);    // { ...module, def, runner }
@@ -45,7 +66,6 @@ const Terminal = ({ manifest }) => {
   const pathStr = mode === 'module' && active
     ? `~/resources/modules/${active.slug}`
     : '~/resources/modules';
-  const promptText = `guest@shelnet:${pathStr}$`;
 
   // Keep the view pinned to the latest output. (DOM side effect, not state sync.)
   useEffect(() => {
@@ -71,7 +91,7 @@ const Terminal = ({ manifest }) => {
 
   const submit = async () => {
     const input = value;
-    const echo = { text: `${promptText} ${input}`, tone: 'prompt' };
+    const echo = { tone: 'cmd', path: pathStr, text: input };
     setValue('');
     setHpos(-1);
     if (!input.trim()) { append([echo]); return; }
@@ -133,36 +153,53 @@ const Terminal = ({ manifest }) => {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 font-mono text-sm leading-relaxed" onClick={focusInput}>
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto pr-1">
-        {buffer.map((l, i) => (
-          <div
-            key={i}
-            className={`whitespace-pre-wrap break-words ${TONE[l.tone] || TONE.out}`}
-            style={l.tone === 'accent' ? { color: accentHex } : undefined}
-          >
-            {l.text || ' '}
-          </div>
-        ))}
+      {/* bare-TTY header: continuity with the sibling /resources pages */}
+      <div className="shrink-0 mb-3">
+        <div className="text-white/30">SHELNET GNU/Linux 3.0 LTS · tty4 · 80×24</div>
+        <pre
+          aria-label="modules"
+          className="my-3 whitespace-pre text-[10px] leading-[1.1] sm:text-xs"
+          style={{ color: GREEN, textShadow: '0 0 8px rgba(67,192,140,.25)' }}
+        >{MODULES_ART}</pre>
+        <div className="text-white/45">interactive skill terminal · practice real blue &amp; red team workflows</div>
+        <div className="text-white/40">
+          type <span style={{ color: GREEN }}>help</span> for commands · <span style={{ color: GREEN }}>list</span> to browse modules
+        </div>
       </div>
 
-      <div className="shrink-0 flex items-baseline gap-2 pt-1">
-        <span className="whitespace-pre">
-          <span style={{ color: DIM }}>guest@shelnet</span>
-          <span className="text-white/40">:</span>
-          <span style={{ color: GREEN }}>{pathStr}</span>
-          <span className="text-white/40">$</span>
-        </span>
-        <input
-          ref={inputRef}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onKeyDown={onKey}
-          className="flex-1 bg-transparent outline-none text-white/90"
-          autoFocus
-          spellCheck={false}
-          autoComplete="off"
-          aria-label="terminal input"
-        />
+      {/* one scrolling column: echoed commands, their output, then the live prompt */}
+      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto pr-1">
+        {buffer.map((l, i) =>
+          l.tone === 'cmd' ? (
+            <div key={i} className="flex items-baseline gap-2">
+              <Prompt path={l.path} />
+              <span className="min-w-0 break-words text-white/90">{l.text}</span>
+            </div>
+          ) : (
+            <div
+              key={i}
+              className={`whitespace-pre-wrap break-words ${TONE[l.tone] || TONE.out}`}
+              style={l.tone === 'accent' ? { color: accentHex } : undefined}
+            >
+              {l.text || ' '}
+            </div>
+          )
+        )}
+
+        <div className="flex items-baseline gap-2">
+          <Prompt path={pathStr} />
+          <input
+            ref={inputRef}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={onKey}
+            className="flex-1 min-w-0 bg-transparent outline-none text-white/90"
+            autoFocus
+            spellCheck={false}
+            autoComplete="off"
+            aria-label="terminal input"
+          />
+        </div>
       </div>
     </div>
   );

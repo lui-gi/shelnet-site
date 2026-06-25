@@ -91,6 +91,7 @@ export function shortcutsForPath(pathname) {
     return [
       { keys: 'type', label: 'command' },
       { keys: '↵', label: 'run' },
+      { keys: '↑↓', label: 'history' },
       { keys: 'esc', label: '~' },
     ];
   }
