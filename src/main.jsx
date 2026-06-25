@@ -13,6 +13,7 @@ import Wiki from './pages/wiki.jsx'
 import ConnectSection from './components/home/ConnectSection.jsx'
 import Bytes from './pages/bytes.jsx'
 import BytesQuiz from './pages/bytes-quiz.jsx'
+import Modules from './pages/modules.jsx'
 import Layout from './Layout.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -30,6 +31,7 @@ createRoot(document.getElementById('root')).render(
           {/* resources (routes equal breadcrumb paths) */}
           <Route path="/resources" element={<ResourceTUI />} />
           <Route path="/resources/visualizations" element={<Visualizations />} />
+          <Route path="/resources/modules" element={<Modules />} />
           <Route path="/resources/labs" element={<Labs />} />
           <Route path="/resources/notes" element={<Notes />} />
           <Route path="/resources/certs" element={<Certs />} />
