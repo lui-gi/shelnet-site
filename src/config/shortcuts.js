@@ -8,7 +8,7 @@ export function shortcutsForPath(pathname) {
     return [
       { keys: '↑↓', label: 'move' },
       { keys: '↵', label: 'open' },
-      { keys: '1–5', label: 'jump' },
+      { keys: '1–6', label: 'jump' },
     ];
   }
   // Cert study console.
@@ -50,7 +50,7 @@ export function shortcutsForPath(pathname) {
     return [
       { keys: '↑↓', label: 'move' },
       { keys: '→/↵', label: 'open' },
-      { keys: '1–4', label: 'jump' },
+      { keys: '1–5', label: 'jump' },
       { keys: 'esc', label: 'home' },
     ];
   }
@@ -83,6 +83,14 @@ export function shortcutsForPath(pathname) {
   if (pathname === '/wiki') {
     return [
       { keys: '↵', label: 'notify' },
+      { keys: 'esc', label: '~' },
+    ];
+  }
+  // Modules terminal.
+  if (pathname === '/resources/modules') {
+    return [
+      { keys: 'type', label: 'command' },
+      { keys: '↵', label: 'run' },
       { keys: 'esc', label: '~' },
     ];
   }

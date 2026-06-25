@@ -20,6 +20,7 @@ const MENU = [
   { n: '3', cmd: './resources', desc: 'browse everything',              to: '/resources' },
   { n: '4', cmd: './wiki',      desc: 'writeups, guides, and more',         to: '/wiki' },
   { n: '5', cmd: './connect',   desc: 'newsletter · github · contact',  anchor: 'connect' },
+  { n: '6', cmd: './modules',   desc: 'interactive skill terminal',     to: '/resources/modules' },
 ];
 
 const fmt = (v) => (v == null ? '-' : v);
@@ -193,7 +194,7 @@ const HeroSection = () => {
 
         <div className="mt-3 text-white/55" style={revealStyle(LOGIN_STEP)}>
           shelnet login: <span style={{ color: ACCENT }}>guest</span>
-          <span className="text-white/40">: ↑↓ + ↵, press 1–5, or click a destination:</span>
+          <span className="text-white/40">: ↑↓ + ↵, press 1–6, or click a destination:</span>
         </div>
 
         <nav className="mt-2" aria-label="Site sections">

@@ -9,6 +9,7 @@ import TerminalShell from '../tui/TerminalShell';
 import { useManifest } from '../../utils/useManifest';
 import { getCerts, getVisualizations } from '../../utils/manifestService';
 import { COMING_LABS } from '../../config/labsShowcase';
+import { MODULES } from '../../config/moduleRegistry';
 import { ACCENTS, SHELL } from '../../config/theme';
 
 const GREEN = SHELL.green;
@@ -77,12 +78,19 @@ function buildDirs(manifest, loading, error) {
   const viz = getVisualizations(manifest);
   const dyn = (rows, mapFn) => (error ? [{ error: true }] : rows.map(mapFn));
   const countMeta = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+  const liveModules = MODULES.filter((m) => m.status === 'live');
+  const soonCount = MODULES.filter((m) => m.status === 'soon').length;
 
   return [
     {
       key: 'certs', label: 'certs/', to: '/resources/certs', accent: 'red',
       meta: loading && !certs.length ? '…' : countMeta(certs.length, 'track'),
       leaves: dyn(certs, (c) => ({ label: c.label, meta: c.code, to: `/resources/certs/${c.slug}` })),
+    },
+    {
+      key: 'modules', label: 'modules/', to: '/resources/modules', accent: 'green',
+      meta: `${liveModules.length} live · ${soonCount} soon`,
+      leaves: [],
     },
     {
       key: 'labs', label: 'labs/', to: '/resources/labs', accent: 'orange',
@@ -141,7 +149,7 @@ const ResourceTUI = () => {
       if (e.key === 'ArrowDown') { e.preventDefault(); setSelTo(flat[(index + 1) % flat.length].to); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); setSelTo(flat[(index - 1 + flat.length) % flat.length].to); }
       else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); open(flat[index]?.to); }
-      else if (/^[1-4]$/.test(e.key)) {
+      else if (/^[1-5]$/.test(e.key)) {
         e.preventDefault();
         const di = Number(e.key) - 1;
         const node = flat.find((n) => n.kind === 'dir' && n.dirIndex === di);
