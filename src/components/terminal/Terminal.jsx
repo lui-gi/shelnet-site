@@ -102,6 +102,10 @@ const Terminal = ({ manifest }) => {
       try {
         const loaded = await action.module.load();
         const runner = RUNNERS[action.module.kind];
+        if (!runner) {
+          append([{ text: `${action.module.name}: unknown module kind '${action.module.kind}'.`, tone: 'err' }]);
+          return;
+        }
         const built = { ...action.module, def: loaded.default, runner };
         const { lines: initLines, state } = runner.init(built);
         setActive(built);
