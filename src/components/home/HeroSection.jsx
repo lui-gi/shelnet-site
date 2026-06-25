@@ -17,10 +17,10 @@ const ALL_REVEALED = 999;   // step sentinel: every element shown (skip / reduce
 const MENU = [
   { n: '1', cmd: './certs',     desc: 'A+ · Security+ · more',          dir: 'certs' },
   { n: '2', cmd: './bytes',     desc: 'rapid-fire practice · mobile',        to: '/bytes' },
-  { n: '3', cmd: './resources', desc: 'browse everything',              to: '/resources' },
+  { n: '3', cmd: './modules',   desc: 'interactive skill terminal',     to: '/resources/modules' },
   { n: '4', cmd: './wiki',      desc: 'writeups, guides, and more',         to: '/wiki' },
-  { n: '5', cmd: './connect',   desc: 'newsletter · github · contact',  anchor: 'connect' },
-  { n: '6', cmd: './modules',   desc: 'interactive skill terminal',     to: '/resources/modules' },
+  { n: '5', cmd: './resources', desc: 'browse everything',              to: '/resources' },
+  { n: '6', cmd: './connect',   desc: 'newsletter · github · contact',  anchor: 'connect' },
 ];
 
 const fmt = (v) => (v == null ? '-' : v);
