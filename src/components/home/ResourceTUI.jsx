@@ -1,8 +1,8 @@
 // src/components/home/ResourceTUI.jsx
-// The ~/resources hub rendered as a `tree`: the four category dirs each expanded
+// The ~/resources hub rendered as a `tree`: the five category dirs each expanded
 // to their children (certs/viz from the manifest, planned labs shown dim, notes
 // as a live external vault). Clickable leaves open the resource directly; dirs
-// open their page. Keyboard-navigable (↑↓ ↵/→ 1-4 esc); one render for all widths.
+// open their page. Keyboard-navigable (↑↓ ↵/→ 1-5 esc); one render for all widths.
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TerminalShell from '../tui/TerminalShell';
