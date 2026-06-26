@@ -15,10 +15,15 @@ const BOX_OPEN = 'rgba(255,255,255,0.22)';
 
 const hexOf = (accent) => (ACCENTS[accent] || ACCENTS.green).hex;
 
-// Short bracket tag from a cert label: "CompTIA A+" -> "A+", "Security+" -> "S+".
+// Short bracket tag from a cert label: "CompTIA A+" -> "A+", "Security+" -> "S+",
+// "CySA+" -> "CS+" (up to two leading capitals/digits of the plus-word).
 const tagOf = (label = '') => {
   const t = label.split(/\s+/).find((w) => w.endsWith('+'));
-  if (t) return t.length <= 2 ? t : `${t[0]}+`;
+  if (t) {
+    if (t.length <= 2) return t;
+    const caps = t.replace(/\+$/, '').match(/[A-Z0-9]/g) || [];
+    return `${caps.length >= 2 ? caps.slice(0, 2).join('') : t[0]}+`;
+  }
   return label.slice(0, 2).toUpperCase();
 };
 

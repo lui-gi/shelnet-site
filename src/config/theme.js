@@ -9,6 +9,7 @@ export const ACCENTS = {
   blue:   { hex: '#38bdf8', name: 'blue'   }, // Security+
   purple: { hex: '#c084fc', name: 'purple' }, // Visualizations
   orange: { hex: '#fb923c', name: 'orange' }, // Labs
+  cyan:   { hex: '#22d3ee', name: 'cyan'   }, // CySA+
   slate:  { hex: '#cbd5e1', name: 'slate'  }, // Notes
 };
 
