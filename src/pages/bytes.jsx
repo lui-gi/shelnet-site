@@ -102,7 +102,7 @@ const Bytes = () => {
                     right={<span className="text-white/40">{b.code}</span>}
                   >
                     {b.blurb && <div className="text-white/70">{b.blurb}</div>}
-                    <div className="text-white/55">{b.count} questions <span className="text-white/30">&middot;</span> instant feedback</div>
+                    <div className="text-white/55">{b.count} questions <span className="text-white/30">&middot;</span> continuous mcq stream</div>
                   </Panel>
                 </button>
               );
