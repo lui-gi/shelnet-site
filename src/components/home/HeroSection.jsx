@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useResourceCounts } from '../../utils/useResourceCounts';
+import { useModuleCounts } from '../../utils/moduleProgress';
 import { ASCII_BANNER } from '../../config/theme';
 
 const SESSION_KEY = 'shelnet_booted';
@@ -16,7 +17,7 @@ const ALL_REVEALED = 999;   // step sentinel: every element shown (skip / reduce
 const MENU = [
   { n: '1', cmd: './certs',     desc: 'A+ · Security+ · more',          dir: 'certs' },
   { n: '2', cmd: './bytes',     desc: 'rapid-fire practice · portable',      to: '/bytes' },
-  { n: '3', cmd: './modules',   desc: 'interactive skill terminal',     to: '/resources/modules' },
+  { n: '3', cmd: './modules',   desc: 'interactive skill rooms',        to: '/resources/modules' },
   { n: '4', cmd: './wiki',      desc: 'writeups, guides, and more',         to: '/wiki' },
   { n: '5', cmd: './resources', desc: 'browse everything',              to: '/resources' },
   { n: '6', cmd: './connect',   desc: 'newsletter · github · contact',  anchor: 'connect' },
@@ -34,7 +35,7 @@ const Mark = ({ inner }) => (
 );
 
 // Boot/mount log as an array of nodes. `narrow` trims leaders + uname for phones.
-function buildLines(counts, narrow) {
+function buildLines(counts, mods, narrow) {
   const sims = (counts.pbqs == null && counts.exams == null)
     ? null : (counts.pbqs || 0) + (counts.exams || 0);
   if (narrow) {
@@ -43,8 +44,8 @@ function buildLines(counts, narrow) {
       <><Mark inner="  OK  " /> <span className="text-white/90">/certs</span>{'  '}<span className="text-white/55">{fmt(counts.certs)} tracks</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/bytes</span>{'  '}<span className="text-white/55">{fmt(counts.bytes)} qs</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/resrc</span>{' '}<span className="text-white/55">{fmt(counts.viz)} viz {'·'} {fmt(counts.labs)} labs</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/mods</span>{'  '}<span className="text-white/55">{fmt(mods.complete)}/{mods.total} rooms</span></>,
       <><Mark inner=" WAIT " /> <span className="text-white/90">wiki: work in progress</span></>,
-      <><Mark inner=" WAIT " /> <span className="text-white/90">modules: work in progress</span></>,
     ];
   }
   const dots = (s) => <span className="text-white/20" aria-hidden="true">{s}</span>;
@@ -53,14 +54,15 @@ function buildLines(counts, narrow) {
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/certs</span> {dots('···········')} <span className="text-white/55">{fmt(counts.certs)} tracks {'·'} {fmt(sims)} sims</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/bytes</span> {dots('···········')} <span className="text-white/55">{fmt(counts.bytes)} questions</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/resources</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules {'·'} {fmt(counts.labs)} labs</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/modules</span> {dots('·········')} <span className="text-white/55">{fmt(mods.complete)}/{mods.total} rooms complete</span></>,
     <><Mark inner=" WAIT " /> wiki: <span className="text-white/90">work in progress</span></>,
-    <><Mark inner=" WAIT " /> modules: <span className="text-white/90">work in progress</span></>,
   ];
 }
 
 const HeroSection = () => {
   const navigate = useNavigate();
   const counts = useResourceCounts();
+  const mods = useModuleCounts();
 
   const prefersReduced = typeof window !== 'undefined'
     && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -78,7 +80,7 @@ const HeroSection = () => {
     return () => mq.removeEventListener('change', onChange);
   }, []);
 
-  const lines = buildLines(counts, narrow);
+  const lines = buildLines(counts, mods, narrow);
   const stats = narrow
     ? ['SHELNET 3.0 LTS · tty3']
     : ['SHELNET GNU/Linux 3.0 LTS · tty3 · 80×24',

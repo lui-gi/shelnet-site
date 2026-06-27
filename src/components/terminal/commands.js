@@ -1,8 +1,10 @@
 // src/components/terminal/commands.js
-// The shell's global command parser: help, clear, list, load, exit. Pure over the
-// registry + manifest. Returns output lines plus an optional action the Terminal
-// performs (clear the buffer, load a module, or navigate for a foundation).
-import { getModule, getTrackListing, getFoundation } from '../../config/moduleRegistry';
+// The lobby shell's global command parser: help, clear, list, load, exit. Pure
+// over the registry + manifest + a progress store (passed in). Returns output
+// lines plus an optional action the caller performs: clear the buffer, load a
+// module (the caller resolves /resources/modules/<slug>), or navigate (for a
+// foundation primer handoff to the visualizations viewer).
+import { getModule, getCategoryListing, getFoundation } from '../../config/moduleRegistry';
 
 const line = (text, tone = 'out') => ({ text, tone });
 
@@ -10,31 +12,42 @@ function help() {
   return [
     line('commands:', 'sys'),
     line('  help            show this help'),
-    line('  list            list tracks and modules'),
-    line('  load <module>   start a module (e.g. load splunk-queries)'),
+    line('  list            list categories and modules'),
+    line('  load <module>   open a module room (e.g. load enumeration)'),
     line('  clear           clear the screen'),
-    line('  exit            leave a module (when inside one)'),
+    line('  exit            leave a room (when inside one)'),
   ];
 }
 
-function list(manifest) {
+// Marker + trailing note for a module given its progress entry.
+function statusMarks(m, entry) {
+  if (m.status === 'soon') return { mark: 'o', note: '  (soon)', tone: 'sys' };
+  if (m.status === 'primer') return { mark: 'o', note: '  (primer)', tone: 'sys' };
+  if (entry?.status === 'complete') return { mark: '+', note: '  (complete)', tone: 'ok' };
+  if (entry?.status === 'in-progress') {
+    const frac = entry.total ? ` ${entry.section ?? 0}/${entry.total}` : '';
+    return { mark: '>', note: `  (resume${frac})`, tone: 'accent' };
+  }
+  return { mark: 'o', note: '', tone: 'out' };
+}
+
+function list(manifest, store = {}) {
   const out = [line('available modules:', 'sys')];
-  getTrackListing(manifest).forEach((t) => {
+  getCategoryListing(manifest).forEach((cat) => {
+    if (!cat.modules.length) return;
     out.push(line(''));
-    out.push(line(`${t.label.toLowerCase().replace(/[^a-z]+/g, '-')}/`, 'accent'));
-    if (!t.modules.length) { out.push(line('  (loading…)', 'sys')); return; }
-    t.modules.forEach((m) => {
-      const tag = m.status === 'live' ? '●' : m.status === 'foundation' ? '◆' : '○';
-      const note = m.status === 'soon' ? '  (soon)' : '';
-      out.push(line(`  ${tag} ${m.slug.padEnd(22)} ${m.name}${note}`, m.status === 'soon' ? 'sys' : 'out'));
+    out.push(line(`${cat.id}/`, 'accent'));
+    cat.modules.forEach((m) => {
+      const { mark, note, tone } = statusMarks(m, store[m.slug]);
+      out.push(line(`  ${mark} ${m.slug.padEnd(24)} ${m.name}${note}`, tone));
     });
   });
   out.push(line(''));
-  out.push(line('start one with:  load <name>', 'sys'));
+  out.push(line('open one with:  load <name>   ·   + done   > in progress   o todo', 'sys'));
   return out;
 }
 
-export function runCommand(input, manifest) {
+export function runCommand(input, manifest, store = {}) {
   const raw = input.trim();
   if (!raw) return { lines: [] };
   const [cmd, ...rest] = raw.split(/\s+/);
@@ -46,7 +59,7 @@ export function runCommand(input, manifest) {
     case 'clear':
       return { lines: [], action: { type: 'clear' } };
     case 'list':
-      return { lines: list(manifest) };
+      return { lines: list(manifest, store) };
     case 'load': {
       if (!arg) return { lines: [line('usage: load <module>   (try `list`)', 'warn')] };
       const mod = getModule(arg);
@@ -68,7 +81,7 @@ export function runCommand(input, manifest) {
     }
     case 'exit':
     case 'back':
-      return { lines: [line('not in a module. try `list`.', 'sys')] };
+      return { lines: [line('not in a room. try `list`.', 'sys')] };
     default:
       return { lines: [line(`command not found: ${cmd}   (try \`help\`)`, 'err')] };
   }

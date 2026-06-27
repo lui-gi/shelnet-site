@@ -1,68 +1,123 @@
 // src/config/moduleRegistry.js
-// Single source of truth for the interactive modules terminal: the two learning
-// tracks plus the foundations track (the old visualizations). Engine code under
-// components/terminal consumes this. Adding a module of an existing kind is a data
-// edit here; a new mechanic is a new runner under components/terminal/kinds.
+// Single source of truth for the interactive modules catalog: skill-domain
+// categories plus the module list. Each category has an accent; each module is
+// `live` (carries a GUI room: a stageKind + a lazily imported data object) or
+// `soon` (a stub that appears in `list` and advertises intended breadth).
+// Foundations also surfaces the old static visualizations as inert "primers".
+//
+// Adding a room of an existing stage kind is a data edit here plus one module
+// file under config/modules/; a genuinely new mechanic is one new stage kind
+// under components/room/stages/. The taxonomy is by skill domain (no red/blue
+// framing) per the GUI-rooms plan.
 import { getVisualizations } from '../utils/manifestService';
 
-export const TRACKS = [
-  { id: 'blue',        label: 'Blue Team',      accent: 'blue'   },
-  { id: 'red',         label: 'CTF / Red Team', accent: 'red'    },
-  { id: 'foundations', label: 'Foundations',    accent: 'purple' }, // old visualizations
+// Ordered skill domains. `accent` indexes ACCENTS (config/theme.js); a room
+// tints its chrome with its category's accent.
+export const CATEGORIES = [
+  { id: 'foundations',       label: 'Foundations',                accent: 'purple' },
+  { id: 'reconnaissance',    label: 'Reconnaissance',             accent: 'cyan'   },
+  { id: 'web',               label: 'Web',                        accent: 'amber'  },
+  { id: 'post-exploitation', label: 'Post-Exploitation',          accent: 'red'    },
+  { id: 'detection',         label: 'Detection & Threat Hunting', accent: 'blue'   },
+  { id: 'incident-response', label: 'Incident Response',          accent: 'green'  },
+  { id: 'exploit-development', label: 'Exploit Development',       accent: 'orange' },
 ];
 
-// status 'live' modules carry a kind + lazy load(); 'soon' modules are stubs that
-// appear in `list` and load to a teaser.
+const CATEGORY_BY_ID = Object.fromEntries(CATEGORIES.map((c) => [c.id, c]));
+
+/** The accent token for a category id (falls back to green). */
+export function accentForCategory(categoryId) {
+  return (CATEGORY_BY_ID[categoryId] || {}).accent || 'green';
+}
+
+// status:'live' modules carry a stageKind + lazy load() returning a room data
+// object ({ stageConfig, ceremony, sections }); 'soon' modules are stubs.
+// difficulty: 'intro' | 'core' | 'advanced'. Order within a category is array order.
 export const MODULES = [
-  // live
-  { slug: 'splunk-queries', name: 'Splunk Queries', track: 'blue',
-    kind: 'guided-walkthrough', accent: 'blue', status: 'live',
+  // ── Foundations (purple) ─ new cross-cutting beginner rooms (soon); the old
+  // visualizations are injected as primers by getCategoryListing(). ───────────
+  { slug: 'linux-cli', name: 'Linux CLI', category: 'foundations', difficulty: 'intro', status: 'soon',
+    blurb: 'Move around a shell like you live there.' },
+  { slug: 'networking', name: 'Networking', category: 'foundations', difficulty: 'intro', status: 'soon',
+    blurb: 'Packets, ports, and how hosts talk.' },
+  { slug: 'how-the-web-works', name: 'How the Web Works', category: 'foundations', difficulty: 'intro', status: 'soon',
+    blurb: 'Requests, responses, and what sits between.' },
+  { slug: 'reading-logs', name: 'Reading Logs', category: 'foundations', difficulty: 'intro', status: 'soon',
+    blurb: 'Turn raw log noise into a timeline.' },
+
+  // ── Reconnaissance (cyan) ───────────────────────────────────────────────────
+  { slug: 'active-reconnaissance', name: 'Active Reconnaissance', category: 'reconnaissance', difficulty: 'core', status: 'soon',
+    blurb: 'Map a target you are allowed to touch.' },
+  { slug: 'enumeration', name: 'Enumeration', category: 'reconnaissance', difficulty: 'core',
+    stageKind: 'shell', status: 'live',
+    blurb: 'Catalogue services, users, and shares.',
+    load: () => import('./modules/enumeration.js') },
+
+  // ── Web (amber) ─ advertised now via soon stubs ─────────────────────────────
+  { slug: 'web-recon', name: 'Web Recon', category: 'web', difficulty: 'core', status: 'soon',
+    blurb: 'Fingerprint a web app before you touch it.' },
+  { slug: 'injection-basics', name: 'Injection Basics', category: 'web', difficulty: 'core', status: 'soon',
+    blurb: 'Where untrusted input becomes code.' },
+
+  // ── Post-Exploitation (red) ─ "after you are in" ────────────────────────────
+  { slug: 'privilege-escalation', name: 'Privilege Escalation', category: 'post-exploitation', difficulty: 'advanced', status: 'soon',
+    blurb: 'Turn a foothold into root.' },
+  { slug: 'post-exploitation', name: 'Post-Exploitation', category: 'post-exploitation', difficulty: 'advanced', status: 'soon',
+    blurb: 'Persist, collect, and stage exfil.' },
+  { slug: 'lateral-movement', name: 'Lateral Movement', category: 'post-exploitation', difficulty: 'advanced', status: 'soon',
+    blurb: 'Move host to host with found credentials.' },
+
+  // ── Detection & Threat Hunting (blue) ───────────────────────────────────────
+  { slug: 'splunk-queries', name: 'Splunk Queries', category: 'detection', difficulty: 'core',
+    stageKind: 'search', status: 'live',
     blurb: 'Write SPL to triage auth logs.',
     load: () => import('./modules/splunk-queries.js') },
-
-  // blue team (soon)
-  { slug: 'incident-response', name: 'Incident Response', track: 'blue', status: 'soon',
-    blurb: 'Run the IR lifecycle on a live alert.' },
-  { slug: 'threat-hunting', name: 'Threat Hunting', track: 'blue', status: 'soon',
-    blurb: 'Hunt for adversary behavior across telemetry.' },
-  { slug: 'log-analysis', name: 'Log Analysis & Threat Intel', track: 'blue', status: 'soon',
-    blurb: 'Correlate logs with threat intel.' },
-  { slug: 'edr-navigation', name: 'EDR Navigation', track: 'blue', status: 'soon',
-    blurb: 'Pivot through an EDR console on a detection.' },
-  { slug: 'crowdstrike-queries', name: 'CrowdStrike Query Languages', track: 'blue', status: 'soon',
+  { slug: 'crowdstrike-queries', name: 'CrowdStrike Query Languages', category: 'detection', difficulty: 'core', status: 'soon',
     blurb: 'Query endpoints with CQL and event search.' },
-  { slug: 'security-dashboards', name: 'Building Security Dashboards', track: 'blue', status: 'soon',
+  { slug: 'log-analysis', name: 'Log Analysis & Threat Intel', category: 'detection', difficulty: 'core', status: 'soon',
+    blurb: 'Correlate logs with threat intel.' },
+  { slug: 'threat-hunting', name: 'Threat Hunting', category: 'detection', difficulty: 'advanced', status: 'soon',
+    blurb: 'Hunt for adversary behavior across telemetry.' },
+  { slug: 'security-dashboards', name: 'Building Security Dashboards', category: 'detection', difficulty: 'core', status: 'soon',
     blurb: 'Assemble panels that surface real signal.' },
+  { slug: 'edr-navigation', name: 'EDR Navigation', category: 'detection', difficulty: 'core', status: 'soon',
+    blurb: 'Pivot through an EDR console on a detection.' },
 
-  // red team (soon)
-  { slug: 'active-recon', name: 'Active Reconnaissance', track: 'red', status: 'soon',
-    blurb: 'Map a target you are allowed to touch.' },
-  { slug: 'enumeration', name: 'Enumeration', track: 'red', status: 'soon',
-    blurb: 'Catalogue services, users, and shares.' },
-  { slug: 'privilege-escalation', name: 'Privilege Escalation', track: 'red', status: 'soon',
-    blurb: 'Turn a foothold into root.' },
-  { slug: 'post-exploitation', name: 'Post-Exploitation', track: 'red', status: 'soon',
-    blurb: 'Persist, collect, and stage exfil.' },
-  { slug: 'exploit-development', name: 'Exploit Development', track: 'red', status: 'soon',
+  // ── Incident Response (green) ───────────────────────────────────────────────
+  { slug: 'incident-response', name: 'Incident Response', category: 'incident-response', difficulty: 'advanced', status: 'soon',
+    blurb: 'Run the IR lifecycle on a live alert.' },
+
+  // ── Exploit Development (orange) ────────────────────────────────────────────
+  { slug: 'exploit-development', name: 'Exploit Development', category: 'exploit-development', difficulty: 'advanced', status: 'soon',
     blurb: 'Craft a working exploit from a crash.' },
-  { slug: 'lateral-movement', name: 'Lateral Movement', track: 'red', status: 'soon',
-    blurb: 'Move host to host with found credentials.' },
 ];
 
-/** A registry module by slug, or null. (Does not include foundations.) */
+/** A registry module by slug, or null. (Does not include foundation primers.) */
 export function getModule(slug) {
   return MODULES.find((m) => m.slug === slug) || null;
 }
 
-/** Built-in tracks with their modules; foundations populated from the manifest. */
-export function getTrackListing(manifest) {
-  const foundations = getVisualizations(manifest).map((v) => ({
-    slug: v.id, name: v.title, track: 'foundations', status: 'foundation', file: v.file,
+/** Just the live (room-carrying) modules. */
+export function getLiveModules() {
+  return MODULES.filter((m) => m.status === 'live');
+}
+
+/**
+ * Categories with their ordered modules, each tagged with its category accent.
+ * Foundations additionally lists the manifest visualizations as `primer` items
+ * (inert reading reached through the existing visualizations viewer).
+ */
+export function getCategoryListing(manifest) {
+  const primers = getVisualizations(manifest).map((v) => ({
+    slug: v.id, name: v.title, category: 'foundations', status: 'primer', file: v.file,
   }));
-  return TRACKS.map((t) => ({
-    ...t,
-    modules: t.id === 'foundations' ? foundations : MODULES.filter((m) => m.track === t.id),
-  }));
+  return CATEGORIES.map((c) => {
+    const mods = MODULES.filter((m) => m.category === c.id).map((m) => ({ ...m, accent: c.accent }));
+    return {
+      ...c,
+      modules: c.id === 'foundations' ? [...mods, ...primers] : mods,
+    };
+  });
 }
 
 /** A foundation (old visualization) item by id, or null. Manifest-derived. */

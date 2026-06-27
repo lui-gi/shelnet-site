@@ -86,13 +86,22 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: '~' },
     ];
   }
-  // Modules terminal.
+  // Modules lobby terminal.
   if (pathname === '/resources/modules') {
     return [
       { keys: 'type', label: 'command' },
       { keys: '↵', label: 'run' },
       { keys: '↑↓', label: 'history' },
       { keys: 'esc', label: '~' },
+    ];
+  }
+  // Module room (lesson + lab stage).
+  if (/^\/resources\/modules\/[^/]+\/?$/.test(pathname)) {
+    return [
+      { keys: '↑↓', label: 'section' },
+      { keys: 'h', label: 'hint' },
+      { keys: '`', label: 'terminal' },
+      { keys: 'esc', label: 'exit' },
     ];
   }
   // Any fallback.

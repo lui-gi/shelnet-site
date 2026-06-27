@@ -32,6 +32,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/resources" element={<ResourceTUI />} />
           <Route path="/resources/visualizations" element={<Visualizations />} />
           <Route path="/resources/modules" element={<Modules />} />
+          <Route path="/resources/modules/:slug" element={<Modules />} />
           <Route path="/resources/labs" element={<Labs />} />
           <Route path="/resources/notes" element={<Notes />} />
           <Route path="/resources/certs" element={<Certs />} />

@@ -10,6 +10,7 @@ import { useManifest } from '../../utils/useManifest';
 import { getCerts, getVisualizations } from '../../utils/manifestService';
 import { COMING_LABS } from '../../config/labsShowcase';
 import { MODULES } from '../../config/moduleRegistry';
+import { useModuleCounts } from '../../utils/moduleProgress';
 import { ACCENTS, SHELL } from '../../config/theme';
 
 const GREEN = SHELL.green;
@@ -73,13 +74,13 @@ const ErrorRow = ({ prefix }) => (
 );
 
 // Ordered directory model from the manifest + local config.
-function buildDirs(manifest, loading, error) {
+function buildDirs(manifest, loading, error, mods) {
   const certs = getCerts(manifest).filter((c) => !c.locked);
   const viz = getVisualizations(manifest);
   const dyn = (rows, mapFn) => (error ? [{ error: true }] : rows.map(mapFn));
   const countMeta = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
-  const liveModules = MODULES.filter((m) => m.status === 'live');
   const soonCount = MODULES.filter((m) => m.status === 'soon').length;
+  const done = mods.complete == null ? '-' : mods.complete;
 
   return [
     {
@@ -89,7 +90,7 @@ function buildDirs(manifest, loading, error) {
     },
     {
       key: 'modules', label: 'modules/', to: '/resources/modules', accent: 'green',
-      meta: `${liveModules.length} live · ${soonCount} soon`,
+      meta: `${done}/${mods.total} rooms · ${soonCount} soon`,
       leaves: [],
     },
     {
@@ -112,8 +113,9 @@ function buildDirs(manifest, loading, error) {
 const ResourceTUI = () => {
   const navigate = useNavigate();
   const { manifest, loading, error } = useManifest();
+  const mods = useModuleCounts();
 
-  const dirs = buildDirs(manifest, loading, error);
+  const dirs = buildDirs(manifest, loading, error, mods);
 
   // Flat, render-ordered list of focusable nodes: each dir then its openable leaves.
   const flat = [];

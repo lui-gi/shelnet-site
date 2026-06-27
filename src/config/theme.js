@@ -8,8 +8,9 @@ export const ACCENTS = {
   red:    { hex: '#fb7185', name: 'red'    }, // A+
   blue:   { hex: '#38bdf8', name: 'blue'   }, // Security+
   purple: { hex: '#c084fc', name: 'purple' }, // Visualizations
-  orange: { hex: '#fb923c', name: 'orange' }, // Labs
-  cyan:   { hex: '#22d3ee', name: 'cyan'   }, // CySA+
+  orange: { hex: '#fb923c', name: 'orange' }, // Labs / Exploit Dev
+  cyan:   { hex: '#22d3ee', name: 'cyan'   }, // CySA+ / Reconnaissance
+  amber:  { hex: '#fbbf24', name: 'amber'  }, // Web
   slate:  { hex: '#cbd5e1', name: 'slate'  }, // Notes
 };
 

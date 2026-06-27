@@ -116,6 +116,21 @@ export const themeColors = {
     iconBorder: 'border-cyan-500/50',
   },
 
+  amber: {
+    bgActive: 'bg-amber-500/10',
+    bgHover: 'bg-white/[0.05]',
+    border: 'border-white/10',
+    borderActive: 'border-amber-500',
+    borderHover: 'border-white/30',
+    hoverBorder: 'hover:border-amber-500',
+    text: 'text-amber-400',
+    textMuted: 'text-amber-400/80',
+    textHover: 'hover:text-amber-400',
+    pulse: 'bg-amber-400',
+    iconBg: 'bg-amber-500/20',
+    iconBorder: 'border-amber-500/50',
+  },
+
   green: {
     bgActive: 'bg-emerald-500/10',
     bgHover: 'bg-white/[0.05]',
