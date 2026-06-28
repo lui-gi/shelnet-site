@@ -73,8 +73,9 @@ function cacheManifest(manifest) {
 
 // Per-resource-type display metadata for cert dashboards.
 const TYPE_META = {
-  pbqs: { label: 'pbqs/', prefix: 'PBQ_0' },
-  exams: { label: 'exams/', prefix: 'EXAM_0' },
+  pbqs:    { label: 'pbqs/',    prefix: 'PBQ_0' },
+  exams:   { label: 'exams/',   prefix: 'EXAM_0' },
+  quizzes: { label: 'quizzes/', prefix: 'QUIZ_0' },
 };
 
 function toItem(base, segments, resource) {
@@ -93,6 +94,7 @@ export function getCerts(manifest) {
     const res = c.resources || {};
     const pbqs = Array.isArray(res.pbqs) ? res.pbqs : [];
     const exams = Array.isArray(res.exams) ? res.exams : [];
+    const quizzes = Array.isArray(res.quizzes) ? res.quizzes : [];
     return {
       slug,
       label: c.label,
@@ -100,9 +102,10 @@ export function getCerts(manifest) {
       accent: c.accent || 'green',
       blurb: c.blurb || '',
       locked: !!c.locked,
-      count: pbqs.length + exams.length,
+      count: pbqs.length + exams.length + quizzes.length,
       pbqTitles: pbqs.map((r) => r.title),
       examTitles: exams.map((r) => r.title),
+      quizTitles: quizzes.map((r) => r.title),
     };
   });
 }
@@ -113,7 +116,7 @@ export function getCert(manifest, slug) {
   if (!cert) return null;
   const base = resourceBaseUrl();
   const res = cert.resources || {};
-  const groups = ['pbqs', 'exams']
+  const groups = ['pbqs', 'exams', 'quizzes']
     .filter((type) => Array.isArray(res[type]) && res[type].length > 0)
     .map((type) => ({
       type,

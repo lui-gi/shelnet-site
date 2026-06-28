@@ -61,6 +61,7 @@ const Certs = () => {
       else if (e.key === 'Enter' && selected) { e.preventDefault(); openDash(selected.slug); }
       else if (e.key === 'p' && selected) { e.preventDefault(); openDash(selected.slug, 'pbqs'); }
       else if (e.key === 'e' && selected) { e.preventDefault(); openDash(selected.slug, 'exams'); }
+      else if (e.key === 'q' && selected) { e.preventDefault(); openDash(selected.slug, 'quizzes'); }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -91,7 +92,7 @@ const Certs = () => {
           <span style={{ color: SHELL.dim }}>guest@shelnet</span>:<span style={{ color: GREEN }}>~</span>$ cd resources/certs
         </div>
         <div className="flex items-baseline justify-between text-white/40 mb-3">
-          <span>certs/: pick a track, jump to PBQs &amp; mock exams</span>
+          <span>certs/: pick a track, jump to PBQs, quizzes &amp; mock exams</span>
           <span className="text-white/30">{open.length} track{open.length === 1 ? '' : 's'}</span>
         </div>
 
@@ -130,6 +131,9 @@ const Certs = () => {
                   {c.blurb && <div className="text-white/70">{c.blurb}</div>}
                   <div className="text-white/55">pbqs <span style={{ color: GREEN }}>▸</span> {topicLine(c.pbqTitles)}</div>
                   <div className="text-white/55">exams <span style={{ color: GREEN }}>▸</span> {topicLine(c.examTitles)}</div>
+                  {c.quizTitles && c.quizTitles.length > 0 && (
+                    <div className="text-white/55">quizzes <span style={{ color: GREEN }}>▸</span> {topicLine(c.quizTitles)}</div>
+                  )}
                 </Panel>
               </button>
             );
@@ -144,6 +148,9 @@ const Certs = () => {
               <button type="button" onClick={() => openDash(selected.slug)} className="hover:text-white"><span style={{ color: GREEN }}>↵</span> dashboard</button>
               <button type="button" onClick={() => openDash(selected.slug, 'pbqs')} className="hover:text-white"><span style={{ color: GREEN }}>p</span> pbqs</button>
               <button type="button" onClick={() => openDash(selected.slug, 'exams')} className="hover:text-white"><span style={{ color: GREEN }}>e</span> mock exam</button>
+              {selected.quizTitles && selected.quizTitles.length > 0 && (
+                <button type="button" onClick={() => openDash(selected.slug, 'quizzes')} className="hover:text-white"><span style={{ color: GREEN }}>q</span> quizzes</button>
+              )}
             </div>
           </div>
         )}

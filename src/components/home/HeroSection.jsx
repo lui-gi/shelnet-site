@@ -36,8 +36,8 @@ const Mark = ({ inner }) => (
 
 // Boot/mount log as an array of nodes. `narrow` trims leaders + uname for phones.
 function buildLines(counts, mods, narrow) {
-  const sims = (counts.pbqs == null && counts.exams == null)
-    ? null : (counts.pbqs || 0) + (counts.exams || 0);
+  const sims = (counts.pbqs == null && counts.exams == null && counts.quizzes == null)
+    ? null : (counts.pbqs || 0) + (counts.exams || 0) + (counts.quizzes || 0);
   if (narrow) {
     return [
       <><Mark inner=" 0.00 " /> booting userland{'…'}</>,
