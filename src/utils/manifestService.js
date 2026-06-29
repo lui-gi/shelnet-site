@@ -72,10 +72,12 @@ function cacheManifest(manifest) {
 }
 
 // Per-resource-type display metadata for cert dashboards.
+// `urlSegment` is the on-disk folder name in shelnet-resources; quizzes live
+// alongside the full exam under `exams/`, not in their own `quizzes/` folder.
 const TYPE_META = {
-  pbqs:    { label: 'pbqs/',    prefix: 'PBQ_0' },
-  exams:   { label: 'exams/',   prefix: 'EXAM_0' },
-  quizzes: { label: 'quizzes/', prefix: 'QUIZ_0' },
+  pbqs:    { label: 'pbqs/',    prefix: 'PBQ_0',  urlSegment: 'pbqs' },
+  exams:   { label: 'exams/',   prefix: 'EXAM_0', urlSegment: 'exams' },
+  quizzes: { label: 'quizzes/', prefix: 'QUIZ_0', urlSegment: 'exams' },
 };
 
 function toItem(base, segments, resource) {
@@ -122,7 +124,7 @@ export function getCert(manifest, slug) {
       type,
       label: TYPE_META[type].label,
       prefix: TYPE_META[type].prefix,
-      items: res[type].map((r) => toItem(base, ['certs', slug, type], r)),
+      items: res[type].map((r) => toItem(base, ['certs', slug, TYPE_META[type].urlSegment], r)),
     }));
   return { slug, label: cert.label, code: cert.code, accent: cert.accent, groups };
 }
