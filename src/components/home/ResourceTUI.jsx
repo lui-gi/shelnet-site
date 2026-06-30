@@ -1,8 +1,8 @@
 // src/components/home/ResourceTUI.jsx
-// The ~/resources hub rendered as a `tree`: the five category dirs each expanded
-// to their children (certs/viz from the manifest, planned labs shown dim, notes
-// as a live external vault). Clickable leaves open the resource directly; dirs
-// open their page. Keyboard-navigable (↑↓ ↵/→ 1-5 esc); one render for all widths.
+// The ~/resources hub rendered as a `tree`: the four category dirs each expanded
+// to their children (certs/viz from the manifest, planned labs shown dim).
+// Clickable leaves open the resource directly; dirs open their page.
+// Keyboard-navigable (↑↓ ↵/→ 1-5 esc); one render for all widths.
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TerminalShell from '../tui/TerminalShell';
@@ -103,10 +103,6 @@ function buildDirs(manifest, loading, error, mods) {
       meta: loading && !viz.length ? '…' : countMeta(viz.length, 'module'),
       leaves: dyn(viz, (v) => ({ label: v.title, to: `/resources/visualizations?m=${v.id}` })),
     },
-    {
-      key: 'notes', label: 'notes/', to: '/resources/notes', accent: 'slate',
-      meta: null, live: true, leaves: [],
-    },
   ];
 }
 
@@ -183,9 +179,7 @@ const ResourceTUI = () => {
                 bold
                 labelHex={accentHex(d.accent)}
                 label={d.label}
-                meta={d.live
-                  ? (<><span style={{ color: GREEN }}>● LIVE</span> <span className="text-white/40">Obsidian vault ↗</span></>)
-                  : d.meta}
+                meta={d.meta}
                 onOpen={() => { selectTo(d.to); open(d.to); }}
                 onHover={() => selectTo(d.to)}
               />
