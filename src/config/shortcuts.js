@@ -29,15 +29,6 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: '~' },
     ];
   }
-  // Notes reader.
-  if (pathname === '/resources/notes') {
-    return [
-      { keys: '↵', label: 'focus' },
-      { keys: 'o', label: 'open' },
-      { keys: 'f', label: 'full' },
-      { keys: 'esc', label: 'back' },
-    ];
-  }
   // Labs WIP.
   if (pathname === '/resources/labs') {
     return [
@@ -79,11 +70,27 @@ export function shortcutsForPath(pathname) {
       { keys: 'esc', label: '~' },
     ];
   }
-  // Wiki WIP.
+  // Wiki home.
   if (pathname === '/wiki') {
     return [
-      { keys: '↵', label: 'notify' },
+      { keys: '↑↓', label: 'select' },
+      { keys: '/', label: 'search' },
+      { keys: 'g', label: 'graph' },
       { keys: 'esc', label: '~' },
+    ];
+  }
+  // Wiki graph.
+  if (pathname === '/wiki/graph') {
+    return [
+      { keys: 'esc', label: 'back' },
+    ];
+  }
+  // Wiki entry.
+  if (/^\/wiki\/[^/]+/.test(pathname)) {
+    return [
+      { keys: '/', label: 'search' },
+      { keys: 'g', label: 'graph' },
+      { keys: 'esc', label: 'up' },
     ];
   }
   // Modules lobby terminal.

@@ -1,8 +1,8 @@
 // src/pages/wiki-entry.jsx
 // Viewer route for /wiki/:section/* — resolves the full path to an entry,
 // hands it to WikiViewer, and renders the standard WikiShell with sidebar.
-import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import WikiShell from '../components/wiki/WikiShell';
 import WikiSidebar from '../components/wiki/WikiSidebar';
 import WikiViewer from '../components/wiki/WikiViewer';
@@ -17,9 +17,25 @@ const WikiEntry = () => {
   const rest = params['*'] || '';
   const path = rest ? `${params.section}/${rest}` : params.section;
 
+  const navigate = useNavigate();
   const { manifest, loading, error } = useWikiManifest();
   const [searchOpen, setSearchOpen] = useState(false);
   useWikiSearchTrigger(setSearchOpen);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'g') { e.preventDefault(); navigate('/wiki/graph'); }
+      else if (e.key === 'Escape') {
+        e.preventDefault();
+        // entry: go up one path segment; home: go to /
+        navigate('/wiki' === window.location.pathname ? '/' : '/wiki');
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [navigate]);
 
   const sidebar = (
     <WikiSidebar

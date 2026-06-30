@@ -1,8 +1,8 @@
 // src/pages/wiki-home.jsx
 // Landing page for /wiki. Shows recent entries, suggested topics, and
 // per-section counts inside the standard WikiShell layout.
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import WikiShell from '../components/wiki/WikiShell';
 import WikiSidebar from '../components/wiki/WikiSidebar';
 import WikiSearch from '../components/wiki/WikiSearch';
@@ -26,9 +26,25 @@ const EntryList = ({ entries }) => (
 );
 
 const WikiHome = () => {
+  const navigate = useNavigate();
   const { manifest, loading, error } = useWikiManifest();
   const [searchOpen, setSearchOpen] = useState(false);
   useWikiSearchTrigger(setSearchOpen);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'g') { e.preventDefault(); navigate('/wiki/graph'); }
+      else if (e.key === 'Escape') {
+        e.preventDefault();
+        // entry: go up one path segment; home: go to /
+        navigate('/wiki' === window.location.pathname ? '/' : '/wiki');
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [navigate]);
 
   const sidebar = <WikiSidebar manifest={manifest} currentPath={null} onOpenSearch={() => setSearchOpen(true)} />;
 

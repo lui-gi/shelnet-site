@@ -6,10 +6,11 @@ import App from './App.jsx'
 import CertDashboard from './pages/cert-dashboard.jsx'
 import Visualizations from './pages/visualizations.jsx'
 import Labs from './pages/labs.jsx'
-import Notes from './pages/notes.jsx'
 import Certs from './pages/certs.jsx'
 import ResourceTUI from './components/home/ResourceTUI.jsx'
 import Wiki from './pages/wiki.jsx'
+import WikiEntry from './pages/wiki-entry.jsx'
+import WikiGraph from './pages/wiki-graph.jsx'
 import ConnectSection from './components/home/ConnectSection.jsx'
 import Bytes from './pages/bytes.jsx'
 import BytesQuiz from './pages/bytes-quiz.jsx'
@@ -23,6 +24,8 @@ createRoot(document.getElementById('root')).render(
         <Route element={<Layout />}>
           <Route path="/" element={<App />} />
           <Route path="/wiki" element={<Wiki />} />
+          <Route path="/wiki/graph" element={<WikiGraph />} />
+          <Route path="/wiki/:section/*" element={<WikiEntry />} />
           <Route path="/connect" element={<ConnectSection />} />
           {/* bytes: rapid-fire practice (top-level, parallel to /resources) */}
           <Route path="/bytes" element={<Bytes />} />
@@ -34,7 +37,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/resources/modules" element={<Modules />} />
           <Route path="/resources/modules/:slug" element={<Modules />} />
           <Route path="/resources/labs" element={<Labs />} />
-          <Route path="/resources/notes" element={<Notes />} />
+          <Route path="/resources/notes" element={<Navigate to="/wiki" replace />} />
           <Route path="/resources/certs" element={<Certs />} />
           <Route path="/resources/certs/:cert" element={<CertDashboard />} />
 
