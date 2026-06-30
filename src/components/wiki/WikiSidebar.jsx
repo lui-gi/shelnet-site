@@ -7,23 +7,24 @@ import { Link } from 'react-router-dom';
 import { buildSidebarTree } from './sidebarTree';
 import { WIKI_ACCENT } from '../../config/wikiConfig';
 
-const Branch = ({ node, currentPath, depth = 0 }) => {
+const EntryLeaf = ({ node, currentPath, depth }) => {
+  const active = currentPath === node.path;
+  return (
+    <Link
+      to={`/wiki/${node.path}`}
+      className={active ? 'block truncate' : 'block truncate text-white/55 hover:text-white'}
+      style={{
+        paddingLeft: `${depth + 2}ch`,
+        ...(active ? { color: WIKI_ACCENT } : null),
+      }}
+    >
+      {active ? '• ' : '  '}{node.name}
+    </Link>
+  );
+};
+
+const DirBranch = ({ node, currentPath, depth }) => {
   const [open, setOpen] = useState(true);
-  if (node.type === 'entry') {
-    const active = currentPath === node.path;
-    return (
-      <Link
-        to={`/wiki/${node.path}`}
-        className={`block truncate hover:text-white ${active ? '' : 'text-white/55'}`}
-        style={active
-          ? { paddingLeft: `${depth + 2}ch`, color: WIKI_ACCENT }
-          : { paddingLeft: `${depth + 2}ch` }}
-      >
-        {active ? '• ' : '  '}{node.name}
-      </Link>
-    );
-  }
-  // dir
   return (
     <div>
       <button
@@ -41,8 +42,13 @@ const Branch = ({ node, currentPath, depth = 0 }) => {
   );
 };
 
+const Branch = ({ node, currentPath, depth = 0 }) =>
+  node.type === 'entry'
+    ? <EntryLeaf node={node} currentPath={currentPath} depth={depth} />
+    : <DirBranch node={node} currentPath={currentPath} depth={depth} />;
+
 const WikiSidebar = ({ manifest, currentPath, onOpenSearch }) => {
-  const tree = useMemo(() => buildSidebarTree(manifest?.entries || []), [manifest]);
+  const tree = useMemo(() => buildSidebarTree(manifest?.entries || []), [manifest?.entries]);
   return (
     <div className="text-xs font-mono leading-relaxed">
       <div className="mb-2 text-white/40">~/wiki</div>
