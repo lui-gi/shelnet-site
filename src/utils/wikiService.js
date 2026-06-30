@@ -63,3 +63,35 @@ export const getRecent = (m, n = 10) =>
 
 export const getSuggested = (m) =>
   (m?.suggested || []).map((slug) => getEntryBySlug(m, slug)).filter(Boolean);
+
+export const getMostRecentInSection = (m, section, n = 3) =>
+  (m?.entries || [])
+    .filter((e) => e.section === section)
+    .slice()
+    .sort((a, b) => (a.updated < b.updated ? 1 : a.updated > b.updated ? -1 : 0))
+    .slice(0, n);
+
+export const getLastEditedDate = (m) => {
+  const entries = m?.entries || [];
+  if (entries.length === 0) return '';
+  let max = entries[0].updated || '';
+  for (const e of entries) if ((e.updated || '') > max) max = e.updated;
+  return max;
+};
+
+export const getTagCounts = (m) => {
+  const counts = new Map();
+  for (const e of m?.entries || []) {
+    for (const t of e.tags || []) {
+      const k = t.toLowerCase();
+      counts.set(k, (counts.get(k) || 0) + 1);
+    }
+  }
+  return counts;
+};
+
+export const getTopTags = (m, n = 12) => {
+  const arr = Array.from(getTagCounts(m).entries()).map(([tag, count]) => ({ tag, count }));
+  arr.sort((a, b) => (b.count - a.count) || a.tag.localeCompare(b.tag));
+  return arr.slice(0, n);
+};
