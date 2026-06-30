@@ -1,9 +1,12 @@
 // src/pages/wiki-home.jsx
 // Landing page for /wiki. Shows recent entries, suggested topics, and
 // per-section counts inside the standard WikiShell layout.
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import WikiShell from '../components/wiki/WikiShell';
 import WikiSidebar from '../components/wiki/WikiSidebar';
+import WikiSearch from '../components/wiki/WikiSearch';
+import { useWikiSearchTrigger } from '../components/wiki/useWikiSearchTrigger';
 import { Panel } from '../components/tui/ascii';
 import { useWikiManifest } from '../utils/useWikiManifest';
 import { getRecent, getSuggested, getEntriesBySection } from '../utils/wikiService';
@@ -24,14 +27,26 @@ const EntryList = ({ entries }) => (
 
 const WikiHome = () => {
   const { manifest, loading, error } = useWikiManifest();
+  const [searchOpen, setSearchOpen] = useState(false);
+  useWikiSearchTrigger(setSearchOpen);
 
-  const sidebar = <WikiSidebar manifest={manifest} currentPath={null} onOpenSearch={() => {}} />;
+  const sidebar = <WikiSidebar manifest={manifest} currentPath={null} onOpenSearch={() => setSearchOpen(true)} />;
 
   if (loading) {
-    return <WikiShell sidebar={sidebar}><div className="py-6 text-white/40 text-xs">loading wiki manifest...</div></WikiShell>;
+    return (
+      <WikiShell sidebar={sidebar}>
+        <div className="py-6 text-white/40 text-xs">loading wiki manifest...</div>
+        <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+      </WikiShell>
+    );
   }
   if (error) {
-    return <WikiShell sidebar={sidebar}><div className="py-6 text-white/60 text-xs">! failed to load wiki manifest</div></WikiShell>;
+    return (
+      <WikiShell sidebar={sidebar}>
+        <div className="py-6 text-white/60 text-xs">! failed to load wiki manifest</div>
+        <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
+      </WikiShell>
+    );
   }
 
   const recent = getRecent(manifest, 10);
@@ -44,6 +59,7 @@ const WikiHome = () => {
 
   return (
     <WikiShell sidebar={sidebar}>
+      <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
       <div className="py-3 space-y-4">
         <Panel hex={WIKI_ACCENT} title={<span style={{ color: WIKI_ACCENT }}>recent</span>}>
           <EntryList entries={recent} />
