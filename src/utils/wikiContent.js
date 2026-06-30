@@ -27,7 +27,8 @@ export async function fetchEntryMarkdown(path) {
     } catch { /* sessionStorage unavailable */ }
     return text;
   } catch (err) {
-    const stale = sessionStorage.getItem(key);
+    let stale = null;
+    try { stale = sessionStorage.getItem(key); } catch { /* sessionStorage unavailable */ }
     if (stale) { console.warn('[WikiContent] using stale md cache for', path); return stale; }
     throw err;
   }
