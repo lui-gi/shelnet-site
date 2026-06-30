@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchSearchIndex } from '../../utils/wikiContent';
 
-const WikiSearch = ({ open, onClose }) => {
+const WikiSearch = ({ open, onClose, initialQuery = '' }) => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
   const [index, setIndex] = useState(null);
@@ -15,8 +15,12 @@ const WikiSearch = ({ open, onClose }) => {
   useEffect(() => {
     if (!open) return;
     inputRef.current?.focus();
+    if (initialQuery) {
+      setQ(initialQuery);
+      setCursor(0);
+    }
     if (!index) fetchSearchIndex().then(setIndex).catch(() => {});
-  }, [open, index]);
+  }, [open, index, initialQuery]);
 
   const hits = useMemo(() => {
     if (!index || !q.trim()) return [];
