@@ -12,7 +12,7 @@ const WikiShell = ({ sidebar, toc, children }) => {
     : 'lg:grid lg:grid-cols-[240px_minmax(0,1fr)]';
 
   return (
-    <main className={`bg-white text-neutral-900 font-sans mt-9 mb-9 min-h-[calc(100dvh-4.5rem)] ${desktopGrid}`}>
+    <main className={`bg-white text-neutral-900 font-sans pt-9 pb-9 min-h-dvh ${desktopGrid}`}>
       {/* Mobile hamburger — only visible <lg */}
       <div className="lg:hidden flex items-center border-b border-neutral-200 px-4 py-2">
         <button
