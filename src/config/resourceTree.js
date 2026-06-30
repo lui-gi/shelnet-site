@@ -21,11 +21,4 @@ export const RESOURCE_TREE = [
     to: '/resources/visualizations', // destination dir
     items: [],
   },
-  {
-    key: 'notes', label: 'notes/', countKey: null,
-    sub: 'Live-synced study notes',
-    items: [
-      { tag: 'LIVE', accent: 'slate', name: 'Obsidian Vault', desc: 'Continuously synced as I study', href: 'https://lui-gi.github.io/shelnet-notes/' },
-    ],
-  },
 ];

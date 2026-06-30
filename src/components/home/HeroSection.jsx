@@ -45,7 +45,7 @@ function buildLines(counts, mods, narrow) {
       <><Mark inner="  OK  " /> <span className="text-white/90">/bytes</span>{'  '}<span className="text-white/55">{fmt(counts.bytes)} qs</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/resrc</span>{' '}<span className="text-white/55">{fmt(counts.viz)} viz {'·'} {fmt(counts.labs)} labs</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/mods</span>{'  '}<span className="text-white/55">{fmt(mods.complete)}/{mods.total} rooms</span></>,
-      <><Mark inner=" WAIT " /> <span className="text-white/90">wiki: work in progress</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">wiki: live</span></>,
     ];
   }
   const dots = (s) => <span className="text-white/20" aria-hidden="true">{s}</span>;
@@ -55,7 +55,7 @@ function buildLines(counts, mods, narrow) {
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/bytes</span> {dots('···········')} <span className="text-white/55">{fmt(counts.bytes)} questions</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/resources</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules {'·'} {fmt(counts.labs)} labs</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/modules</span> {dots('·········')} <span className="text-white/55">{fmt(mods.complete)}/{mods.total} rooms complete</span></>,
-    <><Mark inner=" WAIT " /> wiki: <span className="text-white/90">work in progress</span></>,
+    <><Mark inner="  OK  " /> wiki: <span className="text-white/90">live</span></>,
   ];
 }
 
