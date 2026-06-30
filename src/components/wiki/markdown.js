@@ -36,8 +36,8 @@ export function renderMarkdown(rawMd, { slugMap }) {
   const headings = [];
   for (const tok of marked.lexer(withLinks)) {
     if (tok.type === 'heading' && (tok.depth === 2 || tok.depth === 3)) {
-      const text = tok.text;
-      headings.push({ level: tok.depth, text, id: slugifyHeading(text) });
+      const plain = tok.text.replace(/<[^>]*>/g, '').trim();
+      headings.push({ level: tok.depth, text: plain, id: slugifyHeading(plain) });
     }
   }
   return { html: clean, headings };
