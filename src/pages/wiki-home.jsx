@@ -1,14 +1,15 @@
 // src/pages/wiki-home.jsx
-// Landing page for /wiki — hero search, 3-up section cards with latest-in-
-// section, recently-updated feed. Tag cloud and explore links land in the
-// next slice; this revision already removes the old flat "suggested topics"
-// list.
-import { useState, useEffect } from 'react';
+// Landing page for /wiki — inline hero search (typeahead) with the shared
+// minisearch backend, 3-up section cards with latest-in-section, recently-
+// updated feed, top-12 tag cloud, and explore links. The modal flow stays
+// available via the sidebar and the "advanced search" explore link.
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import WikiShell from '../components/wiki/WikiShell';
 import WikiSidebar from '../components/wiki/WikiSidebar';
 import WikiSearch from '../components/wiki/WikiSearch';
-import { useWikiSearchTrigger } from '../components/wiki/useWikiSearchTrigger';
+import WikiSearchHits from '../components/wiki/WikiSearchHits';
+import { useWikiSearchEngine } from '../components/wiki/useWikiSearchEngine';
 import { useWikiManifest } from '../utils/useWikiManifest';
 import {
   getRecent,
@@ -44,19 +45,49 @@ const HomeHero = ({ entryCount, lastEditedLabel }) => (
   </header>
 );
 
-const HeroSearch = ({ onOpen }) => (
-  <div className="flex justify-center mb-3">
-    <button
-      type="button"
-      onClick={onOpen}
-      aria-label="Open wiki search"
-      className="w-full max-w-xl border border-neutral-300 rounded-lg px-4 py-3 text-base text-neutral-400 bg-white shadow-sm flex items-center justify-between hover:border-neutral-400"
-    >
-      <span><span className="mr-2 text-lg">⌕</span>Search entries, tags, or full text...</span>
-      <kbd className="text-xs text-neutral-500 border border-neutral-200 rounded px-1.5 py-0.5 bg-neutral-50">/</kbd>
-    </button>
-  </div>
-);
+const InlineHeroSearch = ({ q, onQChange, onKeyDown, inputRef, hits, cursor, onCursorChange, onPick }) => {
+  const showPanel = q.trim().length > 0;
+  return (
+    <div className="relative max-w-xl mx-auto mb-3">
+      <div
+        className={[
+          'flex items-center justify-between bg-white border rounded-lg px-4 py-3 text-base',
+          'focus-within:border-purple-600 focus-within:ring-2 focus-within:ring-purple-200',
+          'shadow-sm',
+          showPanel ? 'border-purple-600' : 'border-neutral-300',
+        ].join(' ')}
+      >
+        <span className="text-lg text-neutral-400 mr-2 select-none">⌕</span>
+        <input
+          ref={inputRef}
+          type="text"
+          value={q}
+          onChange={onQChange}
+          onKeyDown={onKeyDown}
+          aria-label="Search wiki"
+          placeholder="Search entries, tags, or full text..."
+          className="flex-1 bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
+        />
+        <kbd className="ml-2 text-xs text-neutral-500 border border-neutral-200 rounded px-1.5 py-0.5 bg-neutral-50 select-none">/</kbd>
+      </div>
+      {showPanel && (
+        <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-neutral-200 rounded-md shadow-lg z-30 text-sm">
+          <WikiSearchHits
+            hits={hits}
+            cursor={cursor}
+            onCursorChange={onCursorChange}
+            onPick={onPick}
+            emptyText={`no results for "${q}"`}
+            query={q}
+          />
+          <div className="px-3 py-1.5 text-xs text-neutral-400 border-t border-neutral-100 select-none">
+            ↑/↓ navigate · ↵ open · Esc to blur
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const SectionCards = ({ sections }) => (
   <section className="mb-8">
@@ -178,43 +209,79 @@ const ExploreLinks = ({ onOpenSearch }) => (
 const WikiHome = () => {
   const navigate = useNavigate();
   const { manifest, loading, error } = useWikiManifest();
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchSeed, setSearchSeed] = useState('');
-  useWikiSearchTrigger(setSearchOpen);
 
+  // Inline hero search state
+  const inputRef = useRef(null);
+  const [q, setQ] = useState('');
+  const [cursor, setCursor] = useState(0);
+  const { hits } = useWikiSearchEngine(q);
+
+  // Modal still exists for sidebar + advanced-search explore link
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const focusInline = useCallback(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Reset cursor whenever the query changes
+  useEffect(() => { setCursor(0); }, [q]);
+
+  // `/` on /wiki focuses the inline input; `g` goes to graph; `Esc` exits to /.
+  // We intentionally do NOT use `useWikiSearchTrigger` here so the home page can
+  // own the `/` behavior.
   useEffect(() => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      if (e.key === 'g') { e.preventDefault(); navigate('/wiki/graph'); }
-      else if (e.key === 'Escape') {
+      const isTyping = tag === 'INPUT' || tag === 'TEXTAREA';
+      if (e.key === '/' && !isTyping) {
         e.preventDefault();
-        navigate('/wiki' === window.location.pathname ? '/' : '/wiki');
+        focusInline();
+      } else if (e.key === 'g' && !isTyping) {
+        e.preventDefault();
+        navigate('/wiki/graph');
+      } else if (e.key === 'Escape' && !isTyping) {
+        e.preventDefault();
+        navigate(window.location.pathname === '/wiki' ? '/' : '/wiki');
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [navigate]);
+  }, [navigate, focusInline]);
 
-  const openSearch = (seed = '') => {
-    setSearchSeed(seed);
-    setSearchOpen(true);
+  const onInputKey = (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setCursor((c) => Math.min(c + 1, Math.max(hits.length - 1, 0)));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setCursor((c) => Math.max(c - 1, 0));
+    } else if (e.key === 'Enter' && hits[cursor]) {
+      e.preventDefault();
+      navigate(`/wiki/${hits[cursor].path}`);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      inputRef.current?.blur();
+    }
   };
 
-  const closeSearch = () => {
-    setSearchOpen(false);
-    setSearchSeed('');
+  const onPickHit = (h) => navigate(`/wiki/${h.path}`);
+  const onChipPick = (tag) => {
+    setQ(tag);
+    setCursor(0);
+    requestAnimationFrame(() => inputRef.current?.focus());
   };
+
+  const closeSearch = () => setSearchOpen(false);
 
   const sidebar = (
-    <WikiSidebar manifest={manifest} currentPath={null} onOpenSearch={() => openSearch('')} />
+    <WikiSidebar manifest={manifest} currentPath={null} onOpenSearch={() => setSearchOpen(true)} />
   );
 
   if (loading) {
     return (
       <WikiShell sidebar={sidebar} toc={null}>
         <div className="text-neutral-500 text-sm">loading wiki manifest...</div>
-        <WikiSearch open={searchOpen} onClose={closeSearch} initialQuery={searchSeed} />
+        <WikiSearch open={searchOpen} onClose={closeSearch} />
       </WikiShell>
     );
   }
@@ -222,7 +289,7 @@ const WikiHome = () => {
     return (
       <WikiShell sidebar={sidebar} toc={null}>
         <div className="text-neutral-700 text-sm">! failed to load wiki manifest</div>
-        <WikiSearch open={searchOpen} onClose={closeSearch} initialQuery={searchSeed} />
+        <WikiSearch open={searchOpen} onClose={closeSearch} />
       </WikiShell>
     );
   }
@@ -237,22 +304,41 @@ const WikiHome = () => {
     latest: getMostRecentInSection(manifest, key, 3),
   }));
   const topTags = getTopTags(manifest, 12);
-  const suggestedTags = topTags.slice(0, 5);
+  const suggestedTags = useMemo(() => topTags.slice(0, 5), [topTags]);
+
+  const searching = q.trim().length > 0;
 
   return (
     <WikiShell sidebar={sidebar} toc={null}>
-      <WikiSearch open={searchOpen} onClose={closeSearch} initialQuery={searchSeed} />
+      <WikiSearch open={searchOpen} onClose={closeSearch} />
 
       <div className="max-w-3xl mx-auto">
         <HomeHero entryCount={entryCount} lastEditedLabel={lastEditedLabel} />
-        <HeroSearch onOpen={() => openSearch('')} />
-        <SuggestedChips tags={suggestedTags} onPick={openSearch} />
-        <SectionCards sections={sections} />
-        <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8">
-          <RecentlyUpdatedList entries={recent} />
-          <div>
-            <TagCloud tags={topTags} onPick={openSearch} />
-            <ExploreLinks onOpenSearch={() => openSearch('')} />
+        <InlineHeroSearch
+          q={q}
+          onQChange={(e) => setQ(e.target.value)}
+          onKeyDown={onInputKey}
+          inputRef={inputRef}
+          hits={hits}
+          cursor={cursor}
+          onCursorChange={setCursor}
+          onPick={onPickHit}
+        />
+        <SuggestedChips tags={suggestedTags} onPick={onChipPick} />
+        <div
+          aria-hidden={searching ? 'true' : 'false'}
+          className={[
+            'transition-opacity',
+            searching ? 'opacity-40 pointer-events-none' : 'opacity-100',
+          ].join(' ')}
+        >
+          <SectionCards sections={sections} />
+          <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8">
+            <RecentlyUpdatedList entries={recent} />
+            <div>
+              <TagCloud tags={topTags} onPick={onChipPick} />
+              <ExploreLinks onOpenSearch={() => setSearchOpen(true)} />
+            </div>
           </div>
         </div>
       </div>
