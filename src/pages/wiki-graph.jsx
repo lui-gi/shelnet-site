@@ -25,6 +25,8 @@ const WikiGraph = () => {
 
   useEffect(() => {
     const onKey = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       if (e.key === 'Escape') { e.preventDefault(); navigate('/wiki'); }
     };
     window.addEventListener('keydown', onKey);
@@ -51,18 +53,21 @@ const WikiGraph = () => {
           wiki graph · {laid.nodes.length} entries, {laid.edges.length} links · <span style={{ color: WIKI_ACCENT }}>esc</span> back
         </div>
         <svg viewBox={`0 0 ${W} ${H}`} className="flex-1 min-h-0 w-full bg-black">
-          {laid.edges.map((e, i) => {
-            const a = laid.nodes.find((n) => n.id === e.from);
-            const b = laid.nodes.find((n) => n.id === e.to);
-            if (!a || !b) return null;
-            return (
-              <line
-                key={i}
-                x1={a.x} y1={a.y} x2={b.x} y2={b.y}
-                stroke="rgba(192,132,252,0.25)" strokeWidth="1"
-              />
-            );
-          })}
+          {(() => {
+            const byId = new Map(laid.nodes.map((n) => [n.id, n]));
+            return laid.edges.map((e) => {
+              const a = byId.get(e.from);
+              const b = byId.get(e.to);
+              if (!a || !b) return null;
+              return (
+                <line
+                  key={`${e.from}-${e.to}`}
+                  x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+                  stroke="rgba(192,132,252,0.25)" strokeWidth="1"
+                />
+              );
+            });
+          })()}
           {laid.nodes.map((n) => {
             const entry = manifest ? getEntryBySlug(manifest, n.id) : null;
             return (

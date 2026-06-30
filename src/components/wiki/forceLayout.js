@@ -37,6 +37,9 @@ export function layoutGraph({ nodes, edges }, opts = {}) {
     .map((e) => [idIndex.get(e.from), idIndex.get(e.to)])
     .filter(([a, b]) => a !== undefined && b !== undefined);
 
+  const cx = width / 2;
+  const cy = height / 2;
+
   for (let iter = 0; iter < iterations; iter++) {
     // Repulsion between every pair.
     for (let i = 0; i < nodes.length; i++) {
@@ -63,10 +66,7 @@ export function layoutGraph({ nodes, edges }, opts = {}) {
       pos[a].vx += fx; pos[a].vy += fy;
       pos[b].vx -= fx; pos[b].vy -= fy;
     }
-    // Centering nudge.
-    const cx = width / 2;
-    const cy = height / 2;
-    // Integrate with damping.
+    // Centering nudge + integrate with damping.
     for (let i = 0; i < pos.length; i++) {
       pos[i].vx = (pos[i].vx + (cx - pos[i].x) * 0.001) * damping;
       pos[i].vy = (pos[i].vy + (cy - pos[i].y) * 0.001) * damping;
