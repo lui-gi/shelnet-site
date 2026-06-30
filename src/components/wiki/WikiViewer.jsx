@@ -33,15 +33,16 @@ const WikiViewer = ({ entry, manifest, onTocChange }) => {
   const { html, headings } = useMemo(() => {
     if (status !== 'ok') return { html: '', headings: [] };
     const body = fetch.raw.replace(/^---[\s\S]*?\n---\s*\n?/, '');
-    return renderMarkdown(body, { slugMap });
+    const rendered = renderMarkdown(body, { slugMap });
+    // Bake heading ids into the HTML before insertion so anchors and scrollspy
+    // resolve without depending on a post-render DOM-mutation effect.
+    if (typeof DOMParser === 'undefined') return rendered;
+    const doc = new DOMParser().parseFromString(`<body>${rendered.html}</body>`, 'text/html');
+    doc.body.querySelectorAll('h2, h3').forEach((el) => {
+      el.id = slugifyHeading(el.textContent || '');
+    });
+    return { html: doc.body.innerHTML, headings: rendered.headings };
   }, [fetch, slugMap, status]);
-
-  // After render, inject ids onto H2/H3 elements so anchors resolve.
-  useEffect(() => {
-    if (!bodyRef.current) return;
-    const els = bodyRef.current.querySelectorAll('h2, h3');
-    els.forEach((el) => { el.id = slugifyHeading(el.textContent || ''); });
-  }, [html]);
 
   // Window-level scrollspy: page scrolls in document flow under the new shell.
   useEffect(() => {

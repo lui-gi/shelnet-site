@@ -37,7 +37,7 @@ const WikiGraph = () => {
 
   if (!laid) {
     return (
-      <main className="bg-white text-neutral-900 mt-9 mb-9 min-h-[calc(100dvh-4.5rem)] p-6">
+      <main className="bg-white text-neutral-900 font-sans mt-9 mb-9 min-h-[calc(100dvh-4.5rem)] p-6">
         <div className="text-sm text-neutral-500">loading graph...</div>
       </main>
     );
@@ -46,7 +46,7 @@ const WikiGraph = () => {
   const byId = new Map(laid.nodes.map((n) => [n.id, n]));
 
   return (
-    <main className="bg-white text-neutral-900 mt-9 mb-9 min-h-[calc(100dvh-4.5rem)] flex flex-col px-6 py-4">
+    <main className="bg-white text-neutral-900 font-sans mt-9 mb-9 min-h-[calc(100dvh-4.5rem)] flex flex-col px-6 py-4">
       <div className="text-sm text-neutral-500 mb-3">
         wiki graph · {laid.nodes.length} entries, {laid.edges.length} links · <span className="text-purple-700">esc</span> back
       </div>
