@@ -49,6 +49,7 @@ const HeroSearch = ({ onOpen }) => (
     <button
       type="button"
       onClick={onOpen}
+      aria-label="Open wiki search"
       className="w-full max-w-xl border border-neutral-300 rounded-lg px-4 py-3 text-base text-neutral-400 bg-white shadow-sm flex items-center justify-between hover:border-neutral-400"
     >
       <span><span className="mr-2 text-lg">⌕</span>Search entries, tags, or full text...</span>
@@ -200,6 +201,11 @@ const WikiHome = () => {
     setSearchOpen(true);
   };
 
+  const closeSearch = () => {
+    setSearchOpen(false);
+    setSearchSeed('');
+  };
+
   const sidebar = (
     <WikiSidebar manifest={manifest} currentPath={null} onOpenSearch={() => openSearch('')} />
   );
@@ -208,7 +214,7 @@ const WikiHome = () => {
     return (
       <WikiShell sidebar={sidebar} toc={null}>
         <div className="text-neutral-500 text-sm">loading wiki manifest...</div>
-        <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} initialQuery={searchSeed} />
+        <WikiSearch open={searchOpen} onClose={closeSearch} initialQuery={searchSeed} />
       </WikiShell>
     );
   }
@@ -216,7 +222,7 @@ const WikiHome = () => {
     return (
       <WikiShell sidebar={sidebar} toc={null}>
         <div className="text-neutral-700 text-sm">! failed to load wiki manifest</div>
-        <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} initialQuery={searchSeed} />
+        <WikiSearch open={searchOpen} onClose={closeSearch} initialQuery={searchSeed} />
       </WikiShell>
     );
   }
@@ -235,7 +241,7 @@ const WikiHome = () => {
 
   return (
     <WikiShell sidebar={sidebar} toc={null}>
-      <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} initialQuery={searchSeed} />
+      <WikiSearch open={searchOpen} onClose={closeSearch} initialQuery={searchSeed} />
 
       <div className="max-w-3xl mx-auto">
         <HomeHero entryCount={entryCount} lastEditedLabel={lastEditedLabel} />

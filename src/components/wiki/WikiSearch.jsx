@@ -12,12 +12,20 @@ const WikiSearch = ({ open, onClose, initialQuery = '' }) => {
   const [q, setQ] = useState('');
   const [cursor, setCursor] = useState(0);
 
+  const prevOpenRef = useRef(false);
   useEffect(() => {
-    if (!open) return;
-    inputRef.current?.focus();
-    if (initialQuery) {
-      setQ(initialQuery);
-      setCursor(0);
+    if (!open) {
+      prevOpenRef.current = false;
+      return;
+    }
+    const wasClosed = !prevOpenRef.current;
+    prevOpenRef.current = true;
+    if (wasClosed) {
+      inputRef.current?.focus();
+      if (initialQuery) {
+        setQ(initialQuery);
+        setCursor(0);
+      }
     }
     if (!index) fetchSearchIndex().then(setIndex).catch(() => {});
   }, [open, index, initialQuery]);
