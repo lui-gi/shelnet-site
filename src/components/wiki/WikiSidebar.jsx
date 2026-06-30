@@ -1,39 +1,42 @@
 // src/components/wiki/WikiSidebar.jsx
-// Collapsible section tree for /wiki. Each section is a top-level dir, entries
-// are leaves. Current path is highlighted. The search input is pinned at top
-// and surfaces a `?` placeholder until WikiSearch is wired (Task 13).
+// Light-themed wiki sidebar. Top-level dirs become section headers
+// (NOTES/WRITEUPS/GUIDES); children render as a collapsible tree.
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { buildSidebarTree } from './sidebarTree';
-import { WIKI_ACCENT } from '../../config/wikiConfig';
 
 const EntryLeaf = ({ node, currentPath, depth }) => {
   const active = currentPath === node.path;
+  const indent = `${depth * 0.75}rem`;
   return (
     <Link
       to={`/wiki/${node.path}`}
-      className={active ? 'block truncate' : 'block truncate text-white/55 hover:text-white'}
-      style={{
-        paddingLeft: `${depth + 2}ch`,
-        ...(active ? { color: WIKI_ACCENT } : null),
-      }}
+      className={[
+        'block truncate text-sm py-0.5 pr-2',
+        active
+          ? 'text-purple-700 font-medium border-l-2 border-purple-600 -ml-[2px]'
+          : 'text-neutral-700 hover:text-neutral-900 border-l-2 border-transparent -ml-[2px]',
+      ].join(' ')}
+      style={{ paddingLeft: `calc(${indent} + 0.5rem)` }}
     >
-      {active ? '• ' : '  '}{node.name}
+      {node.name}
     </Link>
   );
 };
 
 const DirBranch = ({ node, currentPath, depth }) => {
   const [open, setOpen] = useState(true);
+  const indent = `${depth * 0.75}rem`;
   return (
     <div>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="block w-full text-left text-white/70 hover:text-white truncate"
-        style={{ paddingLeft: `${depth}ch` }}
+        className="block w-full text-left text-sm py-0.5 pr-2 text-neutral-700 hover:text-neutral-900 truncate border-l-2 border-transparent -ml-[2px]"
+        style={{ paddingLeft: `calc(${indent} + 0.5rem)` }}
       >
-        <span className="text-white/40">{open ? '▾' : '▸'}</span> {node.name}/
+        <span className="text-neutral-400 mr-1">{open ? '▾' : '▸'}</span>
+        {node.name}/
       </button>
       {open && node.children?.map((c) => (
         <Branch key={c.path} node={c} currentPath={currentPath} depth={depth + 1} />
@@ -47,23 +50,37 @@ const Branch = ({ node, currentPath, depth = 0 }) =>
     ? <EntryLeaf node={node} currentPath={currentPath} depth={depth} />
     : <DirBranch node={node} currentPath={currentPath} depth={depth} />;
 
+const SectionBlock = ({ root, currentPath }) => (
+  <div className="mt-5 first:mt-0">
+    <div className="text-xs uppercase tracking-wide text-neutral-500 mb-1 px-2">
+      {root.name}
+    </div>
+    {root.children?.map((c) => (
+      <Branch key={c.path} node={c} currentPath={currentPath} depth={0} />
+    ))}
+  </div>
+);
+
 const WikiSidebar = ({ manifest, currentPath, onOpenSearch }) => {
   const tree = useMemo(() => buildSidebarTree(manifest?.entries || []), [manifest?.entries]);
   return (
-    <div className="text-xs font-mono leading-relaxed">
-      <div className="mb-2 text-white/40">~/wiki</div>
+    <div className="text-sm">
       <button
         type="button"
         onClick={onOpenSearch}
-        className="mb-3 w-full text-left text-white/40 hover:text-white"
+        className="mb-4 w-full text-left text-neutral-500 hover:text-neutral-900 flex items-center justify-between"
       >
-        ⌕ search... <span className="text-white/20">(/)</span>
+        <span>⌕ search...</span>
+        <kbd className="text-xs text-neutral-400 border border-neutral-200 rounded px-1">/</kbd>
       </button>
       {tree.map((root) => (
-        <Branch key={root.name} node={root} currentPath={currentPath} />
+        <SectionBlock key={root.name} root={root} currentPath={currentPath} />
       ))}
-      <Link to="/wiki/graph" className="mt-4 block text-white/40 hover:text-white">
-        ⌘ graph view
+      <Link
+        to="/wiki/graph"
+        className="mt-6 block text-sm text-neutral-600 hover:text-purple-700 px-2"
+      >
+        ◆ graph view
       </Link>
     </div>
   );
