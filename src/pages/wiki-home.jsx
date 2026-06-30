@@ -15,6 +15,7 @@ import {
   getEntriesBySection,
   getMostRecentInSection,
   getLastEditedDate,
+  getTopTags,
 } from '../utils/wikiService';
 import { relativeTimeAgo } from '../utils/relativeTime';
 import { SECTION_META } from '../config/wikiConfig';
@@ -116,6 +117,63 @@ const RecentlyUpdatedList = ({ entries }) => (
   </div>
 );
 
+const SuggestedChips = ({ tags, onPick }) => {
+  if (!tags.length) return null;
+  return (
+    <div className="text-center text-sm text-neutral-500 mb-8">
+      <span className="mr-1">try:</span>
+      {tags.map(({ tag }) => (
+        <button
+          key={tag}
+          type="button"
+          onClick={() => onPick(tag)}
+          className="inline-block bg-purple-50 text-purple-700 rounded-full px-3 py-0.5 mx-0.5 font-medium hover:bg-purple-100"
+        >
+          {tag}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+const TagCloud = ({ tags, onPick }) => (
+  <div>
+    <div className="text-xs uppercase tracking-wide text-neutral-500 border-b border-neutral-200 pb-1 mb-2">
+      Browse by tag
+    </div>
+    <div className="flex flex-wrap gap-1.5">
+      {tags.map(({ tag, count }) => (
+        <button
+          key={tag}
+          type="button"
+          onClick={() => onPick(tag)}
+          className="border border-neutral-200 text-purple-700 rounded-full px-2.5 py-0.5 text-sm hover:border-neutral-300"
+        >
+          {tag} <span className="text-neutral-400 text-xs">{count}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
+const ExploreLinks = ({ onOpenSearch }) => (
+  <div className="mt-6">
+    <div className="text-xs uppercase tracking-wide text-neutral-500 border-b border-neutral-200 pb-1 mb-2">
+      Explore
+    </div>
+    <Link to="/wiki/graph" className="block text-sm text-purple-700 py-1 hover:underline">
+      ◆ open graph view →
+    </Link>
+    <button
+      type="button"
+      onClick={onOpenSearch}
+      className="block w-full text-left text-sm text-purple-700 py-1 hover:underline"
+    >
+      ⌕ advanced search →
+    </button>
+  </div>
+);
+
 const WikiHome = () => {
   const navigate = useNavigate();
   const { manifest, loading, error } = useWikiManifest();
@@ -172,6 +230,8 @@ const WikiHome = () => {
     count: getEntriesBySection(manifest, key).length,
     latest: getMostRecentInSection(manifest, key, 3),
   }));
+  const topTags = getTopTags(manifest, 12);
+  const suggestedTags = topTags.slice(0, 5);
 
   return (
     <WikiShell sidebar={sidebar} toc={null}>
@@ -180,13 +240,14 @@ const WikiHome = () => {
       <div className="max-w-3xl mx-auto">
         <HomeHero entryCount={entryCount} lastEditedLabel={lastEditedLabel} />
         <HeroSearch onOpen={() => openSearch('')} />
-        {/* Suggested chips slot — Task 6 fills this in. */}
-        <div className="mb-8" />
+        <SuggestedChips tags={suggestedTags} onPick={openSearch} />
         <SectionCards sections={sections} />
         <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8">
           <RecentlyUpdatedList entries={recent} />
-          {/* Right column — Task 6 places TagCloud + ExploreLinks here. */}
-          <div />
+          <div>
+            <TagCloud tags={topTags} onPick={openSearch} />
+            <ExploreLinks onOpenSearch={() => openSearch('')} />
+          </div>
         </div>
       </div>
     </WikiShell>
