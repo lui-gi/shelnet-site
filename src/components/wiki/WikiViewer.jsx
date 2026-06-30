@@ -63,10 +63,13 @@ const WikiViewer = ({ entry, manifest, onTocChange }) => {
     return () => window.removeEventListener('scroll', onScroll);
   }, [html]);
 
-  // Notify parent of heading list + active id whenever either changes.
+  // Notify parent of heading list + active id whenever either changes. Skip
+  // during loading/error so the parent's toc slot does not flash an empty
+  // <WikiToc> between mount and first successful fetch.
   useEffect(() => {
+    if (status !== 'ok') return;
     if (onTocChange) onTocChange(headings, activeId);
-  }, [headings, activeId, onTocChange]);
+  }, [status, headings, activeId, onTocChange]);
 
   const onClick = (e) => {
     const a = e.target.closest('a.wikilink');

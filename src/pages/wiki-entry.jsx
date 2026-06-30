@@ -51,16 +51,16 @@ const WikiEntry = () => {
     />
   );
 
-  if (loading) return <WikiShell sidebar={sidebar} toc={null}><div className="py-6 text-white/40 text-xs">loading...</div></WikiShell>;
-  if (error)   return <WikiShell sidebar={sidebar} toc={null}><div className="py-6 text-white/60 text-xs">! failed to load wiki manifest</div></WikiShell>;
+  if (loading) return <WikiShell sidebar={sidebar} toc={null}><div className="text-sm text-neutral-500">loading...</div></WikiShell>;
+  if (error)   return <WikiShell sidebar={sidebar} toc={null}><div className="text-sm text-neutral-700">! failed to load wiki manifest</div></WikiShell>;
 
   const entry = getEntryByPath(manifest, path);
   if (!entry) {
     return (
       <WikiShell sidebar={sidebar} toc={null}>
-        <div className="py-6 text-white/60 text-xs">
-          ! no entry at <span className="text-white/80">{path}</span> ·{' '}
-          <Link to="/wiki" className="hover:text-white" style={{ color: '#c084fc' }}>back to /wiki</Link>
+        <div className="text-sm text-neutral-700">
+          ! no entry at <span className="text-neutral-900">{path}</span> ·{' '}
+          <Link to="/wiki" className="text-purple-700 hover:underline">back to /wiki</Link>
         </div>
         <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
       </WikiShell>
