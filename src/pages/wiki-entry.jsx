@@ -1,11 +1,12 @@
 // src/pages/wiki-entry.jsx
 // Viewer route for /wiki/:section/* — resolves the full path to an entry,
 // hands it to WikiViewer, and renders the standard WikiShell with sidebar.
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import WikiShell from '../components/wiki/WikiShell';
 import WikiSidebar from '../components/wiki/WikiSidebar';
 import WikiViewer from '../components/wiki/WikiViewer';
+import WikiToc from '../components/wiki/WikiToc';
 import WikiSearch from '../components/wiki/WikiSearch';
 import { useWikiSearchTrigger } from '../components/wiki/useWikiSearchTrigger';
 import { useWikiManifest } from '../utils/useWikiManifest';
@@ -21,6 +22,11 @@ const WikiEntry = () => {
   const { manifest, loading, error } = useWikiManifest();
   const [searchOpen, setSearchOpen] = useState(false);
   useWikiSearchTrigger(setSearchOpen);
+
+  const [toc, setToc] = useState({ headings: [], activeId: null });
+  const handleTocChange = useCallback((headings, activeId) => {
+    setToc({ headings, activeId });
+  }, []);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -62,8 +68,11 @@ const WikiEntry = () => {
   }
 
   return (
-    <WikiShell sidebar={sidebar} toc={null}>
-      <WikiViewer entry={entry} manifest={manifest} />
+    <WikiShell
+      sidebar={sidebar}
+      toc={<WikiToc headings={toc.headings} activeId={toc.activeId} />}
+    >
+      <WikiViewer entry={entry} manifest={manifest} onTocChange={handleTocChange} />
       <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
     </WikiShell>
   );

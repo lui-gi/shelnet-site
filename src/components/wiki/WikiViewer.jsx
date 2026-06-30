@@ -1,21 +1,16 @@
 // src/components/wiki/WikiViewer.jsx
-// Fetches an entry's raw markdown, renders it (preprocessing wikilinks against
-// the manifest's slug→path map), and threads the ToC at the top. Scrollspy
-// updates `activeId` as the user scrolls past headings. Intercepts in-app
-// wikilink clicks to use the SPA navigator instead of full page loads.
+// Fetches and renders an entry's markdown. Owns heading extraction + scrollspy
+// and lifts the (headings, activeId) tuple to the parent via onTocChange so
+// the entry page can place a desktop ToC in WikiShell's right column. Renders
+// its own mobile <details> ToC, hidden on >=lg viewports.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchEntryMarkdown } from '../../utils/wikiContent';
 import { renderMarkdown, slugifyHeading } from './markdown';
-import WikiToc from './WikiToc';
-import { SHELL } from '../../config/theme';
-import { WIKI_ACCENT } from '../../config/wikiConfig';
 
-const WikiViewer = ({ entry, manifest }) => {
+const WikiViewer = ({ entry, manifest, onTocChange }) => {
   const navigate = useNavigate();
   const bodyRef = useRef(null);
-  // `fetch` bundles path+raw+status so every async update is a single setState call.
-  // The initial value already encodes 'loading' so the effect never needs a sync setState.
   const [fetch, setFetch] = useState(() => ({ path: entry.path, raw: '', status: 'loading' }));
   const [activeId, setActiveId] = useState(null);
 
@@ -33,46 +28,45 @@ const WikiViewer = ({ entry, manifest }) => {
     return () => { cancelled = true; };
   }, [entry.path]);
 
-  // If the entry.path has changed but the fetch hasn't caught up yet, treat as loading.
   const status = fetch.path !== entry.path ? 'loading' : fetch.status;
 
   const { html, headings } = useMemo(() => {
     if (status !== 'ok') return { html: '', headings: [] };
-    // Strip frontmatter (between leading --- pairs) before rendering.
     const body = fetch.raw.replace(/^---[\s\S]*?\n---\s*\n?/, '');
     return renderMarkdown(body, { slugMap });
   }, [fetch, slugMap, status]);
 
-  // After render, inject ids onto H2/H3 elements in the rendered DOM so the
-  // ToC anchors resolve. marked doesn't emit ids by default.
+  // After render, inject ids onto H2/H3 elements so anchors resolve.
   useEffect(() => {
     if (!bodyRef.current) return;
     const els = bodyRef.current.querySelectorAll('h2, h3');
     els.forEach((el) => { el.id = slugifyHeading(el.textContent || ''); });
   }, [html]);
 
-  // Scrollspy: pick the topmost heading whose top is at or just above the
-  // viewer's scroll position.
+  // Window-level scrollspy: page scrolls in document flow under the new shell.
   useEffect(() => {
     if (!bodyRef.current) return;
     const root = bodyRef.current;
     const onScroll = () => {
       const els = Array.from(root.querySelectorAll('h2, h3'));
-      const rootTop = root.getBoundingClientRect().top;
       let current = null;
       for (const el of els) {
-        const top = el.getBoundingClientRect().top - rootTop;
-        if (top - 16 <= 0) current = el.id; else break;
+        // 80px offset so a heading remains "active" while still visible near the top.
+        if (el.getBoundingClientRect().top - 80 <= 0) current = el.id;
+        else break;
       }
       setActiveId(current);
     };
-    const target = root.closest('.overflow-y-auto') || root;
-    target.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
-    return () => target.removeEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
   }, [html]);
 
-  // Intercept clicks on wikilinks so they use SPA navigation.
+  // Notify parent of heading list + active id whenever either changes.
+  useEffect(() => {
+    if (onTocChange) onTocChange(headings, activeId);
+  }, [headings, activeId, onTocChange]);
+
   const onClick = (e) => {
     const a = e.target.closest('a.wikilink');
     if (!a) return;
@@ -81,26 +75,42 @@ const WikiViewer = ({ entry, manifest }) => {
   };
 
   if (status === 'loading') {
-    return <div className="py-6 text-white/40 text-xs">loading <span style={{ color: WIKI_ACCENT }}>{entry.path}</span>...</div>;
+    return <div className="text-neutral-500 text-sm">loading {entry.path}...</div>;
   }
   if (status === 'error') {
-    return <div className="py-6 text-white/60 text-xs">! failed to load <span style={{ color: WIKI_ACCENT }}>{entry.path}</span></div>;
+    return <div className="text-neutral-700 text-sm">! failed to load {entry.path}</div>;
   }
+
   return (
-    <div className="py-3">
-      <h1 className="text-base mb-1" style={{ color: WIKI_ACCENT }}># {entry.title}</h1>
-      <div className="text-white/40 text-xs mb-2">
-        <span style={{ color: SHELL.dim }}>updated</span> {entry.updated}
+    <article>
+      <h1 className="text-3xl font-semibold text-neutral-900 mb-1"># {entry.title}</h1>
+      <div className="text-sm text-neutral-500 mb-4">
+        updated {entry.updated}
         {entry.tags?.length ? <> · {entry.tags.map((t) => `#${t}`).join(' ')}</> : null}
       </div>
-      <WikiToc headings={headings} activeId={activeId} />
+      <hr className="border-neutral-200 mb-6" />
+
+      {/* Mobile inline ToC — hidden on >=lg, where the right-column ToC takes over */}
+      {headings.length > 0 && (
+        <details className="lg:hidden mb-6 text-sm">
+          <summary className="cursor-pointer text-neutral-700 select-none">on this page</summary>
+          <ul className="mt-2 ml-2 text-neutral-700">
+            {headings.map((h) => (
+              <li key={h.id} className={h.level === 3 ? 'ml-3' : ''}>
+                <a href={`#${h.id}`} className="hover:text-purple-700">{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+
       <div
         ref={bodyRef}
-        className="wiki-body prose-invert text-white/80 text-sm leading-relaxed"
+        className="wiki-body"
         onClick={onClick}
         dangerouslySetInnerHTML={{ __html: html }}
       />
-    </div>
+    </article>
   );
 };
 
