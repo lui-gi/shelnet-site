@@ -33,7 +33,7 @@ const WikiSearch = ({ open, onClose }) => {
 
   const onKey = (e) => {
     if (e.key === 'Escape') { e.preventDefault(); onClose(); }
-    else if (e.key === 'ArrowDown') { e.preventDefault(); setCursor((c) => Math.min(c + 1, hits.length - 1)); }
+    else if (e.key === 'ArrowDown') { e.preventDefault(); setCursor((c) => Math.min(c + 1, Math.max(hits.length - 1, 0))); }
     else if (e.key === 'ArrowUp') { e.preventDefault(); setCursor((c) => Math.max(c - 1, 0)); }
     else if (e.key === 'Enter' && hits[cursor]) { e.preventDefault(); open_(hits[cursor]); }
   };
