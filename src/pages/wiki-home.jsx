@@ -248,7 +248,7 @@ const WikiHome = () => {
     return () => window.removeEventListener('keydown', onKey);
   }, [navigate, focusInline]);
 
-  const onInputKey = (e) => {
+  const onInputKey = useCallback((e) => {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setCursor((c) => Math.min(c + 1, Math.max(hits.length - 1, 0)));
@@ -262,16 +262,19 @@ const WikiHome = () => {
       e.preventDefault();
       inputRef.current?.blur();
     }
-  };
+  }, [hits, cursor, navigate]);
 
-  const onPickHit = (h) => navigate(`/wiki/${h.path}`);
-  const onChipPick = (tag) => {
+  const onPickHit = useCallback((h) => navigate(`/wiki/${h.path}`), [navigate]);
+  const onChipPick = useCallback((tag) => {
     setQ(tag);
     setCursor(0);
     requestAnimationFrame(() => inputRef.current?.focus());
-  };
+  }, []);
 
   const closeSearch = () => setSearchOpen(false);
+
+  const topTags = useMemo(() => getTopTags(manifest, 12), [manifest]);
+  const suggestedTags = useMemo(() => topTags.slice(0, 5), [topTags]);
 
   const sidebar = (
     <WikiSidebar manifest={manifest} currentPath={null} onOpenSearch={() => setSearchOpen(true)} />
@@ -303,8 +306,6 @@ const WikiHome = () => {
     count: getEntriesBySection(manifest, key).length,
     latest: getMostRecentInSection(manifest, key, 3),
   }));
-  const topTags = getTopTags(manifest, 12);
-  const suggestedTags = useMemo(() => topTags.slice(0, 5), [topTags]);
 
   const searching = q.trim().length > 0;
 

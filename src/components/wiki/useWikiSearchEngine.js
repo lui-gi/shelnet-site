@@ -19,7 +19,10 @@ export function useWikiSearchEngine(query) {
     setStatus('loading');
     fetchSearchIndex()
       .then((idx) => { setIndex(idx); setStatus('ok'); })
-      .catch(() => { setStatus('error'); });
+      .catch(() => {
+        requested.current = false;
+        setStatus('error');
+      });
   }, [trimmed, index]);
 
   const hits = useMemo(() => {
