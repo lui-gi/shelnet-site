@@ -1,29 +1,34 @@
 // src/components/wiki/WikiToc.jsx
-// On-page table of contents extracted from H2/H3 headings. Active heading
-// driven by scrollspy in WikiViewer.
-import { Panel } from '../tui/ascii';
-import { WIKI_ACCENT } from '../../config/wikiConfig';
-
+// Light-themed on-page table of contents. Sticky positioning is handled by
+// WikiShell's right column wrapper; this component renders inline content.
 const WikiToc = ({ headings, activeId }) => {
   if (!headings?.length) return null;
   return (
-    <div className="my-3">
-      <Panel hex={WIKI_ACCENT} title={<span style={{ color: WIKI_ACCENT }}>on this page</span>}>
-        <ul className="py-1 text-xs leading-relaxed">
-          {headings.map((h) => (
-            <li key={h.id} className={h.level === 3 ? 'pl-4' : ''}>
+    <nav aria-label="on this page">
+      <div className="text-xs uppercase tracking-wide text-neutral-500 mb-2">
+        On this page
+      </div>
+      <ul className="text-sm leading-relaxed">
+        {headings.map((h) => {
+          const active = activeId === h.id;
+          return (
+            <li key={h.id} className={h.level === 3 ? 'ml-3' : ''}>
               <a
                 href={`#${h.id}`}
-                className="hover:text-white"
-                style={activeId === h.id ? { color: WIKI_ACCENT } : { color: 'rgba(255,255,255,0.55)' }}
+                className={[
+                  'block py-0.5 pl-2 border-l-2 -ml-[2px]',
+                  active
+                    ? 'text-purple-700 font-medium border-purple-600'
+                    : 'text-neutral-600 hover:text-neutral-900 border-transparent',
+                ].join(' ')}
               >
-                • {h.text}
+                {h.text}
               </a>
             </li>
-          ))}
-        </ul>
-      </Panel>
-    </div>
+          );
+        })}
+      </ul>
+    </nav>
   );
 };
 
