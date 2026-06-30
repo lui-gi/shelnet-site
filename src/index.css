@@ -106,14 +106,17 @@ body {
   }
 }
 
-.wiki-body h2 { color: rgba(255,255,255,0.9); font-size: 0.95rem; margin: 1.25rem 0 0.5rem; }
-.wiki-body h3 { color: rgba(255,255,255,0.8); font-size: 0.875rem; margin: 1rem 0 0.4rem; }
-.wiki-body p  { margin: 0.5rem 0; }
-.wiki-body ul, .wiki-body ol { margin: 0.5rem 0 0.5rem 1.25rem; }
-.wiki-body li { margin: 0.15rem 0; }
-.wiki-body code { background: rgba(255,255,255,0.06); padding: 0.05rem 0.3rem; border-radius: 2px; font-size: 0.85em; }
-.wiki-body pre  { background: rgba(255,255,255,0.05); padding: 0.5rem 0.75rem; overflow-x: auto; border-radius: 3px; font-size: 0.8rem; }
+.wiki-body { color: rgb(38 38 38); font-size: 1rem; line-height: 1.6; }
+.wiki-body h2 { color: rgb(23 23 23); font-size: 1.375rem; font-weight: 600; margin: 2rem 0 0.5rem; padding-bottom: 0.25rem; border-bottom: 1px solid rgb(229 229 229); }
+.wiki-body h3 { color: rgb(23 23 23); font-size: 1.125rem; font-weight: 500; margin: 1.5rem 0 0.4rem; }
+.wiki-body p  { margin: 0.75rem 0; }
+.wiki-body ul, .wiki-body ol { margin: 0.75rem 0 0.75rem 1.5rem; }
+.wiki-body li { margin: 0.25rem 0; }
+.wiki-body code { background: rgb(245 245 245); color: rgb(23 23 23); padding: 0.05rem 0.35rem; border-radius: 3px; font-family: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace; font-size: 0.9em; }
+.wiki-body pre { background: rgb(250 250 250); border: 1px solid rgb(229 229 229); padding: 0.75rem 1rem; overflow-x: auto; border-radius: 4px; font-size: 0.875rem; margin: 0.75rem 0; }
 .wiki-body pre code { background: transparent; padding: 0; }
-.wiki-body a.wikilink { color: #c084fc; text-decoration: none; border-bottom: 1px dotted rgba(192,132,252,0.5); }
-.wiki-body a.wikilink:hover { border-bottom-style: solid; }
-.wiki-body .wikilink-broken { color: rgba(255,200,150,0.7); }
+.wiki-body a.wikilink { color: rgb(126 34 206); text-decoration: none; }
+.wiki-body a.wikilink:hover { text-decoration: underline; }
+.wiki-body .wikilink-broken { color: rgb(180 83 9); }
+.wiki-body hr { border: 0; border-top: 1px solid rgb(229 229 229); margin: 2rem 0; }
+.wiki-body blockquote { border-left: 3px solid rgb(229 229 229); padding-left: 1rem; color: rgb(82 82 82); margin: 1rem 0; }
