@@ -1,10 +1,9 @@
 // src/components/wiki/WikiSearch.jsx
-// Search modal. Lazy-loads minisearch + the index on first open. Results are
-// keyboard-navigable (↑/↓ to move, Enter to open, Esc to close).
+// Light-themed wiki search modal. Lazy-loads minisearch + index on first open.
+// Keyboard: ↑/↓ to move, Enter to open, Esc to close. Click backdrop closes.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchSearchIndex } from '../../utils/wikiContent';
-import { WIKI_ACCENT } from '../../config/wikiConfig';
 
 const WikiSearch = ({ open, onClose }) => {
   const navigate = useNavigate();
@@ -40,39 +39,46 @@ const WikiSearch = ({ open, onClose }) => {
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-start justify-center pt-24" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 bg-black/30 flex items-start justify-center pt-24"
+      onClick={onClose}
+    >
       <div
-        className="w-full max-w-xl bg-black border font-mono text-sm"
-        style={{ borderColor: WIKI_ACCENT }}
+        className="w-full max-w-xl bg-white border border-neutral-200 rounded-md shadow-lg text-sm font-sans"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="px-3 py-2 border-b" style={{ borderColor: 'rgba(192,132,252,0.3)' }}>
+        <div className="px-3 py-2 border-b border-neutral-200">
           <input
             ref={inputRef}
             value={q}
             onChange={handleQueryChange}
             onKeyDown={onKey}
             placeholder="search wiki..."
-            className="w-full bg-transparent outline-none text-white placeholder-white/30"
+            className="w-full bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
           />
         </div>
-        <ul className="max-h-80 overflow-y-auto text-xs">
+        <ul className="max-h-80 overflow-y-auto">
           {hits.length === 0 && q && (
-            <li className="px-3 py-2 text-white/40">no results</li>
+            <li className="px-3 py-2 text-neutral-500">no results</li>
           )}
-          {hits.map((h, i) => (
-            <li
-              key={h.id}
-              className={`px-3 py-1.5 cursor-pointer ${i === cursor ? '' : 'text-white/65'}`}
-              style={i === cursor ? { color: WIKI_ACCENT, backgroundColor: 'rgba(192,132,252,0.08)' } : undefined}
-              onMouseEnter={() => setCursor(i)}
-              onClick={() => open_(h)}
-            >
-              <span className="text-white/40">{h.section}/</span>
-              {h.title}
-              {h.summary && <span className="text-white/30"> — {h.summary}</span>}
-            </li>
-          ))}
+          {hits.map((h, i) => {
+            const active = i === cursor;
+            return (
+              <li
+                key={h.id}
+                className={[
+                  'px-3 py-1.5 cursor-pointer',
+                  active ? 'bg-purple-50 text-purple-900' : 'text-neutral-700 hover:bg-neutral-50',
+                ].join(' ')}
+                onMouseEnter={() => setCursor(i)}
+                onClick={() => open_(h)}
+              >
+                <span className="text-neutral-400">{h.section}/</span>
+                {h.title}
+                {h.summary && <span className="text-neutral-500"> — {h.summary}</span>}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
