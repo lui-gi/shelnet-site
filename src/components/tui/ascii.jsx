@@ -98,7 +98,7 @@ export const Frame = ({ hex, dashed = false, header = null, footer = null, child
     <div className={`flex flex-col min-h-0 ${className}`}>
       {header && <div className="shrink-0">{header}</div>}
       {/* top edge */}
-      <div className="flex shrink-0 whitespace-nowrap" style={{ color: hex }} aria-hidden="true">
+      <div className="flex shrink-0 whitespace-nowrap leading-none" style={{ color: hex }} aria-hidden="true">
         <span>{g.tl}</span>
         <span className="flex-1 overflow-hidden">{FILL(g.h)}</span>
         <span>{g.tr}</span>
@@ -110,7 +110,7 @@ export const Frame = ({ hex, dashed = false, header = null, footer = null, child
         <div className="relative w-[1ch] shrink-0"><VRail char={g.v} hex={hex} side="right" /></div>
       </div>
       {/* bottom edge */}
-      <div className="flex shrink-0 whitespace-nowrap" style={{ color: hex }} aria-hidden="true">
+      <div className="flex shrink-0 whitespace-nowrap leading-none" style={{ color: hex }} aria-hidden="true">
         <span>{g.bl}</span>
         <span className="flex-1 overflow-hidden">{FILL(g.h)}</span>
         <span>{g.br}</span>
