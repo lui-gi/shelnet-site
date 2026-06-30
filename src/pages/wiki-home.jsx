@@ -50,7 +50,7 @@ const WikiHome = () => {
 
   if (loading) {
     return (
-      <WikiShell sidebar={sidebar}>
+      <WikiShell sidebar={sidebar} toc={null}>
         <div className="py-6 text-white/40 text-xs">loading wiki manifest...</div>
         <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
       </WikiShell>
@@ -58,7 +58,7 @@ const WikiHome = () => {
   }
   if (error) {
     return (
-      <WikiShell sidebar={sidebar}>
+      <WikiShell sidebar={sidebar} toc={null}>
         <div className="py-6 text-white/60 text-xs">! failed to load wiki manifest</div>
         <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
       </WikiShell>
@@ -74,7 +74,7 @@ const WikiHome = () => {
   }));
 
   return (
-    <WikiShell sidebar={sidebar}>
+    <WikiShell sidebar={sidebar} toc={null}>
       <WikiSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
       <div className="py-3 space-y-4">
         <Panel hex={WIKI_ACCENT} title={<span style={{ color: WIKI_ACCENT }}>recent</span>}>
