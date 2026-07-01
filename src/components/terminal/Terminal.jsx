@@ -107,22 +107,22 @@ const Terminal = ({ manifest }) => {
 
   return (
     <div className="flex flex-col flex-1 min-h-0 font-mono text-sm leading-relaxed" onClick={focusInput}>
-      {/* bare-TTY header: continuity with the sibling /resources pages */}
-      <div className="shrink-0 mb-3">
-        <div className="text-white/30">SHELNET GNU/Linux 3.0 LTS · tty4 · 80×24</div>
-        <pre
-          aria-label="modules"
-          className="my-3 whitespace-pre text-[10px] leading-[1.1] sm:text-xs"
-          style={{ color: GREEN, textShadow: '0 0 8px rgba(67,192,140,.25)' }}
-        >{MODULES_ART}</pre>
-        <div className="text-white/45">interactive skill rooms · learn a technique, then do it in a live lab stage</div>
-        <div className="text-white/40">
-          type <span style={{ color: GREEN }}>help</span> for commands · <span style={{ color: GREEN }}>list</span> to browse modules · <span style={{ color: GREEN }}>load &lt;name&gt;</span> to enter
-        </div>
-      </div>
-
-      {/* one scrolling column: echoed commands, their output, then the live prompt */}
+      {/* one scrolling column: bare-TTY header, echoed commands, their output, then the live prompt */}
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto pr-1">
+        {/* header scrolls with the buffer, like real TTY output */}
+        <div className="mb-3">
+          <div className="text-white/30">SHELNET GNU/Linux 3.0 LTS · tty4 · 80×24</div>
+          <pre
+            aria-label="modules"
+            className="my-3 whitespace-pre text-[10px] leading-[1.1] sm:text-xs"
+            style={{ color: GREEN, textShadow: '0 0 8px rgba(67,192,140,.25)' }}
+          >{MODULES_ART}</pre>
+          <div className="text-white/45">interactive skill rooms · learn a technique, then do it in a live lab stage</div>
+          <div className="text-white/40">
+            type <span style={{ color: GREEN }}>help</span> for commands · <span style={{ color: GREEN }}>list</span> to browse modules · <span style={{ color: GREEN }}>load &lt;name&gt;</span> to enter
+          </div>
+        </div>
+
         {buffer.map((l, i) =>
           l.tone === 'cmd' ? (
             <div key={i} className="flex items-baseline gap-2">
