@@ -32,7 +32,7 @@ const formatLastEdited = (iso) => {
 
 const HomeHero = ({ entryCount, lastEditedLabel }) => (
   <header className="text-center mb-8">
-    <h1 className="text-3xl font-semibold text-neutral-900 tracking-tight">Shelnet wiki</h1>
+    <h1 className="text-3xl font-semibold text-neutral-900 tracking-tight">shelnet wiki</h1>
     <p className="text-sm text-neutral-500 mt-1">
       A personal wiki for notes, writeups, and guides
       {entryCount > 0 && (
@@ -66,7 +66,7 @@ const InlineHeroSearch = ({ q, onQChange, onKeyDown, inputRef, hits, cursor, onC
           onKeyDown={onKeyDown}
           aria-label="Search wiki"
           placeholder="Search entries, tags, or full text..."
-          className="flex-1 bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
+          className="flex-1 bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400 selection:bg-purple-200 selection:text-neutral-900"
         />
         <kbd className="ml-2 text-xs text-neutral-500 border border-neutral-200 rounded px-1.5 py-0.5 bg-neutral-50 select-none">/</kbd>
       </div>
@@ -188,24 +188,6 @@ const TagCloud = ({ tags, onPick }) => (
   </div>
 );
 
-const ExploreLinks = ({ onOpenSearch }) => (
-  <div className="mt-6">
-    <div className="text-xs uppercase tracking-wide text-neutral-500 border-b border-neutral-200 pb-1 mb-2">
-      Explore
-    </div>
-    <Link to="/wiki/graph" className="block text-sm text-purple-700 py-1 hover:underline">
-      ◆ open graph view →
-    </Link>
-    <button
-      type="button"
-      onClick={onOpenSearch}
-      className="block w-full text-left text-sm text-purple-700 py-1 hover:underline"
-    >
-      ⌕ advanced search →
-    </button>
-  </div>
-);
-
 const WikiHome = () => {
   const navigate = useNavigate();
   const { manifest, loading, error } = useWikiManifest();
@@ -226,7 +208,7 @@ const WikiHome = () => {
   // Reset cursor whenever the query changes
   useEffect(() => { setCursor(0); }, [q]);
 
-  // `/` on /wiki focuses the inline input; `g` goes to graph; `Esc` exits to /.
+  // `/` on /wiki focuses the inline input; `Esc` exits to /.
   // We intentionally do NOT use `useWikiSearchTrigger` here so the home page can
   // own the `/` behavior.
   useEffect(() => {
@@ -236,9 +218,6 @@ const WikiHome = () => {
       if (e.key === '/' && !isTyping) {
         e.preventDefault();
         focusInline();
-      } else if (e.key === 'g' && !isTyping) {
-        e.preventDefault();
-        navigate('/wiki/graph');
       } else if (e.key === 'Escape' && !isTyping) {
         e.preventDefault();
         navigate(window.location.pathname === '/wiki' ? '/' : '/wiki');
@@ -336,10 +315,7 @@ const WikiHome = () => {
           <SectionCards sections={sections} />
           <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_1fr] gap-8">
             <RecentlyUpdatedList entries={recent} />
-            <div>
-              <TagCloud tags={topTags} onPick={onChipPick} />
-              <ExploreLinks onOpenSearch={() => setSearchOpen(true)} />
-            </div>
+            <TagCloud tags={topTags} onPick={onChipPick} />
           </div>
         </div>
       </div>

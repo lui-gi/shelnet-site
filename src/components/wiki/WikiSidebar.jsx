@@ -76,12 +76,6 @@ const WikiSidebar = ({ manifest, currentPath, onOpenSearch }) => {
       {tree.map((root) => (
         <SectionBlock key={root.name} root={root} currentPath={currentPath} />
       ))}
-      <Link
-        to="/wiki/graph"
-        className="mt-6 block text-sm text-neutral-600 hover:text-purple-700 px-2"
-      >
-        ◆ graph view
-      </Link>
     </div>
   );
 };

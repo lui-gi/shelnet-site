@@ -1,11 +1,10 @@
 // src/utils/wikiContent.js
-// Fetches per-entry raw markdown, the graph JSON, and the MiniSearch index.
-// Markdown is sessionStorage-cached per path (5-min TTL); graph and index are
-// module-scope memoized for the session.
+// Fetches per-entry raw markdown and the MiniSearch index. Markdown is
+// sessionStorage-cached per path (5-min TTL); the index is module-scope
+// memoized for the session.
 import { WIKI_BASE_URL } from '../config/wikiConfig';
 
 const MD_TTL_MS = 5 * 60 * 1000;
-let graphPromise = null;
 let searchIndexPromise = null;
 
 export async function fetchEntryMarkdown(path) {
@@ -32,16 +31,6 @@ export async function fetchEntryMarkdown(path) {
     if (stale) { console.warn('[WikiContent] using stale md cache for', path); return stale; }
     throw err;
   }
-}
-
-export function fetchGraph() {
-  if (!graphPromise) {
-    graphPromise = fetch(`${WIKI_BASE_URL}/graph.json`).then((r) => {
-      if (!r.ok) throw new Error(`graph fetch HTTP ${r.status}`);
-      return r.json();
-    });
-  }
-  return graphPromise;
 }
 
 export function fetchSearchIndex() {

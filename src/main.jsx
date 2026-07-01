@@ -10,7 +10,6 @@ import Certs from './pages/certs.jsx'
 import ResourceTUI from './components/home/ResourceTUI.jsx'
 import Wiki from './pages/wiki.jsx'
 import WikiEntry from './pages/wiki-entry.jsx'
-import WikiGraph from './pages/wiki-graph.jsx'
 import ConnectSection from './components/home/ConnectSection.jsx'
 import Bytes from './pages/bytes.jsx'
 import BytesQuiz from './pages/bytes-quiz.jsx'
@@ -24,7 +23,6 @@ createRoot(document.getElementById('root')).render(
         <Route element={<Layout />}>
           <Route path="/" element={<App />} />
           <Route path="/wiki" element={<Wiki />} />
-          <Route path="/wiki/graph" element={<WikiGraph />} />
           <Route path="/wiki/:section/*" element={<WikiEntry />} />
           <Route path="/connect" element={<ConnectSection />} />
           {/* bytes: rapid-fire practice (top-level, parallel to /resources) */}

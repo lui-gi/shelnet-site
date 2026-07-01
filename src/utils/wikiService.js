@@ -58,6 +58,11 @@ export const getEntryByPath = (m, path) =>
 export const getEntriesBySection = (m, section) =>
   (m?.entries || []).filter((e) => e.section === section);
 
+export const getEntriesUnderPath = (m, path) => {
+  const prefix = `${path}/`;
+  return (m?.entries || []).filter((e) => e.path.startsWith(prefix));
+};
+
 export const getRecent = (m, n = 10) =>
   (m?.recent || []).slice(0, n).map((slug) => getEntryBySlug(m, slug)).filter(Boolean);
 

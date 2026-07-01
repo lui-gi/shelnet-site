@@ -75,21 +75,13 @@ export function shortcutsForPath(pathname) {
     return [
       { keys: '↑↓', label: 'select' },
       { keys: '/', label: 'search' },
-      { keys: 'g', label: 'graph' },
       { keys: 'esc', label: '~' },
     ];
   }
-  // Wiki graph.
-  if (pathname === '/wiki/graph') {
-    return [
-      { keys: 'esc', label: 'back' },
-    ];
-  }
-  // Wiki entry (anything under /wiki/ except /wiki/graph).
-  if (/^\/wiki\/(?!graph(?:\/|$))/.test(pathname)) {
+  // Wiki entry (anything under /wiki/).
+  if (/^\/wiki\//.test(pathname)) {
     return [
       { keys: '/', label: 'search' },
-      { keys: 'g', label: 'graph' },
       { keys: 'esc', label: 'up' },
     ];
   }

@@ -62,7 +62,7 @@ const WikiSearch = ({ open, onClose, initialQuery = '' }) => {
             onChange={handleQueryChange}
             onKeyDown={onKey}
             placeholder="search wiki..."
-            className="w-full bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400"
+            className="w-full bg-transparent outline-none text-neutral-900 placeholder:text-neutral-400 selection:bg-purple-200 selection:text-neutral-900"
           />
         </div>
         <WikiSearchHits
