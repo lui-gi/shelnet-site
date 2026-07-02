@@ -227,7 +227,13 @@ const Room = ({ module, onProgress }) => {
 
   // ── stage pane ─────────────────────────────────────────────────────────────
   const stageBody = StageComp ? (
-    <StageComp config={module.stageConfig} accentHex={hex} onEvent={handleStageEvent} active={checkpoint?.via === 'stage'} />
+    <StageComp
+      config={module.stageConfig}
+      accentHex={hex}
+      onEvent={handleStageEvent}
+      active={checkpoint?.via === 'stage'}
+      activeIndex={Math.min(activeIndex, Math.max(0, len - 1))}
+    />
   ) : (
     <div className="text-rose-400/90 text-xs">unknown stage kind: {String(module.stageKind)}</div>
   );

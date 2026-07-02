@@ -4,10 +4,12 @@
 // here; the Room engine does not change.
 import ShellStage from './ShellStage';
 import SearchStage from './SearchStage';
+import EditorStage from './EditorStage';
 
 export const STAGES = {
   shell: ShellStage,
   search: SearchStage,
+  editor: EditorStage,
 };
 
 /** The stage component for a kind, or null if unknown. */
