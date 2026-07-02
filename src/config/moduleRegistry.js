@@ -58,8 +58,10 @@ export const MODULES = [
 
   // ── Scripting (yellow) ─ advertised now via soon stubs; flipped live in
   // Tasks 3 & 4 of the scripting-category plan. ──────────────────────────────
-  { slug: 'bash-scripting', name: 'Bash Scripting', category: 'scripting', difficulty: 'core', status: 'soon',
-    blurb: 'Automate the shell you already know.' },
+  { slug: 'bash-scripting', name: 'Bash Scripting', category: 'scripting', difficulty: 'core',
+    stageKind: 'shell', status: 'live',
+    blurb: 'Automate the shell you already know.',
+    load: () => import('./modules/bash-scripting.js') },
   { slug: 'python-scripting', name: 'Python Scripting', category: 'scripting', difficulty: 'core', status: 'soon',
     blurb: 'Small scripts that do real work.' },
 
