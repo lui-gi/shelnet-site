@@ -46,8 +46,10 @@ export const MODULES = [
     blurb: 'Turn raw log noise into a timeline.' },
 
   // ── Reconnaissance (cyan) ───────────────────────────────────────────────────
-  { slug: 'active-reconnaissance', name: 'Active Reconnaissance', category: 'reconnaissance', difficulty: 'core', status: 'soon',
-    blurb: 'Map a target you are allowed to touch.' },
+  { slug: 'active-reconnaissance', name: 'Active Reconnaissance', category: 'reconnaissance', difficulty: 'core',
+    stageKind: 'shell', status: 'live',
+    blurb: 'Map a target you are allowed to touch.',
+    load: () => import('./modules/active-reconnaissance.js') },
   { slug: 'enumeration', name: 'Enumeration', category: 'reconnaissance', difficulty: 'core',
     stageKind: 'shell', status: 'live',
     blurb: 'Catalogue services, users, and shares.',
@@ -84,8 +86,10 @@ export const MODULES = [
     blurb: 'Pivot through an EDR console on a detection.' },
 
   // ── Incident Response (green) ───────────────────────────────────────────────
-  { slug: 'incident-response', name: 'Incident Response', category: 'incident-response', difficulty: 'advanced', status: 'soon',
-    blurb: 'Run the IR lifecycle on a live alert.' },
+  { slug: 'incident-response', name: 'Incident Response', category: 'incident-response', difficulty: 'advanced',
+    stageKind: 'search', status: 'live',
+    blurb: 'Run the IR lifecycle on a live alert.',
+    load: () => import('./modules/incident-response.js') },
 
   // ── Exploit Development (orange) ────────────────────────────────────────────
   { slug: 'exploit-development', name: 'Exploit Development', category: 'exploit-development', difficulty: 'advanced', status: 'soon',
