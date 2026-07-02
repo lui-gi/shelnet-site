@@ -62,8 +62,10 @@ export const MODULES = [
     stageKind: 'shell', status: 'live',
     blurb: 'Automate the shell you already know.',
     load: () => import('./modules/bash-scripting.js') },
-  { slug: 'python-scripting', name: 'Python Scripting', category: 'scripting', difficulty: 'core', status: 'soon',
-    blurb: 'Small scripts that do real work.' },
+  { slug: 'python-scripting', name: 'Python Scripting', category: 'scripting', difficulty: 'core',
+    stageKind: 'editor', status: 'live',
+    blurb: 'Small scripts that do real work.',
+    load: () => import('./modules/python-scripting.js') },
 
   // ── Web (amber) ─ advertised now via soon stubs ─────────────────────────────
   { slug: 'web-recon', name: 'Web Recon', category: 'web', difficulty: 'core', status: 'soon',
