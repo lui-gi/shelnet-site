@@ -131,6 +131,21 @@ export const themeColors = {
     iconBorder: 'border-amber-500/50',
   },
 
+  yellow: {
+    bgActive: 'bg-yellow-500/10',
+    bgHover: 'bg-white/[0.05]',
+    border: 'border-white/10',
+    borderActive: 'border-yellow-500',
+    borderHover: 'border-white/30',
+    hoverBorder: 'hover:border-yellow-500',
+    text: 'text-yellow-400',
+    textMuted: 'text-yellow-400/80',
+    textHover: 'hover:text-yellow-400',
+    pulse: 'bg-yellow-400',
+    iconBg: 'bg-yellow-500/20',
+    iconBorder: 'border-yellow-500/50',
+  },
+
   green: {
     bgActive: 'bg-emerald-500/10',
     bgHover: 'bg-white/[0.05]',

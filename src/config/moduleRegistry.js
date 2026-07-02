@@ -15,6 +15,7 @@ import { getVisualizations } from '../utils/manifestService';
 // tints its chrome with its category's accent.
 export const CATEGORIES = [
   { id: 'foundations',       label: 'Foundations',                accent: 'purple' },
+  { id: 'scripting',         label: 'Scripting',                  accent: 'yellow' },
   { id: 'reconnaissance',    label: 'Reconnaissance',             accent: 'cyan'   },
   { id: 'web',               label: 'Web',                        accent: 'amber'  },
   { id: 'post-exploitation', label: 'Post-Exploitation',          accent: 'red'    },
@@ -54,6 +55,13 @@ export const MODULES = [
     stageKind: 'shell', status: 'live',
     blurb: 'Catalogue services, users, and shares.',
     load: () => import('./modules/enumeration.js') },
+
+  // ── Scripting (yellow) ─ advertised now via soon stubs; flipped live in
+  // Tasks 3 & 4 of the scripting-category plan. ──────────────────────────────
+  { slug: 'bash-scripting', name: 'Bash Scripting', category: 'scripting', difficulty: 'core', status: 'soon',
+    blurb: 'Automate the shell you already know.' },
+  { slug: 'python-scripting', name: 'Python Scripting', category: 'scripting', difficulty: 'core', status: 'soon',
+    blurb: 'Small scripts that do real work.' },
 
   // ── Web (amber) ─ advertised now via soon stubs ─────────────────────────────
   { slug: 'web-recon', name: 'Web Recon', category: 'web', difficulty: 'core', status: 'soon',

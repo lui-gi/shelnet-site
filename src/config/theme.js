@@ -11,6 +11,7 @@ export const ACCENTS = {
   orange: { hex: '#fb923c', name: 'orange' }, // Labs / Exploit Dev
   cyan:   { hex: '#22d3ee', name: 'cyan'   }, // CySA+ / Reconnaissance
   amber:  { hex: '#fbbf24', name: 'amber'  }, // Web
+  yellow: { hex: '#eab308', name: 'yellow' }, // Scripting
   slate:  { hex: '#cbd5e1', name: 'slate'  }, // Notes
 };
 
