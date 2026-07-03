@@ -1,6 +1,6 @@
 // src/utils/paletteIndex.js
 // Builds the searchable pool for the global command palette (`/`). Includes:
-//   - fixed top-level routes (home, wiki, resources subtrees, bytes, connect)
+//   - fixed top-level routes (home, wiki, certs/modules/labs/visualizations, bytes, connect)
 //   - every cert dashboard from the resources manifest
 //   - every module room from the static moduleRegistry
 // Each entry has a hex accent so the marker glyph matches the destination's
@@ -13,15 +13,14 @@ import { getCerts } from './manifestService';
 const hex = (accent) => (ACCENTS[accent] || ACCENTS.green).hex;
 
 const STATIC_ROUTES = [
-  { label: 'home',           sub: '~',                       path: '/',                          accent: 'green'  },
-  { label: 'wiki',           sub: 'notes + writeups + guides', path: '/wiki',                    accent: 'purple' },
-  { label: 'resources',      sub: 'index',                    path: '/resources',                accent: 'green'  },
-  { label: 'certs',          sub: 'study console',            path: '/resources/certs',          accent: 'green'  },
-  { label: 'modules',        sub: 'interactive rooms',        path: '/resources/modules',        accent: 'green'  },
-  { label: 'labs',           sub: 'wip lab environments',     path: '/resources/labs',           accent: 'orange' },
-  { label: 'visualizations', sub: 'foundational primers',     path: '/resources/visualizations', accent: 'purple' },
-  { label: 'bytes',          sub: 'rapid-fire practice',      path: '/bytes',                    accent: 'green'  },
-  { label: 'connect',        sub: 'contact + socials',        path: '/connect',                  accent: 'green'  },
+  { label: 'home',           sub: '~',                          path: '/',                accent: 'green'  },
+  { label: 'wiki',           sub: 'notes + writeups + guides',  path: '/wiki',            accent: 'purple' },
+  { label: 'certs',          sub: 'study console',              path: '/certs',           accent: 'green'  },
+  { label: 'modules',        sub: 'interactive rooms',          path: '/modules',         accent: 'green'  },
+  { label: 'labs',           sub: 'wip lab environments',       path: '/labs',            accent: 'orange' },
+  { label: 'visualizations', sub: 'foundational primers',       path: '/visualizations',  accent: 'purple' },
+  { label: 'bytes',          sub: 'rapid-fire practice',        path: '/bytes',           accent: 'green'  },
+  { label: 'connect',        sub: 'contact + socials',          path: '/connect',         accent: 'green'  },
 ];
 
 export function buildPaletteIndex(manifest) {
@@ -29,14 +28,14 @@ export function buildPaletteIndex(manifest) {
     ? getCerts(manifest).map((c) => ({
         label: c.label.toLowerCase(),
         sub: `cert · ${c.code || c.slug}`,
-        path: `/resources/certs/${c.slug}`,
+        path: `/certs/${c.slug}`,
         accent: c.accent,
       }))
     : [];
   const modules = MODULES.map((m) => ({
     label: m.name.toLowerCase(),
     sub: `module · ${m.category}${m.status === 'soon' ? ' · soon' : ''}`,
-    path: `/resources/modules/${m.slug}`,
+    path: `/modules/${m.slug}`,
     accent: accentForCategory(m.category),
   }));
   return STATIC_ROUTES.concat(certs, modules).map((e) => ({ ...e, hex: hex(e.accent) }));
