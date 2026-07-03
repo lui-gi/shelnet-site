@@ -34,7 +34,7 @@ const HomeHero = ({ entryCount, lastEditedLabel }) => (
   <header className="text-center mb-8">
     <h1 className="text-3xl font-semibold text-neutral-900 tracking-tight">shelnet wiki</h1>
     <p className="text-sm text-neutral-500 mt-1">
-      A personal wiki for notes, writeups, and guides
+      a personal wiki for notes, writeups, and guides
       {entryCount > 0 && (
         <>
           {' · '}{entryCount} entries

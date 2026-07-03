@@ -7,7 +7,7 @@ import { buildSidebarTree } from './sidebarTree';
 
 const EntryLeaf = ({ node, currentPath, depth }) => {
   const active = currentPath === node.path;
-  const indent = `${depth * 1.1}rem`;
+  const indent = `${depth * 1.5}rem`;
   return (
     <Link
       to={`/wiki/${node.path}`}
@@ -26,7 +26,7 @@ const EntryLeaf = ({ node, currentPath, depth }) => {
 
 const DirBranch = ({ node, currentPath, depth }) => {
   const [open, setOpen] = useState(true);
-  const indent = `${depth * 1.1}rem`;
+  const indent = `${depth * 1.5}rem`;
   return (
     <div>
       <button
