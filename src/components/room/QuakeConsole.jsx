@@ -1,11 +1,11 @@
 // src/components/room/QuakeConsole.jsx
 // A persistent bottom dock that reads as a real prompt at rest
-// ("guest@shelnet:~/resources/modules[/<slug>]$ … summon `") and, on click or
+// ("guest@shelnet:~/modules[/<slug>]$ … summon `") and, on click or
 // backtick (`), opens a centered modal terminal with a blurred backdrop. From
 // the modal you can run lobby commands (help / list / load <other> / clear).
 //
-// Two modes share this component so the lobby (/resources/modules) and an open
-// room (/resources/modules/<slug>) feel like the same summoned-console shell:
+// Two modes share this component so the lobby (/modules) and an open
+// room (/modules/<slug>) feel like the same summoned-console shell:
 //   - mode='room'  (default): path includes the slug; `exit`/`back` and
 //     Escape-when-closed call onExit; navigate commands print an "exit the
 //     room first" note (the room owns the viewport).
@@ -45,7 +45,7 @@ const QuakeConsole = ({ slug, manifest, onLoad, onExit, mode = 'room' }) => {
   const scrollRef = useRef(null);
   const navigate = useNavigate();
   const isLobby = mode === 'lobby';
-  const path = isLobby ? '~/resources/modules' : `~/resources/modules/${slug}`;
+  const path = isLobby ? '~/modules' : `~/modules/${slug}`;
 
   // Backtick toggles the console. Escape closes it when open. When closed:
   // room mode calls onExit; lobby mode falls back to the site home.

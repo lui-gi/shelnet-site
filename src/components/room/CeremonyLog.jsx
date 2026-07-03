@@ -76,7 +76,7 @@ const CeremonyLog = ({ module, accentHex, onDone }) => {
         <span className="whitespace-pre">
           <span style={{ color: SHELL.dim }}>guest@shelnet</span>
           <span className="text-white/40">:</span>
-          <span style={{ color: SHELL.green }}>~/resources/modules</span>
+          <span style={{ color: SHELL.green }}>~/modules</span>
           <span className="text-white/40">$</span>
         </span>
         <span className="text-white/90">load {module.slug}</span>
