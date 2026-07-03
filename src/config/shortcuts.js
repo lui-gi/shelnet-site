@@ -8,11 +8,11 @@ export function shortcutsForPath(pathname) {
     return [
       { keys: '↑↓', label: 'move' },
       { keys: '↵', label: 'open' },
-      { keys: '1–6', label: 'jump' },
+      { keys: '1–5', label: 'jump' },
     ];
   }
   // Cert study console.
-  if (/^\/resources\/certs\/?$/.test(pathname)) {
+  if (/^\/certs\/?$/.test(pathname)) {
     return [
       { keys: '↑↓', label: 'select' },
       { keys: '↵', label: 'open' },
@@ -21,7 +21,7 @@ export function shortcutsForPath(pathname) {
     ];
   }
   // File viewers: cert dashboards + the visualizations playground.
-  if (/^\/resources\/certs\/[^/]+\/?$/.test(pathname) || pathname === '/resources/visualizations') {
+  if (/^\/certs\/[^/]+\/?$/.test(pathname) || pathname === '/visualizations') {
     return [
       { keys: '↑↓', label: 'file' },
       { keys: 'e', label: 'files' },
@@ -30,19 +30,10 @@ export function shortcutsForPath(pathname) {
     ];
   }
   // Labs WIP.
-  if (pathname === '/resources/labs') {
+  if (pathname === '/labs') {
     return [
       { keys: '↵', label: 'notify' },
       { keys: 'esc', label: 'back' },
-    ];
-  }
-  // Resources index.
-  if (/^\/resources\/?$/.test(pathname)) {
-    return [
-      { keys: '↑↓', label: 'move' },
-      { keys: '→/↵', label: 'open' },
-      { keys: '1–5', label: 'jump' },
-      { keys: 'esc', label: 'home' },
     ];
   }
   // bytes cert picker.
@@ -86,7 +77,7 @@ export function shortcutsForPath(pathname) {
     ];
   }
   // Modules lobby terminal.
-  if (pathname === '/resources/modules') {
+  if (pathname === '/modules') {
     return [
       { keys: 'type', label: 'command' },
       { keys: '↵', label: 'run' },
@@ -95,7 +86,7 @@ export function shortcutsForPath(pathname) {
     ];
   }
   // Module room (lesson + lab stage).
-  if (/^\/resources\/modules\/[^/]+\/?$/.test(pathname)) {
+  if (/^\/modules\/[^/]+\/?$/.test(pathname)) {
     return [
       { keys: '↑↓', label: 'section' },
       { keys: 'h', label: 'hint' },
