@@ -1,13 +1,13 @@
 // src/pages/modules.jsx
 // Route page for the interactive modules. Two states share one viewport-filling
 // shell:
-//   /resources/modules        -> the lobby: centered ASCII banner + info text
-//                                 with a QuakeConsole (mode='lobby') pill dock
-//                                 at the bottom that summons the same modal
-//                                 terminal used inside a room.
-//   /resources/modules/:slug   -> a GUI room: the load ceremony plays, then the
-//                                 two-pane Room mounts with a collapsed quake
-//                                 console docked at the bottom.
+//   /modules            -> the lobby: centered ASCII banner + info text
+//                            with a QuakeConsole (mode='lobby') pill dock
+//                            at the bottom that summons the same modal
+//                            terminal used inside a room.
+//   /modules/:slug      -> a GUI room: the load ceremony plays, then the
+//                            two-pane Room mounts with a collapsed quake
+//                            console docked at the bottom.
 // `load <slug>` in the lobby console navigates here (with a ceremony flag); a
 // deep link / refresh on an already-started room resumes straight into it.
 import { useEffect, useState } from 'react';
@@ -140,7 +140,7 @@ const Modules = () => {
       <TerminalShell fill>
         <Lobby
           manifest={manifest}
-          onLoad={(s) => navigate(`/resources/modules/${s}`, { state: { ceremony: true } })}
+          onLoad={(s) => navigate(`/modules/${s}`, { state: { ceremony: true } })}
         />
       </TerminalShell>
     );
@@ -150,7 +150,7 @@ const Modules = () => {
   if (!stub || stub.status !== 'live') {
     return (
       <TerminalShell fill>
-        <RoomMissing slug={slug} status={stub?.status} onBack={() => navigate('/resources/modules')} />
+        <RoomMissing slug={slug} status={stub?.status} onBack={() => navigate('/modules')} />
       </TerminalShell>
     );
   }
@@ -166,8 +166,8 @@ const Modules = () => {
         stub={stub}
         manifest={manifest}
         startWithCeremony={startWithCeremony}
-        onExit={() => navigate('/resources/modules')}
-        onLoad={(s) => navigate(`/resources/modules/${s}`, { state: { ceremony: true } })}
+        onExit={() => navigate('/modules')}
+        onLoad={(s) => navigate(`/modules/${s}`, { state: { ceremony: true } })}
       />
     </TerminalShell>
   );
