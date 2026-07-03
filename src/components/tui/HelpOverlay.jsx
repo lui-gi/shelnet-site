@@ -1,21 +1,19 @@
 // src/components/tui/HelpOverlay.jsx
 // Modal cheat sheet opened by the global `?` shortcut. Two columns: the site-
-// wide chord vocabulary (source: JUMP_MAP + BottomBar), and the current page's
-// contextual keys (source: shortcutsForPath). Meant to be the answer to "what
-// were the leader letters again?" — not a marketing page.
+// wide bare-key vocabulary sourced from BottomBar, and the current page's
+// contextual keys sourced from shortcutsForPath. Meant to be the answer to
+// "what were the keys again?" — not a marketing page.
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SHELL } from '../../config/theme';
 import { shortcutsForPath } from '../../config/shortcuts';
-import { JUMP_MAP, CHORD_ACTIONS } from '../../utils/useGlobalShortcuts';
 
 const GLOBAL_ROWS = [
   { keys: '/',   label: 'command palette (skips on /wiki — local search)' },
   { keys: '?',   label: 'this help' },
   { keys: 'r',   label: 'random — wiki entry or bytes track' },
   { keys: 'n',   label: 'news / changelog (skips on /bytes/<cert> — next)' },
-  { keys: 'g _', label: 'jump leader (see below)' },
-  { keys: 'esc', label: 'close · back · bail chord' },
+  { keys: 'esc', label: 'close · back' },
 ];
 
 const HelpOverlay = ({ open, onClose }) => {
@@ -53,22 +51,6 @@ const HelpOverlay = ({ open, onClose }) => {
                 </li>
               ))}
             </ul>
-
-            <h3 className="mt-5 mb-2 text-white/45 text-xs uppercase tracking-wider">g&nbsp;leader</h3>
-            <ul className="grid grid-cols-2 gap-y-1 gap-x-3">
-              {Object.entries(JUMP_MAP).map(([k, v]) => (
-                <li key={k} className="flex items-baseline gap-2">
-                  <span className="w-8 shrink-0" style={{ color: SHELL.green, fontWeight: 600 }}>g {k}</span>
-                  <span className="text-white/70 truncate">{v.label}</span>
-                </li>
-              ))}
-              {Object.entries(CHORD_ACTIONS).map(([k, v]) => (
-                <li key={`a-${k}`} className="flex items-baseline gap-2">
-                  <span className="w-8 shrink-0" style={{ color: SHELL.green, fontWeight: 600 }}>g {k}</span>
-                  <span className="text-white/70 truncate">{v.label}</span>
-                </li>
-              ))}
-            </ul>
           </section>
 
           <section>
@@ -88,10 +70,6 @@ const HelpOverlay = ({ open, onClose }) => {
               ))}
             </ul>
           </section>
-        </div>
-
-        <div className="border-t border-white/10 px-4 py-1.5 text-xs text-white/40">
-          chord leader has an ~800ms window; press esc to bail
         </div>
       </div>
     </div>

@@ -2,8 +2,8 @@
 // Global sticky tty bar pinned to the bottom of every page, the mirror of
 // PromptBar. Left: three global affordances that work on every route —
 //   [ /  find ]   command palette (routes + certs + modules)
-//   [ g_ go   ]   vim-style jump leader (see JUMP_MAP)
 //   [ r  ??   ]   random discovery (wiki entry or bytes track)
+//   [ n  news ]   changelog / recent shipped changes
 // Right: contextual keyboard shortcuts for the current route, plus an always-
 // present [ ? help ] hint that opens the cheat sheet. Hidden on mobile where
 // there is no keyboard. Mounted once in Layout, below the Outlet.
@@ -23,10 +23,9 @@ import ChangelogOverlay from './ChangelogOverlay';
 // Rendered left-side affordances. Each shows a colored key hint next to a
 // dim label, using the same `[ … ]` frame as the old CTAs.
 const SLOTS = [
-  { id: 'palette', keys: '/',  label: 'find' },
-  { id: 'jump',    keys: 'g_', label: 'go'   },
-  { id: 'random',  keys: 'r',  label: '??'   },
-  { id: 'news',    keys: 'n',  label: 'news' },
+  { id: 'palette', keys: '/', label: 'find' },
+  { id: 'random',  keys: 'r', label: '??'   },
+  { id: 'news',    keys: 'n', label: 'news' },
 ];
 
 const BottomBar = () => {
@@ -63,7 +62,6 @@ const BottomBar = () => {
 
   const onSlotClick = (id) => {
     if (id === 'palette') openPalette();
-    else if (id === 'jump') openHelp();
     else if (id === 'random') doRandom();
     else if (id === 'news') openNews();
   };

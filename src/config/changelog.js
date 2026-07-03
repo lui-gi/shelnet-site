@@ -7,8 +7,8 @@ export const CHANGELOG = [
   {
     date: '2026-07-02',
     tag: 'shortcuts',
-    title: 'global chord shortcuts',
-    blurb: 'new bottom bar affordances: `/` command palette, `g <x>` jump leader, `r` random, `?` help, `n` news.',
+    title: 'global shortcuts',
+    blurb: 'new bottom bar affordances: `/` command palette, `r` random, `?` help, `n` news.',
   },
   {
     date: '2026-07-02',
