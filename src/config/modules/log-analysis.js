@@ -185,5 +185,83 @@ export default {
         explain: 'Six lines spanning 14:02–14:06: several Failed passwords for jsmith and root from 10.0.0.9, plus one Accepted password for jsmith at the tail. That is the shape you will keep narrowing.',
       },
     },
+    {
+      id: 'grep',
+      title: 'Filter with grep',
+      blocks: [
+        { h3: 'The universal narrowing tool' },
+        { p: '`grep <pattern> <file>` prints every matching line. Case-insensitive is `-i`; extended regex is `-E`; invert (keep non-matches) is `-v`. Quote patterns that contain spaces or shell metacharacters.' },
+        {
+          list: [
+            '`grep -i failed /var/log/auth.log`: case-insensitive substring match.',
+            "`grep -E 'Failed|Invalid' /var/log/auth.log`: alternation across two words.",
+            '`grep -v Accepted /var/log/auth.log`: drop success lines, keep everything else.',
+          ],
+        },
+        { callout: "Rule of thumb: filter first, transform second. Every downstream pipe stage runs on fewer rows, and grep is the cheapest filter you have." },
+        { task: "Show only the failed-password lines." },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: /^grep(\s+-[iEv]+)*\s+['"]?Failed password['"]?\s+\/var\/log\/auth\.log\s*$/i,
+        hints: [
+          'grep the exact phrase "Failed password" out of the auth log.',
+          'quote the pattern because it contains a space.',
+          "try `grep 'Failed password' /var/log/auth.log`.",
+        ],
+        reveal: "grep 'Failed password' /var/log/auth.log",
+        explain: 'Four failure lines survive. jsmith accounts for three of them, root for one — all from 10.0.0.9. The shape of the incident is already showing.',
+      },
+    },
+    {
+      id: 'window',
+      title: 'Narrow to a time window',
+      blocks: [
+        { h3: 'awk on the timestamp column' },
+        { p: 'Syslog lines start with `Mon DD HH:MM:SS` — three space-separated fields. `awk` splits each line on whitespace and lets you compare fields directly. Field 3 (`$3`) is the time; a string comparison against `"HH:MM"` is enough when the day is fixed.' },
+        { code: "awk '$3 >= \"14:02\" && $3 < \"14:06\"' /var/log/auth.log" },
+        { p: 'The upper bound uses `< "14:06"` rather than `<= "14:05"` because string comparison sorts `"14:05:08"` after `"14:05"` (longer strings with a shared prefix are "greater"), so a `<=` bound would drop 14:05:xx events. For date arithmetic across days, reach for `date -d` or Python; when the window fits inside one day, string comparison is the shortest path.' },
+        { task: 'Keep only lines from 14:02 through 14:05.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: /^awk\s+'\$3\s*>=\s*"14:02"\s*&&\s*\$3\s*<\s*"14:06"'\s+\/var\/log\/auth\.log\s*$/i,
+        hints: [
+          '$3 is the timestamp field.',
+          'string comparison works when the window is inside one day — but bound with `< "14:06"`, not `<= "14:05"`, so 14:05:xx events are kept.',
+          "try `awk '$3 >= \"14:02\" && $3 < \"14:06\"' /var/log/auth.log`.",
+        ],
+        reveal: "awk '$3 >= \"14:02\" && $3 < \"14:06\"' /var/log/auth.log",
+        explain: 'Five lines land in-window. The Accepted-password success at 14:06 is now cut off — save that pivot for later, once you have the failure story quantified.',
+      },
+    },
+    {
+      id: 'fields',
+      title: 'Extract fields',
+      blocks: [
+        { h3: 'awk \'{print $N}\' — the shell \'| fields\'' },
+        { p: 'Once every line has the same shape, pull out just the columns you need. In sshd log lines, field 9 is the username and field 11 is the source IP. Chain grep-filters into an awk-print to end up with a two-column view.' },
+        { code: "grep 'Failed password' /var/log/auth.log | grep jsmith | awk '{print $9, $11}'" },
+        {
+          list: [
+            '`awk \'{print $1, $2, $3}\'`: pick specific columns.',
+            '`cut -d\' \' -f9,11 file`: same idea, no scripting language.',
+            '`awk \'{print $NF}\'`: the last field, useful when width varies.',
+          ],
+        },
+        { task: 'Extract user and source IP for failed jsmith logins.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: /^grep\s+['"]?Failed password['"]?\s+\/var\/log\/auth\.log\s*\|\s*grep\s+jsmith\s*\|\s*awk\s+'\{\s*print\s+\$9\s*,\s*\$11\s*\}'\s*$/i,
+        hints: [
+          'chain three stages: grep for Failed password, grep for jsmith, awk for the two fields.',
+          'field 9 is the user, field 11 is the source IP.',
+          "try `grep 'Failed password' /var/log/auth.log | grep jsmith | awk '{print $9, $11}'`.",
+        ],
+        reveal: "grep 'Failed password' /var/log/auth.log | grep jsmith | awk '{print $9, $11}'",
+        explain: 'Three lines, all `jsmith 10.0.0.9`. Same source every time — this is not fat-fingers across a hallway of workstations, it is one host hammering one account.',
+      },
+    },
   ],
 };
