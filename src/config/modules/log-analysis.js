@@ -263,5 +263,99 @@ export default {
         explain: 'Three lines, all `jsmith 10.0.0.9`. Same source every time — this is not fat-fingers across a hallway of workstations, it is one host hammering one account.',
       },
     },
+    {
+      id: 'count',
+      title: 'Count with sort | uniq -c',
+      blocks: [
+        { h3: 'The shell \'| stats count by\'' },
+        { p: '`uniq -c` prefixes each unique adjacent line with its count. It requires the input to be sorted first (otherwise "adjacent" means nothing), so the canonical shell frequency table is `... | sort | uniq -c`.' },
+        { code: "grep 'Failed password' /var/log/auth.log | awk '{print $9}' | sort | uniq -c" },
+        {
+          list: [
+            '`sort | uniq`: distinct values, no counts.',
+            '`sort | uniq -c`: distinct values with a leading count.',
+            '`sort | uniq -c | sort -rn`: same, sorted with the biggest count first.',
+          ],
+        },
+        { callout: 'Every SIEM aggregation ultimately looks like this pipeline. You are learning the primitive it wraps.' },
+        { task: 'Count failed logins per user.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: /^grep\s+['"]?Failed password['"]?\s+\/var\/log\/auth\.log\s*\|\s*awk\s+'\{\s*print\s+\$9\s*\}'\s*\|\s*sort\s*\|\s*uniq\s+-c\s*$/i,
+        hints: [
+          'grep the failure lines, print field 9, then sort and uniq -c.',
+          'the pipeline is four stages: grep, awk, sort, uniq -c.',
+          "try `grep 'Failed password' /var/log/auth.log | awk '{print $9}' | sort | uniq -c`.",
+        ],
+        reveal: "grep 'Failed password' /var/log/auth.log | awk '{print $9}' | sort | uniq -c",
+        explain: 'jsmith owns 47 failures, admin 3, root 1. The other accounts are background noise; the attack is on jsmith.',
+      },
+    },
+    {
+      id: 'howmany',
+      title: 'Read the numbers',
+      blocks: [
+        { h3: 'Knowledge check' },
+        { p: 'Numbers drive the severity you report. Look at the count table you just produced.' },
+        { task: 'How many failed logins did jsmith rack up?' },
+      ],
+      checkpoint: {
+        via: 'answer',
+        accept: /\b47\b/,
+        hints: ['It is the count next to jsmith in the uniq -c output.'],
+        reveal: '47',
+        explain: '47 failures is well past any fat-finger threshold. The only question left is whether one of them eventually worked.',
+      },
+    },
+    {
+      id: 'rank',
+      title: 'Rank the top offenders',
+      blocks: [
+        { h3: 'sort -rn | head' },
+        { p: 'To surface the worst offenders, pipe the count table into another `sort -rn` (numeric, descending) and then `head` to keep just the top N. This is the shell equivalent of `| sort -count | head 3` in SPL.' },
+        { code: "grep 'Failed password' /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -rn | head -3" },
+        {
+          list: [
+            '`sort -rn`: numeric (-n), reverse (-r). Alphabetic sort would put "10" before "3".',
+            '`head -3` or `head -n 3`: keep the first three rows.',
+            '`tail -3`: same, but the smallest ones — useful for finding quiet outliers.',
+          ],
+        },
+        { task: 'Find the top 3 source IPs by failure count.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: /^grep\s+['"]?Failed password['"]?\s+\/var\/log\/auth\.log\s*\|\s*awk\s+'\{\s*print\s+\$11\s*\}'\s*\|\s*sort\s*\|\s*uniq\s+-c\s*\|\s*sort\s+-rn\s*\|\s*head(\s+-n?\s*3)?\s*$/i,
+        hints: [
+          'aggregate by src_ip (field 11), then rank descending.',
+          'sort -rn puts the largest count first; head -3 keeps three rows.',
+          "try `grep 'Failed password' /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -rn | head -3`.",
+        ],
+        reveal: "grep 'Failed password' /var/log/auth.log | awk '{print $11}' | sort | uniq -c | sort -rn | head -3",
+        explain: '10.0.0.9 owns 47 of the 51 failures. One host is doing almost all the noise — mirroring exactly what the Splunk room told you with `| stats count by src_ip`.',
+      },
+    },
+    {
+      id: 'success',
+      title: 'Did it succeed?',
+      blocks: [
+        { h3: 'Pivot to the successes' },
+        { p: 'A brute force only matters if one attempt landed. Flip the grep from "Failed password" to "Accepted password" and re-filter for the same user.' },
+        { code: "grep 'Accepted password' /var/log/auth.log | grep jsmith" },
+        { task: 'Show whether any jsmith login finally succeeded.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: /^grep\s+['"]?Accepted password['"]?\s+\/var\/log\/auth\.log\s*\|\s*grep\s+jsmith\s*$/i,
+        hints: [
+          'same file, but grep for Accepted password instead of Failed.',
+          'chain a second grep for the user.',
+          "try `grep 'Accepted password' /var/log/auth.log | grep jsmith`.",
+        ],
+        reveal: "grep 'Accepted password' /var/log/auth.log | grep jsmith",
+        explain: 'One Accepted password at 14:06:01, from 10.0.0.9 — the same IP that supplied the 47 failures. The brute force worked. That is the moment the incident becomes a compromise.',
+      },
+    },
   ],
 };
