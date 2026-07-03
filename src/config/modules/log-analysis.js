@@ -418,5 +418,21 @@ export default {
         explain: '10.0.0.9 is tagged `ssh-brute-forcer`, first seen 2026-06-14. That is the enriched row you paste into the ticket: not a raw IP, but an IP with a name.',
       },
     },
+    {
+      id: 'verdict',
+      title: 'Call it',
+      blocks: [
+        { h3: 'Make the call' },
+        { p: 'Triage ends with a verdict an analyst can act on. You have the counts, you have the successful login that followed them, and the source IP is on your intel list. That is enough to answer the only question that matters.' },
+        { task: 'Given 47 failures then a success from an IP already on your IOC list, is jsmith compromised? (yes / no)' },
+      ],
+      checkpoint: {
+        via: 'answer',
+        accept: /^\s*y(es)?\s*$/i,
+        hints: ['47 failures, one Accepted password from the same IP, and that IP is on the intel list.'],
+        reveal: 'yes',
+        explain: 'Yes. Treat jsmith as compromised: disable the account, reset credentials, and hunt for what that session touched after 14:06. You just triaged a real intrusion from a flat file, and every command you ran is one an on-call analyst could reach for in the dark.',
+      },
+    },
   ],
 };
