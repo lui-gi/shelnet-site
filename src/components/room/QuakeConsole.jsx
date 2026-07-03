@@ -1,14 +1,22 @@
 // src/components/room/QuakeConsole.jsx
-// A persistent bottom dock under the open room that reads as a real prompt at
-// rest ("guest@shelnet:~/resources/modules/<slug>$ … summon `") and, on click or
+// A persistent bottom dock that reads as a real prompt at rest
+// ("guest@shelnet:~/resources/modules[/<slug>]$ … summon `") and, on click or
 // backtick (`), opens a centered modal terminal with a blurred backdrop. From
-// the modal you can run lobby commands (help / list / load <other> / clear) and
-// `exit`. Loading another module swaps the room; `exit` (or Escape from the
-// closed dock) returns to the full-screen lobby.
+// the modal you can run lobby commands (help / list / load <other> / clear).
+//
+// Two modes share this component so the lobby (/resources/modules) and an open
+// room (/resources/modules/<slug>) feel like the same summoned-console shell:
+//   - mode='room'  (default): path includes the slug; `exit`/`back` and
+//     Escape-when-closed call onExit; navigate commands print an "exit the
+//     room first" note (the room owns the viewport).
+//   - mode='lobby': path is the lobby; there is no room to exit, so Escape-
+//     when-closed navigates to '/' (matching the old Terminal.jsx behavior),
+//     and `navigate` actions perform the navigation directly.
 //
 // The prompt glyph + cursor stay SHELL.green regardless of the room accent, for
 // continuity with the lobby terminal.
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { runCommand } from '../terminal/commands';
 import { loadStore } from '../../utils/moduleProgress';
 import { SHELL } from '../../config/theme';
@@ -29,26 +37,30 @@ const Prompt = ({ path }) => (
   </span>
 );
 
-const QuakeConsole = ({ slug, manifest, accentHex, onLoad, onExit }) => {
+const QuakeConsole = ({ slug, manifest, onLoad, onExit, mode = 'room' }) => {
   const [open, setOpen] = useState(false);
   const [buffer, setBuffer] = useState([]);
   const [value, setValue] = useState('');
   const inputRef = useRef(null);
   const scrollRef = useRef(null);
-  const path = `~/resources/modules/${slug}`;
+  const navigate = useNavigate();
+  const isLobby = mode === 'lobby';
+  const path = isLobby ? '~/resources/modules' : `~/resources/modules/${slug}`;
 
-  // Backtick toggles the console; Escape closes it (or exits the room when closed).
+  // Backtick toggles the console. Escape closes it when open. When closed:
+  // room mode calls onExit; lobby mode falls back to the site home.
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === '`') { e.preventDefault(); setOpen((o) => !o); }
       else if (e.key === 'Escape') {
         if (open) { e.preventDefault(); setOpen(false); }
+        else if (isLobby) navigate('/');
         else onExit?.();
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [open, onExit]);
+  }, [open, onExit, isLobby, navigate]);
 
   useEffect(() => { if (open) inputRef.current?.focus(); }, [open]);
   useEffect(() => {
@@ -65,18 +77,22 @@ const QuakeConsole = ({ slug, manifest, accentHex, onLoad, onExit }) => {
     if (!input.trim()) { append([echo]); return; }
 
     const n = norm(input);
-    if (n === 'exit' || n === 'back') { onExit?.(); return; }
+    if (!isLobby && (n === 'exit' || n === 'back')) { onExit?.(); return; }
 
     const { lines, action } = runCommand(input, manifest, loadStore());
     if (action?.type === 'clear') { setBuffer([]); return; }
     if (action?.type === 'load') {
-      if (action.module.slug === slug) { append([echo, { text: 'already in this room.', tone: 'sys' }]); return; }
+      if (!isLobby && action.module.slug === slug) {
+        append([echo, { text: 'already in this room.', tone: 'sys' }]);
+        return;
+      }
       append([echo, { text: `loading ${action.module.name}…`, tone: 'sys' }]);
       onLoad?.(action.module.slug);
       setOpen(false);
       return;
     }
     if (action?.type === 'navigate') {
+      if (isLobby) { append([echo, ...lines]); navigate(action.to); setOpen(false); return; }
       append([echo, ...lines, { text: 'exit the room first to open a foundation primer.', tone: 'sys' }]);
       return;
     }
@@ -105,10 +121,11 @@ const QuakeConsole = ({ slug, manifest, accentHex, onLoad, onExit }) => {
         </button>
       </div>
 
-      {/* centered modal */}
+      {/* centered modal — clears the top PromptBar (h-9) and bottom BottomBar
+          (h-9) so the site chrome stays visible while the console is up */}
       {open && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-4 backdrop-blur-md"
+          className="fixed inset-x-0 top-9 bottom-9 z-40 flex items-center justify-center bg-black/55 px-4 backdrop-blur-md"
           onClick={() => setOpen(false)}
           role="presentation"
         >
@@ -116,8 +133,8 @@ const QuakeConsole = ({ slug, manifest, accentHex, onLoad, onExit }) => {
             className="flex max-h-[70vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border shadow-2xl"
             style={{
               background: 'rgba(20, 22, 28, 0.94)',
-              borderColor: `${accentHex}55`,
-              boxShadow: `0 30px 60px rgba(0,0,0,0.7), 0 0 0 1px ${accentHex}22`,
+              borderColor: `${SHELL.green}55`,
+              boxShadow: `0 30px 60px rgba(0,0,0,0.7), 0 0 0 1px ${SHELL.green}22`,
             }}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
@@ -141,9 +158,12 @@ const QuakeConsole = ({ slug, manifest, accentHex, onLoad, onExit }) => {
               {buffer.length === 0 && (
                 <div className="text-white/45">
                   summoned console · try{' '}
+                  <span style={{ color: SHELL.green }}>help</span>,{' '}
                   <span style={{ color: SHELL.green }}>list</span>,{' '}
-                  <span style={{ color: SHELL.green }}>load &lt;module&gt;</span>, or{' '}
-                  <span style={{ color: SHELL.green }}>exit</span>
+                  <span style={{ color: SHELL.green }}>load &lt;module&gt;</span>
+                  {isLobby ? null : (
+                    <>, or <span style={{ color: SHELL.green }}>exit</span></>
+                  )}
                 </div>
               )}
               {buffer.map((l, i) =>

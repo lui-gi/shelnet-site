@@ -1,25 +1,66 @@
 // src/pages/modules.jsx
 // Route page for the interactive modules. Two states share one viewport-filling
 // shell:
-//   /resources/modules        -> the lobby terminal (Terminal.jsx), the launcher
+//   /resources/modules        -> the lobby: centered ASCII banner + info text
+//                                 with a QuakeConsole (mode='lobby') pill dock
+//                                 at the bottom that summons the same modal
+//                                 terminal used inside a room.
 //   /resources/modules/:slug   -> a GUI room: the load ceremony plays, then the
 //                                 two-pane Room mounts with a collapsed quake
 //                                 console docked at the bottom.
-// `load <slug>` in the lobby navigates here (with a ceremony flag); a deep link /
-// refresh on an already-started room resumes straight into it.
+// `load <slug>` in the lobby console navigates here (with a ceremony flag); a
+// deep link / refresh on an already-started room resumes straight into it.
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import TerminalShell from '../components/tui/TerminalShell';
-import Terminal from '../components/terminal/Terminal';
 import Room from '../components/room/Room';
 import CeremonyLog from '../components/room/CeremonyLog';
 import QuakeConsole from '../components/room/QuakeConsole';
 import { useManifest } from '../utils/useManifest';
 import { getModule, accentForCategory } from '../config/moduleRegistry';
 import { getModuleProgress } from '../utils/moduleProgress';
-import { ACCENTS } from '../config/theme';
+import { ACCENTS, SHELL } from '../config/theme';
 
 const hexFor = (category) => (ACCENTS[accentForCategory(category)] || ACCENTS.green).hex;
+
+// figlet "standard" font, matching the hero banner + sibling page titles.
+const MODULES_ART = [
+  '                     _       _           ',
+  ' _ __ ___   ___   __| |_   _| | ___  ___ ',
+  "| '_ ` _ \\ / _ \\ / _` | | | | |/ _ \\/ __|",
+  '| | | | | | (_) | (_| | |_| | |  __/\\__ \\',
+  '|_| |_| |_|\\___/ \\__,_|\\__,_|_|\\___||___/',
+].join('\n');
+
+// Lobby view: centered banner + info text with the summonable console docked
+// at the bottom. Presses on the pill (or `) open the modal; `load <slug>`
+// navigates into the room. Typography matches the hero (banner sizing,
+// leading-snug body, dimmed hint) so the two entry surfaces read the same.
+const Lobby = ({ manifest, onLoad }) => (
+  <>
+    <div className="flex flex-1 min-h-0 flex-col items-center justify-center px-4 text-center">
+      <pre
+        aria-label="modules"
+        className="whitespace-pre text-[8px] leading-[1.1] sm:text-xs md:text-sm"
+        style={{ color: SHELL.green, textShadow: '0 0 8px rgba(52,211,153,.28)' }}
+      >{MODULES_ART}</pre>
+      <div className="mt-4 leading-snug text-white/65">
+        interactive skill rooms · learn a technique, then do it in a live lab stage
+      </div>
+      <div className="mt-1 text-white/55">
+        summon the console with{' '}
+        <kbd className="rounded border border-white/15 bg-white/10 px-1.5 py-[1px] font-mono text-[11px] text-white/85">`</kbd>
+        <span className="text-white/40">
+          {' '}or the prompt below · try{' '}
+          <span style={{ color: SHELL.green }}>help</span>,{' '}
+          <span style={{ color: SHELL.green }}>list</span>,{' '}
+          <span style={{ color: SHELL.green }}>load &lt;module&gt;</span>
+        </span>
+      </div>
+    </div>
+    <QuakeConsole mode="lobby" manifest={manifest} onLoad={onLoad} />
+  </>
+);
 
 // Inline note for an unknown or not-yet-live slug, with a way back to the lobby.
 const RoomMissing = ({ slug, status, onBack }) => {
@@ -83,7 +124,7 @@ const RoomView = ({ stub, manifest, startWithCeremony, onExit, onLoad }) => {
   return (
     <>
       <Room module={module} />
-      <QuakeConsole slug={stub.slug} manifest={manifest} accentHex={hex} onLoad={onLoad} onExit={onExit} />
+      <QuakeConsole slug={stub.slug} manifest={manifest} onLoad={onLoad} onExit={onExit} />
     </>
   );
 };
@@ -97,7 +138,10 @@ const Modules = () => {
   if (!slug) {
     return (
       <TerminalShell fill>
-        <Terminal manifest={manifest} />
+        <Lobby
+          manifest={manifest}
+          onLoad={(s) => navigate(`/resources/modules/${s}`, { state: { ceremony: true } })}
+        />
       </TerminalShell>
     );
   }
