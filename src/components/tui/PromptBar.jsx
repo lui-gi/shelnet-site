@@ -2,8 +2,8 @@
 // Global sticky tty status line pinned to the top of every page. Renders the
 // shell prompt `guest@shelnet <~/path> $`: the working directory housed in
 // green inside angle brackets, the `~` root and ancestor segments clickable
-// (home), the current segment inert. A `[ cd ~ ]` button on the right mirrors
-// the home affordance. Mounted once in Layout, above Outlet.
+// (home), the current segment inert. A `[ cd ../ ]` button on the right pops
+// one segment off the current path. Mounted once in Layout, above Outlet.
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { SHELL } from '../../config/theme';
 import { segmentsForPath, routeForSegments } from '../../config/resourcePaths';
@@ -14,6 +14,8 @@ const PromptBar = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const segments = segmentsForPath(pathname);
+  const parentPath = segments.length <= 1 ? '/' : routeForSegments(segments.slice(0, -1));
+  const atRoot = segments.length === 0;
 
   return (
     <nav aria-label="Terminal path"
@@ -51,12 +53,12 @@ const PromptBar = () => {
           <span style={{ color: SHELL.green }}>$</span>
         </div>
 
-        {/* home button */}
-        <button type="button" onClick={() => navigate('/')} aria-label="cd ~ (home)"
-                className="group shrink-0 rounded-sm transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60">
+        {/* parent button */}
+        <button type="button" onClick={() => navigate(parentPath)} disabled={atRoot} aria-label="cd ../ (up one)"
+                className="group shrink-0 rounded-sm transition-opacity focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#43c08c]/60 disabled:opacity-40 disabled:cursor-not-allowed">
           <span className="text-white/25">[</span>
           <span style={{ color: SHELL.dim }}>&nbsp;cd&nbsp;</span>
-          <span style={{ color: SHELL.green }}>~</span>
+          <span style={{ color: SHELL.green }}>../</span>
           <span className="text-white/25">&nbsp;]</span>
         </button>
       </div>
