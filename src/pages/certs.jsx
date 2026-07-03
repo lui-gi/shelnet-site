@@ -54,7 +54,7 @@ const Certs = () => {
     const onKey = (e) => {
       const tag = document.activeElement?.tagName;
       if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-      if (e.key === 'Escape') { e.preventDefault(); navigate('/resources'); return; }
+      if (e.key === 'Escape') { e.preventDefault(); navigate('/'); return; }
       if (!open.length) return;
       if (e.key === 'ArrowDown') { e.preventDefault(); setSel((n) => (n + 1) % open.length); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); setSel((n) => (n - 1 + open.length) % open.length); }
@@ -78,7 +78,7 @@ const Certs = () => {
           <div className="mt-2 text-white/40">
             <button type="button" onClick={() => window.location.reload()} style={{ color: GREEN }} className="hover:underline">↵ retry</button>
             &nbsp;·&nbsp;
-            <button type="button" onClick={() => navigate('/resources')} style={{ color: GREEN }} className="hover:underline">esc home</button>
+            <button type="button" onClick={() => navigate('/')} style={{ color: GREEN }} className="hover:underline">esc home</button>
           </div>
         </div>
       </TerminalShell>
@@ -89,7 +89,7 @@ const Certs = () => {
     <TerminalShell maxWidthClass="max-w-3xl">
       <div className="font-mono text-sm leading-relaxed">
         <div className="text-white/40 mb-4">
-          <span style={{ color: SHELL.dim }}>guest@shelnet</span>:<span style={{ color: GREEN }}>~</span>$ cd resources/certs
+          <span style={{ color: SHELL.dim }}>guest@shelnet</span>:<span style={{ color: GREEN }}>~</span>$ cd certs
         </div>
         <div className="flex items-baseline justify-between text-white/40 mb-3">
           <span>certs/: pick a track, jump to PBQs, quizzes &amp; mock exams</span>

@@ -16,7 +16,7 @@ const CertDashboard = () => {
   const cert = manifest ? getCert(manifest, slug) : null;
 
   if (!loading && !error && manifest && !cert) {
-    return <Navigate to="/resources/certs" replace />;
+    return <Navigate to="/certs" replace />;
   }
 
   return (
