@@ -2,7 +2,7 @@
 // Framed-ASCII primitives for the resource pages: real box-drawing glyphs
 // (corners, rails, rules, dot-leaders, bars) drawn as text, while CSS owns the
 // layout so content wraps and reflows without breaking the art. Shared so every
-// /resources page speaks one vocabulary (matches the hero's bare-TTY look).
+// tty-styled page speaks one vocabulary (matches the hero's bare-TTY look).
 
 // A run of fill characters long enough to span any panel; clipped by overflow.
 const FILL = (ch) => ch.repeat(300);

@@ -13,7 +13,7 @@ import { ACCENTS, SHELL } from '../../config/theme';
 const uidOf = (group, item) => `${group.type}:${item.id}`;
 const RAIL = 'rgba(255,255,255,0.3)'; // outer box / rail color (dim, per mockups)
 
-// Tree glyphs — same vocabulary as the /resources tree (ResourceTUI).
+// Tree glyphs, matching the ~/ file-tree vocabulary used across the site.
 const dirGlyph = (isLast) => (isLast ? '└─ ' : '├─ ');
 const leafGlyph = (dirLast, leafLast) => `${dirLast ? '   ' : '│  '}${leafLast ? '└─ ' : '├─ '}`;
 

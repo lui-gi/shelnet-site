@@ -7,7 +7,7 @@ export function segmentsForPath(pathname) {
   return pathname.split('/').filter(Boolean);
 }
 
-/** The route for a prefix of segments, e.g. ['resources','certs'] -> '/resources/certs'. */
+/** The route for a prefix of segments, e.g. ['certs','a-plus'] -> '/certs/a-plus'. */
 export function routeForSegments(segments) {
   return '/' + segments.join('/');
 }
