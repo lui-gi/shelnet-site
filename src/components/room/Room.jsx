@@ -172,7 +172,7 @@ const Room = ({ module, onProgress }) => {
     return nextSet;
   });
 
-  // Keyboard: bound once, reads latest via ref (mirrors ResourceTUI). `h` hint,
+  // Keyboard: bound once, reads latest state via a ref. `h` hint,
   // ↑↓ move the review cursor over unlocked sections, ↵ expands a done section or
   // continues a checkpoint-free active one. Bails while typing in a field.
   const kb = useRef({});
