@@ -11,16 +11,14 @@ const ACCENT = '#7e9b86';  // dim phosphor: status markers + `guest`
 const REVEAL_MS = 90;       // opacity-transition duration per line (reads as a crisp print)
 const ALL_REVEALED = 999;   // step sentinel: every element shown (skip / reduced-motion / repeat visit)
 
-// `to` => direct path (/bytes, /resources).
-// `dir` => opens the file-explorer at /resources/<dir>.
+// `to` => direct path (/certs, /bytes, /modules, /wiki).
 // `anchor` => opens the matching route (/connect).
 const MENU = [
-  { n: '1', cmd: './certs',     desc: 'A+ · Security+ · CySA+ · more',          dir: 'certs' },
-  { n: '2', cmd: './bytes',     desc: 'rapid-fire practice · portable',      to: '/bytes' },
-  { n: '3', cmd: './modules',   desc: 'interactive skill rooms',        to: '/resources/modules' },
+  { n: '1', cmd: './certs',     desc: 'A+ · Security+ · CySA+ · more',      to: '/certs' },
+  { n: '2', cmd: './bytes',     desc: 'rapid-fire practice · portable',     to: '/bytes' },
+  { n: '3', cmd: './modules',   desc: 'interactive skill rooms',            to: '/modules' },
   { n: '4', cmd: './wiki',      desc: 'writeups, guides, and more',         to: '/wiki' },
-  { n: '5', cmd: './resources', desc: 'browse everything',              to: '/resources' },
-  { n: '6', cmd: './connect',   desc: 'newsletter · github · contact',  anchor: 'connect' },
+  { n: '5', cmd: './connect',   desc: 'newsletter · github · contact',      anchor: 'connect' },
 ];
 
 const fmt = (v) => (v == null ? '-' : v);
@@ -43,7 +41,7 @@ function buildLines(counts, mods, narrow) {
       <><Mark inner=" 0.00 " /> booting userland{'…'}</>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/certs</span>{'  '}<span className="text-white/55">{fmt(counts.certs)} tracks</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/bytes</span>{'  '}<span className="text-white/55">{fmt(counts.bytes)} qs</span></>,
-      <><Mark inner="  OK  " /> <span className="text-white/90">/resrc</span>{' '}<span className="text-white/55">{fmt(counts.viz)} viz {'·'} {fmt(counts.labs)} labs</span></>,
+      <><Mark inner="  OK  " /> <span className="text-white/90">/viz</span>{'   '}<span className="text-white/55">{fmt(counts.viz)} modules</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">/mods</span>{'  '}<span className="text-white/55">{fmt(mods.complete)}/{mods.total} rooms</span></>,
       <><Mark inner="  OK  " /> <span className="text-white/90">wiki: live</span></>,
     ];
@@ -53,7 +51,7 @@ function buildLines(counts, mods, narrow) {
     <><Mark inner=" 0.00 " /> shelnet kernel v3.0: booting userland{'…'}</>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/certs</span> {dots('···········')} <span className="text-white/55">{fmt(counts.certs)} tracks {'·'} {fmt(sims)} sims</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/bytes</span> {dots('···········')} <span className="text-white/55">{fmt(counts.bytes)} questions</span></>,
-    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/resources</span> {dots('·······')} <span className="text-white/55">{fmt(counts.viz)} modules {'·'} {fmt(counts.labs)} labs</span></>,
+    <><Mark inner="  OK  " /> mounting <span className="text-white/90">/visualizations</span> {dots('··')} <span className="text-white/55">{fmt(counts.viz)} modules</span></>,
     <><Mark inner="  OK  " /> mounting <span className="text-white/90">/modules</span> {dots('·········')} <span className="text-white/55">{fmt(mods.complete)}/{mods.total} rooms complete</span></>,
     <><Mark inner="  OK  " /> wiki: <span className="text-white/90">live</span></>,
   ];
@@ -154,12 +152,11 @@ const HeroSection = () => {
   const [selected, setSelected] = useState(0);
 
   const activate = useCallback((item) => {
-    if (item.to) navigate(item.to);              // direct path (/bytes, /resources)
-    else if (item.dir) navigate(`/resources/${item.dir}`); // open the file-explorer here
+    if (item.to) navigate(item.to);              // direct path (/certs, /bytes, /modules, /wiki)
     else if (item.anchor) navigate(`/${item.anchor}`);     // /connect
   }, [navigate]);
 
-  // After boot: ↑↓ move the cursor, ↵ opens it, and keys 1–6 jump straight in.
+  // After boot: ↑↓ move the cursor, ↵ opens it, and keys 1–5 jump straight in.
   useEffect(() => {
     if (!finished) return;
     const onKey = (e) => {
@@ -194,7 +191,7 @@ const HeroSection = () => {
 
         <div className="mt-3 text-white/55" style={revealStyle(LOGIN_STEP)}>
           shelnet login: <span style={{ color: ACCENT }}>guest</span>
-          <span className="text-white/40">: ↑↓ + ↵, press 1–6, or click a destination:</span>
+          <span className="text-white/40">: ↑↓ + ↵, press 1–5, or click a destination:</span>
         </div>
 
         <nav className="mt-2" aria-label="Site sections">
