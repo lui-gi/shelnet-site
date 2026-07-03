@@ -163,6 +163,8 @@ const HeroSection = () => {
   useEffect(() => {
     if (!finished) return;
     const onKey = (e) => {
+      const tag = document.activeElement?.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
       if (e.key === 'ArrowDown') { e.preventDefault(); setSelected((s) => (s + 1) % MENU.length); }
       else if (e.key === 'ArrowUp') { e.preventDefault(); setSelected((s) => (s - 1 + MENU.length) % MENU.length); }
       else if (e.key === 'Enter') { e.preventDefault(); activate(MENU[selected]); }
