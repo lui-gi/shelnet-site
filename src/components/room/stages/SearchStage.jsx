@@ -6,6 +6,8 @@
 // test it against the active via:'stage' checkpoint.
 //
 // Stage contract: ({ config, accentHex, onEvent, active }) => JSX.
+// Surface colors read from CSS custom properties on the Room root so the stage
+// flips with the room's light/dark theme.
 import { useRef, useEffect, useState } from 'react';
 
 // Resolve a typed query to its canned result, or null if unrecognized.
@@ -46,16 +48,16 @@ const SearchStage = ({ config = {}, accentHex, onEvent, active }) => {
   };
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col font-mono text-xs leading-relaxed">
-      <div className="shrink-0 pb-1 text-white/35">
+    <div className="flex min-h-0 flex-1 flex-col font-mono text-xs leading-relaxed">
+      <div className="shrink-0 pb-1" style={{ color: 'var(--text-dim)' }}>
         <span style={{ color: accentHex }}>{product}</span>
-        {index != null && <> · index=<span className="text-white/60">{index}</span></>}
+        {index != null && <> · index=<span style={{ color: 'var(--text-mute)' }}>{index}</span></>}
       </div>
 
       {/* query bar */}
       <div
-        className="shrink-0 flex items-center gap-2 rounded border bg-black/40 px-2 py-1.5"
-        style={{ borderColor: accentHex }}
+        className="flex shrink-0 items-center gap-2 rounded border px-2 py-1.5"
+        style={{ borderColor: accentHex, background: 'var(--block-bg)' }}
         onClick={() => inputRef.current?.focus()}
       >
         <span aria-hidden="true" style={{ color: accentHex }}>&gt;</span>
@@ -65,7 +67,8 @@ const SearchStage = ({ config = {}, accentHex, onEvent, active }) => {
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
           placeholder={placeholder}
-          className="flex-1 min-w-0 bg-transparent outline-none text-white/90 placeholder:text-white/25"
+          className="min-w-0 flex-1 bg-transparent outline-none"
+          style={{ color: 'var(--text-strong)', caretColor: 'var(--cursor)' }}
           spellCheck={false}
           autoComplete="off"
           aria-label="search query"
@@ -73,7 +76,7 @@ const SearchStage = ({ config = {}, accentHex, onEvent, active }) => {
         <button
           type="button"
           onClick={submit}
-          className="shrink-0 rounded px-2 py-0.5 text-[0.7rem] text-black"
+          className="shrink-0 rounded px-2 py-0.5 text-[0.7rem] font-semibold text-black"
           style={{ backgroundColor: accentHex }}
         >
           run
@@ -81,21 +84,27 @@ const SearchStage = ({ config = {}, accentHex, onEvent, active }) => {
       </div>
 
       {/* results */}
-      <div className="mt-2 flex-1 min-h-0 overflow-auto pr-1">
+      <div className="mt-2 min-h-0 flex-1 overflow-auto pr-1">
         {result == null && (
-          <div className="text-white/30">run a query to see matching events.</div>
+          <div style={{ color: 'var(--text-dim)' }}>run a query to see matching events.</div>
         )}
         {result?.miss && (
-          <div className="text-amber-400/90">no events found. check your syntax and fields.</div>
+          <div className="text-amber-500">no events found. check your syntax and fields.</div>
         )}
         {result && !result.miss && (
           <>
-            {result.note && <div className="mb-1 text-white/45">{result.note}</div>}
+            {result.note && <div className="mb-1" style={{ color: 'var(--text-mute)' }}>{result.note}</div>}
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr>
                   {result.columns.map((c, i) => (
-                    <th key={i} className="border-b border-white/15 pb-1 pr-4 font-semibold text-white/55">{c}</th>
+                    <th
+                      key={i}
+                      className="border-b pb-1 pr-4 font-semibold"
+                      style={{ borderColor: 'var(--block-border)', color: 'var(--text-mute)' }}
+                    >
+                      {c}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -103,13 +112,13 @@ const SearchStage = ({ config = {}, accentHex, onEvent, active }) => {
                 {result.rows.map((row, ri) => (
                   <tr key={ri} className="align-top">
                     {row.map((cell, ci) => (
-                      <td key={ci} className="py-0.5 pr-4 text-white/80 whitespace-pre">{cell}</td>
+                      <td key={ci} className="whitespace-pre py-0.5 pr-4" style={{ color: 'var(--text)' }}>{cell}</td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="mt-1 text-white/30">{result.rows.length} result{result.rows.length === 1 ? '' : 's'}</div>
+            <div className="mt-1" style={{ color: 'var(--text-dim)' }}>{result.rows.length} result{result.rows.length === 1 ? '' : 's'}</div>
           </>
         )}
       </div>

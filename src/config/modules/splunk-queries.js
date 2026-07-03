@@ -1,7 +1,7 @@
 // src/config/modules/splunk-queries.js
-// The reference `search`-stage room. Teaches SPL from the ground up — query
+// The reference `search`-stage room. Teaches SPL from the ground up: query
 // anatomy, boolean/wildcard filtering, time modifiers, field selection, the
-// stats family, sort/dedup, eval, timechart, and subsearches — then walks the
+// stats family, sort/dedup, eval, timechart, and subsearches, then walks the
 // learner through triaging a brute-force alert in a hand-authored auth index
 // (no real Splunk). Lazily imported by moduleRegistry; consumed by
 // components/room/Room.jsx. Stage query matchers are whitespace/case tolerant;
@@ -15,7 +15,7 @@ export default {
     placeholder: 'index=auth sourcetype=linux_secure …',
     queries: [
       {
-        // Failed jsmith with an explicit table/fields command — selects columns.
+        // Failed jsmith with an explicit table/fields command; selects columns.
         match: /index\s*=\s*auth[\s\S]*jsmith[\s\S]*(fail|action\s*=\s*failure)[\s\S]*\|\s*(table|fields)\s+/i,
         columns: ['_time', 'src_ip', 'user', 'action'],
         rows: [
@@ -23,7 +23,7 @@ export default {
           ['14:03', '10.0.0.9', 'jsmith', 'failure'],
           ['14:05', '10.0.0.9', 'jsmith', 'failure'],
         ],
-        note: 'showing 3 of 47 matching events — only the columns you asked for.',
+        note: 'showing 3 of 47 matching events: only the columns you asked for.',
       },
       {
         // Unique src_ip values for jsmith (dedup).
@@ -67,7 +67,7 @@ export default {
           ['14:04', '10', '0', '1'],
           ['14:05', '4', '1', '0'],
         ],
-        note: 'span=1m — one row per minute, one column per user.',
+        note: 'span=1m: one row per minute, one column per user.',
       },
       {
         // Subsearch: successes from src_ips that had >10 failures.
@@ -150,10 +150,10 @@ export default {
         { p: 'The commands you will meet most often fall into four buckets:' },
         {
           list: [
-            '**Filter** — narrow events: `search`, `where`, `dedup`',
-            '**Shape** — pick or compute fields: `fields`, `table`, `rename`, `eval`, `rex`',
-            '**Aggregate** — turn events into rows: `stats`, `top`, `rare`, `chart`, `timechart`',
-            '**Enrich** — pull in outside data: `lookup`, `join`, `append`',
+            '**Filter**: narrow events: `search`, `where`, `dedup`',
+            '**Shape**: pick or compute fields: `fields`, `table`, `rename`, `eval`, `rex`',
+            '**Aggregate**: turn events into rows: `stats`, `top`, `rare`, `chart`, `timechart`',
+            '**Enrich**: pull in outside data: `lookup`, `join`, `append`',
           ],
         },
         { callout: 'Rule of thumb: put filters as early as possible. The fewer events survive to the first pipe, the faster (and cheaper) the whole search runs.' },
@@ -184,7 +184,7 @@ export default {
       title: 'Time modifiers',
       blocks: [
         { h3: 'earliest / latest' },
-        { p: 'Every Splunk search has a time window. The picker sets a default, but you can pin the window inline with `earliest=` and `latest=` — the safest way to keep an alert query reproducible.' },
+        { p: 'Every Splunk search has a time window. The picker sets a default, but you can pin the window inline with `earliest=` and `latest=`, the safest way to keep an alert query reproducible.' },
         { code: 'index=auth earliest=-1h latest=now user=jsmith action=failure' },
         {
           list: [
@@ -234,12 +234,12 @@ export default {
       title: 'Pick columns with table',
       blocks: [
         { h3: 'fields vs table' },
-        { p: 'By default the results grid shows every field Splunk extracted. When you know what you need — for a screenshot, a ticket, or a downstream pipe — pick the columns explicitly.' },
+        { p: 'By default the results grid shows every field Splunk extracted. When you know what you need, for a screenshot, a ticket, or a downstream pipe, pick the columns explicitly.' },
         {
           list: [
-            '`| fields _time src_ip user action` — keeps those fields, drops the rest, preserves the order.',
-            '`| fields - password` — keeps everything **except** the listed fields.',
-            '`| table _time src_ip user action` — like `fields`, but also formats results as a display table (loses the raw events view).',
+            '`| fields _time src_ip user action`: keeps those fields, drops the rest, preserves the order.',
+            '`| fields - password`: keeps everything **except** the listed fields.',
+            '`| table _time src_ip user action`: like `fields`, but also formats results as a display table (loses the raw events view).',
           ],
         },
         { task: 'Show only _time, src_ip, user, action for the failed jsmith logins.' },
@@ -249,7 +249,7 @@ export default {
         expect: /index\s*=\s*auth[\s\S]*jsmith[\s\S]*(fail|action\s*=\s*failure)[\s\S]*\|\s*(table|fields)\s+/i,
         hints: ['Take your last query and pipe it into `table`.', 'index=auth user=jsmith action=failure | table _time src_ip user action'],
         reveal: 'index=auth user=jsmith action=failure | table _time src_ip user action',
-        explain: 'Clean four-column output. This is the shape you paste into a ticket — no noise, just the fields that carry the story.',
+        explain: 'Clean four-column output. This is the shape you paste into a ticket: no noise, just the fields that carry the story.',
       },
     },
     {
@@ -261,11 +261,11 @@ export default {
         { p: '`stats` takes any number of aggregation functions. The most common:' },
         {
           list: [
-            '`count` — number of events (optionally per grouped value).',
-            '`dc(field)` — **d**istinct **c**ount of unique values.',
-            '`sum(field)` / `avg(field)` / `min(field)` / `max(field)` — arithmetic.',
-            '`values(field)` — the sorted-unique list; `list(field)` — the ordered list with duplicates.',
-            '`latest(field)` / `earliest(field)` — value at the newest / oldest event in the group.',
+            '`count`: number of events (optionally per grouped value).',
+            '`dc(field)`: **d**istinct **c**ount of unique values.',
+            '`sum(field)` / `avg(field)` / `min(field)` / `max(field)`: arithmetic.',
+            '`values(field)`: the sorted-unique list; `list(field)`: the ordered list with duplicates.',
+            '`latest(field)` / `earliest(field)`: value at the newest / oldest event in the group.',
           ],
         },
         { code: '| stats count as attempts, dc(src_ip) as sources, values(action) by user' },
@@ -304,10 +304,10 @@ export default {
         { p: 'Aggregations are unordered until you say otherwise. Pipe into `sort` and `head` (or use `top`) to surface the worst offenders first.' },
         {
           list: [
-            '`| sort -count` — descending by count (leading `-` = desc; `+` or nothing = asc).',
-            '`| sort 10 -count` — same, capped at 10 rows.',
-            '`| head 5` — first 5 rows after sorting.',
-            '`| top limit=5 src_ip` — shortcut for count + sort + head + percent, all in one.',
+            '`| sort -count`: descending by count (leading `-` = desc; `+` or nothing = asc).',
+            '`| sort 10 -count`: same, capped at 10 rows.',
+            '`| head 5`: first 5 rows after sorting.',
+            '`| top limit=5 src_ip`: shortcut for count + sort + head + percent, all in one.',
           ],
         },
         { task: 'Find the top 3 source IPs by failure count.' },
@@ -376,9 +376,9 @@ export default {
         { p: '`dedup` keeps the first event for each value (or combination) of the fields you name. Use it to answer "how many distinct X are there" without an aggregation.' },
         {
           list: [
-            '`| dedup src_ip` — one row per unique src_ip.',
-            '`| dedup src_ip sortby -_time` — the **most recent** event per src_ip.',
-            '`| dedup 3 user` — keep up to 3 events per user (useful for sampling).',
+            '`| dedup src_ip`: one row per unique src_ip.',
+            '`| dedup src_ip sortby -_time`: the **most recent** event per src_ip.',
+            '`| dedup 3 user`: keep up to 3 events per user (useful for sampling).',
           ],
         },
         { p: 'For a pure count of uniques (no rows), `stats dc(field)` is usually the right tool. Reach for `dedup` when you want to keep the rest of the row too.' },
@@ -392,7 +392,7 @@ export default {
           'index=auth user=jsmith | dedup src_ip | table src_ip _time',
         ],
         reveal: 'index=auth user=jsmith | dedup src_ip | table src_ip _time',
-        explain: 'Every jsmith event — failure or success — came from 10.0.0.9. Same source before and after the compromise; that is a single-attacker story.',
+        explain: 'Every jsmith event, failure or success, came from 10.0.0.9. Same source before and after the compromise; that is a single-attacker story.',
       },
     },
     {
@@ -403,10 +403,10 @@ export default {
         { p: '`timechart` produces a time-series table (and, in the UI, a chart) by bucketing events into fixed time slices and aggregating each bucket. It is `stats` with `_time` as the implicit grouping key.' },
         {
           list: [
-            '`| timechart span=1m count` — count per one-minute bucket.',
-            '`| timechart span=5m count by user` — a column per user, so you can spot the loud one.',
-            '`| timechart avg(bytes)` — average bytes per bucket.',
-            '`| bin _time span=1h | stats ...` — manual bucketing when you need weirder aggregations.',
+            '`| timechart span=1m count`: count per one-minute bucket.',
+            '`| timechart span=5m count by user`: a column per user, so you can spot the loud one.',
+            '`| timechart avg(bytes)`: average bytes per bucket.',
+            '`| bin _time span=1h | stats ...`: manual bucketing when you need weirder aggregations.',
           ],
         },
         { task: 'Chart the per-minute failure count, split by user.' },
@@ -419,7 +419,7 @@ export default {
           'index=auth action=failure | timechart span=1m count by user',
         ],
         reveal: 'index=auth action=failure | timechart span=1m count by user',
-        explain: 'jsmith\'s column carries the whole spike from 14:02 to 14:05 — a tight, aggressive burst. Everyone else is background.',
+        explain: 'jsmith\'s column carries the whole spike from 14:02 to 14:05: a tight, aggressive burst. Everyone else is background.',
       },
     },
     {
@@ -432,7 +432,7 @@ export default {
         { p: 'The inner query yields a set of `src_ip` values; the outer query becomes `action=success (src_ip="10.0.0.9" OR src_ip="…")`. In one shot you get: **successful logins from any IP that also had a brute-force count**.' },
         {
           list: [
-            'Cap: subsearches are limited to ~10,000 rows and a 60-second runtime by default — keep them small.',
+            'Cap: subsearches are limited to ~10,000 rows and a 60-second runtime by default; keep them small.',
             'Always end the inner search with `| fields <name>` so only the values you need are spliced back in.',
             'For row-level joining (not just filtering), reach for `join` or `lookup` instead.',
           ],
@@ -447,7 +447,7 @@ export default {
           'index=auth action=success [ search index=auth action=failure | stats count by src_ip | where count > 10 | fields src_ip ]',
         ],
         reveal: 'index=auth action=success [ search index=auth action=failure | stats count by src_ip | where count > 10 | fields src_ip ]',
-        explain: 'One row: jsmith at 14:06 from 10.0.0.9 — the successful login that followed a brute force. This is the query you paste into the incident.',
+        explain: 'One row: jsmith at 14:06 from 10.0.0.9, the successful login that followed a brute force. This is the query you paste into the incident.',
       },
     },
     {
@@ -455,20 +455,20 @@ export default {
       title: 'Advanced techniques (reference)',
       blocks: [
         { h3: 'Commands you will reach for eventually' },
-        { p: '`rex` — extract new fields from `_raw` (or any string field) with a named-capture regex. Great for logs where a parser has not been written yet.' },
+        { p: '`rex`: extract new fields from `_raw` (or any string field) with a named-capture regex. Great for logs where a parser has not been written yet.' },
         { code: '... | rex field=_raw "from (?<src_ip>\\d+\\.\\d+\\.\\d+\\.\\d+) port (?<src_port>\\d+)"' },
-        { p: '`spath` — parse JSON. Point it at a field containing JSON and every key becomes accessible (dot-path for nested).' },
+        { p: '`spath`: parse JSON. Point it at a field containing JSON and every key becomes accessible (dot-path for nested).' },
         { code: '... | spath input=_raw | table user, event.action, event.result' },
-        { p: '`lookup` — enrich events using a CSV or KV-store table. Match on a key field; add the other columns to every event.' },
+        { p: '`lookup`: enrich events using a CSV or KV-store table. Match on a key field; add the other columns to every event.' },
         { code: '... | lookup asset_owners host OUTPUT owner, team | stats count by owner' },
-        { p: '`join` — SQL-style join between two searches on a shared field. Use sparingly; `stats` with `dc()` or a `lookup` is usually cheaper.' },
+        { p: '`join`: SQL-style join between two searches on a shared field. Use sparingly; `stats` with `dc()` or a `lookup` is usually cheaper.' },
         { code: 'index=auth | join user [ search index=hr | fields user, department ] | stats count by department' },
-        { p: '`eventstats` / `streamstats` — like `stats`, but write the aggregate back onto every event so you can compare rows to the group (`eventstats`) or to a running window (`streamstats`).' },
+        { p: '`eventstats` / `streamstats`: like `stats`, but write the aggregate back onto every event so you can compare rows to the group (`eventstats`) or to a running window (`streamstats`).' },
         { code: '... | eventstats avg(bytes) as baseline by host | where bytes > 3*baseline' },
-        { p: '`transaction` — group related events by a key and time window (session, source_ip). Slow at scale; prefer `stats` when possible.' },
-        { p: '`tstats` — like `stats`, but runs over indexed metadata / accelerated data models. Orders of magnitude faster for common counts.' },
+        { p: '`transaction`: group related events by a key and time window (session, source_ip). Slow at scale; prefer `stats` when possible.' },
+        { p: '`tstats`: like `stats`, but runs over indexed metadata / accelerated data models. Orders of magnitude faster for common counts.' },
         { code: '| tstats count where index=auth by host, sourcetype' },
-        { p: '`| makeresults` — synthesizes rows out of nothing. Perfect for testing eval expressions or seeding a subsearch.' },
+        { p: '`| makeresults`: synthesizes rows out of nothing. Perfect for testing eval expressions or seeding a subsearch.' },
         { code: '| makeresults count=5 | streamstats count as n | eval doubled = n*2' },
         { callout: 'Splunk Docs is authoritative; the Search Reference page for each command lists every option. Once you know a command exists, the docs finish the sentence.' },
       ],
@@ -486,7 +486,7 @@ export default {
         accept: /^\s*y(es)?\s*$/i,
         hints: ['47 failures then an Accepted password from the same source.'],
         reveal: 'yes',
-        explain: 'Yes. Treat jsmith as compromised: disable the account, reset credentials, and hunt for what that session touched after 14:06. You triaged a real intrusion from raw logs — and you now know every SPL command you needed to do it.',
+        explain: 'Yes. Treat jsmith as compromised: disable the account, reset credentials, and hunt for what that session touched after 14:06. You triaged a real intrusion from raw logs, and you now know every SPL command you needed to do it.',
       },
     },
   ],

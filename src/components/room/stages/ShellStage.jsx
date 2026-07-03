@@ -6,8 +6,9 @@
 //
 // Stage contract: ({ config, accentHex, onEvent, active }) => JSX. The stage owns
 // its own working state (scrollback + input); the Room never reaches into it.
+// Surface colors read from CSS custom properties on the Room root so the
+// terminal flips with the room's light/dark theme.
 import { useRef, useEffect, useState } from 'react';
-import { SHELL } from '../../../config/theme';
 
 const norm = (s) => s.trim().replace(/\s+/g, ' ');
 
@@ -22,7 +23,7 @@ function lookup(commands, input) {
 }
 
 const ShellStage = ({ config = {}, accentHex, onEvent, active }) => {
-  const { host, prompt = 'root@kali', cwd = '~', commands = [], motd = [] } = config;
+  const { prompt = 'root@kali', cwd = '~', commands = [], motd = [] } = config;
   const [lines, setLines] = useState(() => motd.map((text) => ({ kind: 'out', text })));
   const [value, setValue] = useState('');
   const scrollRef = useRef(null);
@@ -52,34 +53,30 @@ const ShellStage = ({ config = {}, accentHex, onEvent, active }) => {
 
   const promptGlyph = (
     <span className="shrink-0 whitespace-pre">
-      <span style={{ color: SHELL.dim }}>{prompt}</span>
-      <span className="text-white/40">:</span>
-      <span style={{ color: SHELL.green }}>{cwd}</span>
-      <span className="text-white/40">$ </span>
+      <span style={{ color: 'var(--stage-prompt)' }}>{prompt}</span>
+      <span style={{ color: 'var(--stage-prompt)' }}>:</span>
+      <span style={{ color: accentHex }}>{cwd}</span>
+      <span style={{ color: 'var(--stage-prompt)' }}>$ </span>
     </span>
   );
 
   return (
     <div
-      className="flex flex-1 min-h-0 flex-col font-mono text-xs leading-relaxed"
+      className="flex min-h-0 flex-1 flex-col font-mono text-xs leading-relaxed"
       onClick={() => inputRef.current?.focus()}
     >
-      {host && (
-        <div className="shrink-0 pb-1 text-white/35">
-          session: <span style={{ color: accentHex }}>{host}</span>
-        </div>
-      )}
-      <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto pr-1">
+      <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto pr-1">
         {lines.map((l, i) =>
           l.kind === 'cmd' ? (
             <div key={i} className="flex items-baseline">
               {promptGlyph}
-              <span className="min-w-0 break-words text-white/90">{l.text}</span>
+              <span className="min-w-0 break-words" style={{ color: 'var(--stage-cmd)' }}>{l.text}</span>
             </div>
           ) : (
             <div
               key={i}
-              className={`whitespace-pre-wrap break-words ${l.kind === 'err' ? 'text-rose-400/90' : 'text-white/70'}`}
+              className="whitespace-pre-wrap break-words"
+              style={{ color: l.kind === 'err' ? '#f43f5e' : 'var(--stage-text)' }}
             >
               {l.text || ' '}
             </div>
@@ -92,7 +89,8 @@ const ShellStage = ({ config = {}, accentHex, onEvent, active }) => {
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
-            className="flex-1 min-w-0 bg-transparent outline-none text-white/90"
+            className="min-w-0 flex-1 bg-transparent outline-none"
+            style={{ color: 'var(--stage-cmd)', caretColor: 'var(--cursor)' }}
             spellCheck={false}
             autoComplete="off"
             aria-label="lab shell input"

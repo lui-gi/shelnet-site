@@ -146,7 +146,7 @@ export default {
       title: 'Argument handling & quoting',
       blocks: [
         { h2: 'Argument handling & quoting' },
-        { p: 'Positional args land in `$1`, `$2`, ... `$#` counts them. Always quote — `"$1"` handles targets with spaces; bare `$1` breaks on them.' },
+        { p: 'Positional args land in `$1`, `$2`, ... `$#` counts them. Always quote: `"$1"` handles targets with spaces; bare `$1` breaks on them.' },
         { code: '#!/usr/bin/env bash\ntarget="$1"\necho "argument received: $target"\necho "starting enumeration..."' },
         { p: 'Save the snippet above as `enum.sh` and run it against the lab target.' },
       ],
@@ -188,7 +188,7 @@ export default {
       title: 'Putting it together',
       blocks: [
         { h2: 'Putting it together' },
-        { p: "Run the full script against a small subnet. It should sweep, parse, and summarise — that's the payoff for the sections above." },
+        { p: "Run the full script against a small subnet. It should sweep, parse, and summarise; that's the payoff for the sections above." },
         { code: './enum.sh 10.0.0.0/29' },
         { p: 'Ship it.' },
       ],

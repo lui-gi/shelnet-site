@@ -7,6 +7,8 @@
 // sections.
 //
 // Stage contract: ({ config, accentHex, onEvent, active, activeIndex }) => JSX.
+// Surface colors read from CSS custom properties on the Room root so the stage
+// flips with the room's light/dark theme.
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 const norm = (s) => String(s).trim().replace(/\s+/g, ' ');
@@ -66,24 +68,32 @@ const EditorStage = ({ config = {}, accentHex, onEvent, active, activeIndex = 0 
 
   const firstBlankIndex = script.findIndex((r) => r.blank);
 
+  const panelStyle = {
+    background: 'var(--block-bg)',
+    borderColor: 'var(--block-border)',
+  };
+
   return (
-    <div className="flex flex-1 min-h-0 flex-col font-mono text-xs leading-relaxed">
+    <div className="flex min-h-0 flex-1 flex-col font-mono text-xs leading-relaxed">
       {filename && (
-        <div className="shrink-0 pb-1 text-white/35">
+        <div className="shrink-0 pb-1" style={{ color: 'var(--text-dim)' }}>
           file: <span style={{ color: accentHex }}>{filename}</span>
         </div>
       )}
 
-      <div className="flex-1 min-h-0 grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 md:grid-cols-2">
         {/* editor pane */}
-        <div className="rounded border border-white/10 bg-black/40 p-2 overflow-y-auto">
+        <div
+          className="overflow-y-auto rounded border p-2"
+          style={panelStyle}
+        >
           {motd.map((m, i) => (
-            <div key={`m${i}`} className="text-white/40">{m}</div>
+            <div key={`m${i}`} style={{ color: 'var(--text-dim)' }}>{m}</div>
           ))}
           {script.map((row, i) => {
             if (!row.blank) {
               return (
-                <div key={i} className="whitespace-pre text-white/80">{row.line}</div>
+                <div key={i} className="whitespace-pre" style={{ color: 'var(--text)' }}>{row.line}</div>
               );
             }
             const failed = result && !result.matched && result.failed.some((b) => b.index === i);
@@ -91,7 +101,7 @@ const EditorStage = ({ config = {}, accentHex, onEvent, active, activeIndex = 0 
             const ref = i === firstBlankIndex ? firstInputRef : null;
             return (
               <div key={i}>
-                <div className="whitespace-pre text-white/80">
+                <div className="whitespace-pre" style={{ color: 'var(--text)' }}>
                   <span>{row.before || ''}</span>
                   <input
                     ref={ref}
@@ -100,12 +110,13 @@ const EditorStage = ({ config = {}, accentHex, onEvent, active, activeIndex = 0 
                     onFocus={() => setFocusIndex(i)}
                     onBlur={() => setFocusIndex(null)}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); run(); } }}
-                    className={`mx-0.5 rounded bg-black/60 px-1 outline-none ${
-                      failed
-                        ? 'border border-rose-400/80 text-rose-200'
-                        : 'border border-white/25 text-white/95'
-                    }`}
-                    style={{ minWidth: '10ch' }}
+                    className={`mx-0.5 rounded border px-1 outline-none ${failed ? 'text-rose-500' : ''}`}
+                    style={{
+                      background: 'var(--input-bg)',
+                      borderColor: failed ? '#f43f5e' : 'var(--input-border)',
+                      color: failed ? '#f43f5e' : 'var(--text-strong)',
+                      minWidth: '10ch',
+                    }}
                     aria-label={`blank ${i + 1}`}
                     spellCheck={false}
                     autoComplete="off"
@@ -113,7 +124,7 @@ const EditorStage = ({ config = {}, accentHex, onEvent, active, activeIndex = 0 
                   <span>{row.after || ''}</span>
                 </div>
                 {showHint && (
-                  <div className="ml-2 text-white/40">hint: {row.hint}</div>
+                  <div className="ml-2" style={{ color: 'var(--text-dim)' }}>hint: {row.hint}</div>
                 )}
               </div>
             );
@@ -122,7 +133,7 @@ const EditorStage = ({ config = {}, accentHex, onEvent, active, activeIndex = 0 
             <button
               type="button"
               onClick={run}
-              className="rounded px-2 py-0.5 text-[0.7rem] text-black"
+              className="rounded px-2 py-0.5 text-[0.7rem] font-semibold text-black"
               style={{ backgroundColor: accentHex }}
             >
               run
@@ -131,18 +142,21 @@ const EditorStage = ({ config = {}, accentHex, onEvent, active, activeIndex = 0 
         </div>
 
         {/* run pane */}
-        <div className="rounded border border-white/10 bg-black/40 p-2 overflow-y-auto">
-          <div className="pb-1 text-white/35">$ python3 {filename || 'script.py'}</div>
+        <div
+          className="overflow-y-auto rounded border p-2"
+          style={panelStyle}
+        >
+          <div className="pb-1" style={{ color: 'var(--text-dim)' }}>$ python3 {filename || 'script.py'}</div>
           {result == null && (
-            <div className="text-white/30">press run to execute.</div>
+            <div style={{ color: 'var(--text-dim)' }}>press run to execute.</div>
           )}
           {result && !result.matched && (
-            <div className="text-rose-400/90">
+            <div className="text-rose-500">
               traceback: {result.failed.length} blank(s) unfilled or wrong
             </div>
           )}
           {result?.matched && runOutput.map((o, i) => (
-            <div key={i} className="whitespace-pre-wrap text-white/80">{o}</div>
+            <div key={i} className="whitespace-pre-wrap" style={{ color: 'var(--text)' }}>{o}</div>
           ))}
         </div>
       </div>

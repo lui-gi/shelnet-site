@@ -1,9 +1,10 @@
 // src/components/room/QuakeConsole.jsx
-// The collapsed terminal that persists under an open room: a thin bottom dock
-// showing the last prompt, summonable to a small overlay console with backtick
-// (`) or a click. From the overlay you can run lobby commands (help / list /
-// load <other> / clear) and `exit`. Loading another module swaps the room;
-// `exit` (or Escape from the closed dock) returns to the full-screen lobby.
+// A persistent bottom dock under the open room that reads as a real prompt at
+// rest ("guest@shelnet:~/resources/modules/<slug>$ … summon `") and, on click or
+// backtick (`), opens a centered modal terminal with a blurred backdrop. From
+// the modal you can run lobby commands (help / list / load <other> / clear) and
+// `exit`. Loading another module swaps the room; `exit` (or Escape from the
+// closed dock) returns to the full-screen lobby.
 //
 // The prompt glyph + cursor stay SHELL.green regardless of the room accent, for
 // continuity with the lobby terminal.
@@ -83,54 +84,96 @@ const QuakeConsole = ({ slug, manifest, accentHex, onLoad, onExit }) => {
   };
 
   return (
-    <div className="shrink-0">
+    <>
+      {/* dock strip — always visible under the room */}
+      <div className="shrink-0 pt-1">
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          className="flex w-full items-center gap-2 rounded-lg border bg-white/[0.04] px-3 py-2 text-left font-mono text-xs transition-colors hover:bg-white/[0.07]"
+          style={{
+            borderColor: `${accentHex}47`, // ~28% alpha
+            boxShadow: `0 0 0 4px ${accentHex}0d, 0 8px 20px rgba(0,0,0,0.35)`,
+          }}
+          aria-label={open ? 'close console' : 'open console'}
+        >
+          <Prompt path={path} />
+          <span className="ml-auto flex items-center gap-1.5 text-[11px] text-white/55">
+            summon
+            <kbd className="rounded border border-white/15 bg-white/10 px-1.5 py-[1px] font-mono text-[10.5px] text-white/85">`</kbd>
+          </span>
+        </button>
+      </div>
+
+      {/* centered modal */}
       {open && (
         <div
-          className="mb-1 flex max-h-[38vh] min-h-[8rem] flex-col rounded-t border-t border-x bg-black/85 font-mono text-xs leading-relaxed backdrop-blur"
-          style={{ borderColor: accentHex }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 px-4 backdrop-blur-md"
+          onClick={() => setOpen(false)}
+          role="presentation"
         >
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-2 py-1.5">
-            {buffer.length === 0 && (
-              <div className="text-white/35">summoned console · try <span style={{ color: SHELL.green }}>list</span>, <span style={{ color: SHELL.green }}>load &lt;module&gt;</span>, or <span style={{ color: SHELL.green }}>exit</span></div>
-            )}
-            {buffer.map((l, i) =>
-              l.tone === 'cmd' ? (
-                <div key={i} className="flex items-baseline gap-2">
-                  <Prompt path={path} />
-                  <span className="min-w-0 break-words text-white/90">{l.text}</span>
+          <div
+            className="flex max-h-[70vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border shadow-2xl"
+            style={{
+              background: 'rgba(20, 22, 28, 0.94)',
+              borderColor: `${accentHex}55`,
+              boxShadow: `0 30px 60px rgba(0,0,0,0.7), 0 0 0 1px ${accentHex}22`,
+            }}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-label="module console"
+          >
+            <div
+              className="flex shrink-0 items-center gap-3 border-b px-4 py-2.5 text-xs"
+              style={{ borderColor: 'rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.02)' }}
+            >
+              <span className="font-sans text-sm font-semibold text-white/90">Console</span>
+              <span className="ml-auto font-mono text-[11px] text-white/45">
+                <kbd className="rounded border border-white/15 bg-white/5 px-1.5 py-[1px] text-white/70">Esc</kbd> close ·{' '}
+                <kbd className="rounded border border-white/15 bg-white/5 px-1.5 py-[1px] text-white/70">`</kbd> toggle
+              </span>
+            </div>
+
+            <div
+              ref={scrollRef}
+              className="min-h-0 flex-1 overflow-y-auto px-4 py-3 font-mono text-xs leading-relaxed"
+            >
+              {buffer.length === 0 && (
+                <div className="text-white/45">
+                  summoned console · try{' '}
+                  <span style={{ color: SHELL.green }}>list</span>,{' '}
+                  <span style={{ color: SHELL.green }}>load &lt;module&gt;</span>, or{' '}
+                  <span style={{ color: SHELL.green }}>exit</span>
                 </div>
-              ) : (
-                <div key={i} className={`whitespace-pre-wrap break-words ${TONE[l.tone] || TONE.out}`}>{l.text || ' '}</div>
-              )
-            )}
-            <div className="flex items-baseline gap-2">
-              <Prompt path={path} />
-              <input
-                ref={inputRef}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
-                className="min-w-0 flex-1 bg-transparent text-white/90 outline-none"
-                spellCheck={false}
-                autoComplete="off"
-                aria-label="summoned console input"
-              />
+              )}
+              {buffer.map((l, i) =>
+                l.tone === 'cmd' ? (
+                  <div key={i} className="flex items-baseline gap-2">
+                    <Prompt path={path} />
+                    <span className="min-w-0 break-words text-white/90">{l.text}</span>
+                  </div>
+                ) : (
+                  <div key={i} className={`whitespace-pre-wrap break-words ${TONE[l.tone] || TONE.out}`}>{l.text || ' '}</div>
+                )
+              )}
+              <div className="flex items-baseline gap-2">
+                <Prompt path={path} />
+                <input
+                  ref={inputRef}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
+                  className="min-w-0 flex-1 bg-transparent text-white/90 outline-none"
+                  spellCheck={false}
+                  autoComplete="off"
+                  aria-label="module console input"
+                />
+              </div>
             </div>
           </div>
         </div>
       )}
-
-      {/* dock strip */}
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 rounded border border-white/10 bg-white/[0.03] px-2 py-1 text-left font-mono text-xs hover:bg-white/[0.06]"
-        aria-label={open ? 'collapse console' : 'summon console'}
-      >
-        <Prompt path={path} />
-        <span className="ml-auto text-white/35" aria-hidden="true">{open ? '[v]' : '[^] `'}</span>
-      </button>
-    </div>
+    </>
   );
 };
 

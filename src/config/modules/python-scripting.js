@@ -162,7 +162,7 @@ export default {
       title: 'Requests-based web enum',
       blocks: [
         { h2: 'Requests-based web enum' },
-        { p: '`requests.get` returns a Response. The status_code tells you whether the path exists (200), is forbidden (403), or missing (404). Always pass a timeout — hanging on a slow host is worse than missing it.' },
+        { p: '`requests.get` returns a Response. The status_code tells you whether the path exists (200), is forbidden (403), or missing (404). Always pass a timeout; hanging on a slow host is worse than missing it.' },
       ],
       checkpoint: {
         via: 'stage',
@@ -196,7 +196,7 @@ export default {
       title: 'Simple log parser',
       blocks: [
         { h2: 'Simple log parser' },
-        { p: '`re.compile` builds a pattern once so `findall` is fast in a loop. A capture group `(...)` returns just the matched substring — the username after "Failed password for" in this case.' },
+        { p: '`re.compile` builds a pattern once so `findall` is fast in a loop. A capture group `(...)` returns just the matched substring: the username after "Failed password for" in this case.' },
       ],
       checkpoint: {
         via: 'stage',
