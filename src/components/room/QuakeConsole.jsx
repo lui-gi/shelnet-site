@@ -92,8 +92,8 @@ const QuakeConsole = ({ slug, manifest, accentHex, onLoad, onExit }) => {
           onClick={() => setOpen((o) => !o)}
           className="flex w-full items-center gap-2 rounded-lg border bg-white/[0.04] px-3 py-2 text-left font-mono text-xs transition-colors hover:bg-white/[0.07]"
           style={{
-            borderColor: `${accentHex}47`, // ~28% alpha
-            boxShadow: `0 0 0 4px ${accentHex}0d, 0 8px 20px rgba(0,0,0,0.35)`,
+            borderColor: `${SHELL.green}47`, // site shell green ~28% alpha
+            boxShadow: `0 0 0 4px ${SHELL.green}0d, 0 8px 20px rgba(0,0,0,0.35)`,
           }}
           aria-label={open ? 'close console' : 'open console'}
         >

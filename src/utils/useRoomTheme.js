@@ -61,7 +61,9 @@ export const THEME_VARS = {
     '--input-border':     'rgba(255,255,255,0.15)',
   },
   light: {
-    '--room-bg':          '#eef0f3',
+    // Outer gutter stays dark so the light cards read as floating tiles with
+    // visible rounded corners; only the cards + stage flip to light.
+    '--room-bg':          '#000000',
     '--card-bg':          '#f0f1f4',
     '--card-border':      'rgba(20,22,28,0.12)',
     '--card-head-bg':     '#e6e8ec',
