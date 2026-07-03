@@ -19,7 +19,7 @@ const AUTH_LOG = [
   'Jul  3 14:04:22 web-01 sshd[4229]: Failed password for root from 10.0.0.9 port 55510 ssh2',
   'Jul  3 14:05:08 web-01 sshd[4235]: Failed password for jsmith from 10.0.0.9 port 55552 ssh2',
   'Jul  3 14:06:01 web-01 sshd[4241]: Accepted password for jsmith from 10.0.0.9 port 55603 ssh2',
-  '(showing 6 of 51 matching lines)',
+  '(showing 6 of 51 lines)',
 ];
 
 const IOCS_TXT = [
@@ -385,7 +385,7 @@ export default {
           'try `grep -f /etc/iocs.txt /var/log/auth.log`.',
         ],
         reveal: 'grep -f /etc/iocs.txt /var/log/auth.log',
-        explain: 'Every jsmith event — failures and the successful login — matches. The compromising IP was in your threat-intel list before the attack even started; a scheduled version of this query would have alerted you first.',
+        explain: 'Every event tied to `10.0.0.9` — four jsmith failures, root\'s 14:04:22 probe, and jsmith\'s successful login — matches. The compromising IP was in your threat-intel list before the attack even started; a scheduled version of this query would have alerted you first.',
       },
     },
     {
@@ -431,7 +431,7 @@ export default {
         accept: /^\s*y(es)?\s*$/i,
         hints: ['47 failures, one Accepted password from the same IP, and that IP is on the intel list.'],
         reveal: 'yes',
-        explain: 'Yes. Treat jsmith as compromised: disable the account, reset credentials, and hunt for what that session touched after 14:06. You just triaged a real intrusion from a flat file, and every command you ran is one an on-call analyst could reach for in the dark.',
+        explain: 'Yes. jsmith is compromised: kill the session, rotate the credential, and pivot into what happened on `web-01` after 14:06 — from the same shell you triaged with. You just triaged a real intrusion from a flat file, and every command you ran is one an on-call analyst could reach for in the dark.',
       },
     },
   ],
