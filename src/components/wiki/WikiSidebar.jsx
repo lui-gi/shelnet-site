@@ -7,7 +7,7 @@ import { buildSidebarTree } from './sidebarTree';
 
 const EntryLeaf = ({ node, currentPath, depth }) => {
   const active = currentPath === node.path;
-  const indent = `${depth * 0.75}rem`;
+  const indent = `${depth * 1.1}rem`;
   return (
     <Link
       to={`/wiki/${node.path}`}
@@ -26,17 +26,21 @@ const EntryLeaf = ({ node, currentPath, depth }) => {
 
 const DirBranch = ({ node, currentPath, depth }) => {
   const [open, setOpen] = useState(true);
-  const indent = `${depth * 0.75}rem`;
+  const indent = `${depth * 1.1}rem`;
   return (
     <div>
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="block w-full text-left text-sm py-0.5 pr-2 text-neutral-700 hover:text-neutral-900 truncate border-l-2 border-transparent -ml-[2px]"
+        className={[
+          'block w-full text-left text-[13px] py-0.5 pr-2 truncate border-l-2 border-transparent -ml-[2px]',
+          'font-semibold tracking-wide text-neutral-800 hover:text-neutral-950',
+        ].join(' ')}
         style={{ paddingLeft: `calc(${indent} + 0.5rem)` }}
       >
-        <span className="text-neutral-400 mr-1">{open ? '▾' : '▸'}</span>
-        {node.name}/
+        <span className="text-neutral-500 mr-1 inline-block w-3">{open ? '▾' : '▸'}</span>
+        {node.name}
+        <span className="text-neutral-400 font-normal">/</span>
       </button>
       {open && node.children?.map((c) => (
         <Branch key={c.path} node={c} currentPath={currentPath} depth={depth + 1} />
