@@ -357,5 +357,66 @@ export default {
         explain: 'One Accepted password at 14:06:01, from 10.0.0.9 — the same IP that supplied the 47 failures. The brute force worked. That is the moment the incident becomes a compromise.',
       },
     },
+    {
+      id: 'iocs',
+      title: 'Match against an IOC list',
+      blocks: [
+        { h2: 'Threat intel: pattern lists' },
+        { p: 'Threat intel feeds are, in the end, just lists — IPs, hashes, domains — that a peer or vendor has flagged as bad. Cross-referencing your logs against one of these lists is the cheapest form of hunting, and grep already knows how.' },
+        { code: 'cat /etc/iocs.txt' },
+        { p: '`grep -f <file>` reads its patterns from a file, one per line, instead of taking them on the command line. Point it at an IOC list and every log line matching any listed IP survives.' },
+        { code: 'grep -f /etc/iocs.txt /var/log/auth.log' },
+        {
+          list: [
+            'Empty lines and `#` comments in the pattern file are respected by most greps; keep them for humans.',
+            '`grep -Ff` treats patterns as fixed strings — safer for IPs so a dot is not interpreted as a regex any-char.',
+            'Big pattern files scale well; grep is happy with tens of thousands of lines.',
+          ],
+        },
+        { callout: "IOCs age fast. A list is only as useful as its last update — always check the header comment for freshness before you trust the match." },
+        { task: 'Filter auth.log to lines whose IP appears in /etc/iocs.txt.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: /^grep\s+-f\s+\/etc\/iocs\.txt\s+\/var\/log\/auth\.log\s*$/i,
+        hints: [
+          'the flag is -f (patterns from a file).',
+          'point -f at /etc/iocs.txt and target /var/log/auth.log.',
+          'try `grep -f /etc/iocs.txt /var/log/auth.log`.',
+        ],
+        reveal: 'grep -f /etc/iocs.txt /var/log/auth.log',
+        explain: 'Every jsmith event — failures and the successful login — matches. The compromising IP was in your threat-intel list before the attack even started; a scheduled version of this query would have alerted you first.',
+      },
+    },
+    {
+      id: 'enrich',
+      title: 'Enrich with a lookup file',
+      blocks: [
+        { h3: 'join for row-level enrichment' },
+        { p: 'A lookup CSV pairs a key with context — a tag, an owner, a first-seen date. `join` merges two sorted inputs on a shared key, exactly like a SQL inner join. Use process substitution `<(...)` to sort inline without touching disk.' },
+        { code: 'cat /etc/known_bad.csv' },
+        { p: 'To tag every offending source IP with its threat category, extract the unique src_ips, sort them, and join against the sorted lookup file on the first column:' },
+        { code: "join -t, -1 1 -2 1 <(grep 'Failed password' /var/log/auth.log | awk '{print $11}' | sort -u) <(sort /etc/known_bad.csv)" },
+        {
+          list: [
+            '`-t,`: use comma as the field separator (CSVs are comma-delimited).',
+            '`-1 1 -2 1`: join field 1 of file 1 with field 1 of file 2.',
+            '`sort -u`: unique-and-sort in one step; `join` requires sorted input.',
+          ],
+        },
+        { task: 'Tag the failing source IPs with their known-bad category.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: /^join\s+-t,?\s*-1\s*1\s+-2\s*1\s+<\(.*sort.*\)\s+<\(sort\s+\/etc\/known_bad\.csv\)\s*$/i,
+        hints: [
+          'sort both inputs first — join requires it.',
+          'use process substitution `<(...)` so you can sort inline.',
+          "try `join -t, -1 1 -2 1 <(grep 'Failed password' /var/log/auth.log | awk '{print $11}' | sort -u) <(sort /etc/known_bad.csv)`.",
+        ],
+        reveal: "join -t, -1 1 -2 1 <(grep 'Failed password' /var/log/auth.log | awk '{print $11}' | sort -u) <(sort /etc/known_bad.csv)",
+        explain: '10.0.0.9 is tagged `ssh-brute-forcer`, first seen 2026-06-14. That is the enriched row you paste into the ticket: not a raw IP, but an IP with a name.',
+      },
+    },
   ],
 };
