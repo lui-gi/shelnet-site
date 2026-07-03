@@ -15,7 +15,7 @@ const ALL_REVEALED = 999;   // step sentinel: every element shown (skip / reduce
 // `dir` => opens the file-explorer at /resources/<dir>.
 // `anchor` => opens the matching route (/connect).
 const MENU = [
-  { n: '1', cmd: './certs',     desc: 'A+ · Security+ · more',          dir: 'certs' },
+  { n: '1', cmd: './certs',     desc: 'A+ · Security+ · CySA+ · more',          dir: 'certs' },
   { n: '2', cmd: './bytes',     desc: 'rapid-fire practice · portable',      to: '/bytes' },
   { n: '3', cmd: './modules',   desc: 'interactive skill rooms',        to: '/resources/modules' },
   { n: '4', cmd: './wiki',      desc: 'writeups, guides, and more',         to: '/wiki' },
