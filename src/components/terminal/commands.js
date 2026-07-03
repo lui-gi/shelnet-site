@@ -2,7 +2,7 @@
 // The lobby shell's global command parser: help, clear, list, load, exit. Pure
 // over the registry + manifest + a progress store (passed in). Returns output
 // lines plus an optional action the caller performs: clear the buffer, load a
-// module (the caller resolves /resources/modules/<slug>), or navigate (for a
+// module (the caller resolves /modules/<slug>), or navigate (for a
 // foundation primer handoff to the visualizations viewer).
 import { getModule, getCategoryListing, getFoundation } from '../../config/moduleRegistry';
 
@@ -74,7 +74,7 @@ export function runCommand(input, manifest, store = {}) {
       if (found) {
         return {
           lines: [line(`opening ${found.title}…`, 'sys')],
-          action: { type: 'navigate', to: `/resources/visualizations?m=${found.id}` },
+          action: { type: 'navigate', to: `/visualizations?m=${found.id}` },
         };
       }
       return { lines: [line(`command not found: load ${arg}   (try \`list\`)`, 'err')] };

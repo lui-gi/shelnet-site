@@ -1,5 +1,5 @@
 // src/pages/labs.jsx
-// Interim "build in progress" screen for /resources/labs. The labs section is
+// Interim "build in progress" screen for /labs. The labs section is
 // being rebuilt as a self-contained showcase; this keeps the shell + orange
 // accent and teases the revamp. esc → home, ↵ → /connect.
 import { useEffect } from 'react';

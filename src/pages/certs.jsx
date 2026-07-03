@@ -47,7 +47,7 @@ const Certs = () => {
   const selected = open[sel] || null;
 
   const openDash = useCallback((slug, focus) => {
-    navigate(`/resources/certs/${slug}${focus ? `?focus=${focus}` : ''}`);
+    navigate(`/certs/${slug}${focus ? `?focus=${focus}` : ''}`);
   }, [navigate]);
 
   useEffect(() => {

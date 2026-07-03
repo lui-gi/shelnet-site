@@ -89,7 +89,7 @@ const Workspace = ({
   if (error) return <div className="flex-1 grid place-items-center text-rose-400 text-sm">! failed to load: {error}</div>;
 
   // ── shared pieces ──────────────────────────────────────────────────────────
-  // Color-coded `tree`-style file rail, matching the /resources tree vocabulary:
+  // Color-coded `tree`-style file rail, matching the ~/ tree vocabulary:
   // a dim root (./), accent-colored group dirs with ├─/└─ glyphs, and leaves on
   // │  ├─ / └─ glyphs. Selected/hovered rows get a tinted background using the
   // cert/page accent so the selection cue carries the accent itself.
