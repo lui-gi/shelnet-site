@@ -39,7 +39,19 @@ export default {
           { match: /^ip\.addr\s*==\s*10\.0\.0\.9\s*$/i, keep: [1, 2, 4] },
           { match: /^ssh\s*$/i, keep: [4] },
         ],
-        actions: [],
+        actions: [
+          {
+            match: { menu: 'Statistics→Conversations' },
+            payload: {
+              kind: 'table',
+              columns: ['Address A', 'Address B', 'Packets', 'Bytes'],
+              rows: [
+                ['10.0.0.9', '10.0.0.1', '51', '8.4 kB'],
+                ['10.0.0.4', '10.0.0.1', '3',  '0.6 kB'],
+              ],
+            },
+          },
+        ],
       },
     },
   },
