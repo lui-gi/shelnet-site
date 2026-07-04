@@ -272,6 +272,86 @@ const dnsC2 = {
   ],
 };
 
+// ── Act IV: SMB lateral movement ─ 10.0.0.9 pivots to the finance share on
+// 10.0.0.1 and pulls a spreadsheet. Same actor as Act I and III — the room's
+// throughline resolves here.
+const smbLateral = {
+  packets: [
+    { no: 1, time: '0.0000', src: '10.0.0.9', dst: '10.0.0.1', proto: 'TCP',  info: '49882→445 [SYN]',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.9', 'Dst: 10.0.0.1'] },
+        { layer: 'TCP', rows: ['Src Port: 49882', 'Dst Port: 445', 'Flags: SYN'] },
+      ] },
+    { no: 2, time: '0.0192', src: '10.0.0.1', dst: '10.0.0.9', proto: 'TCP',  info: '445→49882 [SYN, ACK]',
+      details: [
+        { layer: 'TCP', rows: ['Src Port: 445', 'Dst Port: 49882', 'Flags: SYN,ACK'] },
+      ] },
+    { no: 3, time: '0.0301', src: '10.0.0.9', dst: '10.0.0.1', proto: 'SMB2', info: 'Negotiate Protocol Request',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Negotiate Protocol (0x00)', 'Dialects: 0x0311 (SMB 3.1.1), 0x0302, 0x0210'] },
+      ] },
+    { no: 4, time: '0.0402', src: '10.0.0.1', dst: '10.0.0.9', proto: 'SMB2', info: 'Negotiate Protocol Response',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Negotiate Protocol (0x00)', 'Dialect Selected: 0x0311 (SMB 3.1.1)'] },
+      ] },
+    { no: 5, time: '0.0510', src: '10.0.0.9', dst: '10.0.0.1', proto: 'SMB2', info: 'Session Setup Request, User: jsmith',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Session Setup (0x01)', 'User: jsmith'] },
+      ] },
+    { no: 6, time: '0.0688', src: '10.0.0.1', dst: '10.0.0.9', proto: 'SMB2', info: 'Session Setup Response',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Session Setup (0x01)', 'Status: STATUS_SUCCESS'] },
+      ] },
+    { no: 7, time: '0.0801', src: '10.0.0.9', dst: '10.0.0.1', proto: 'SMB2', info: 'Tree Connect Request, Path: \\\\10.0.0.1\\finance',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Tree Connect (0x03)', 'Path: \\\\10.0.0.1\\finance'] },
+      ] },
+    { no: 8, time: '0.0912', src: '10.0.0.1', dst: '10.0.0.9', proto: 'SMB2', info: 'Tree Connect Response',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Tree Connect (0x03)', 'Status: STATUS_SUCCESS'] },
+      ] },
+    { no: 9, time: '0.1044', src: '10.0.0.9', dst: '10.0.0.1', proto: 'SMB2', info: 'Find Request, Pattern: *',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Find (0x0e)', 'Search Pattern: *'] },
+      ] },
+    { no: 10, time: '0.1210', src: '10.0.0.1', dst: '10.0.0.9', proto: 'SMB2', info: 'Find Response, 3 entries (payroll.xlsx, budget-2026.xlsx, README.txt)',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Find (0x0e)', 'Entry: payroll.xlsx (128 kB)', 'Entry: budget-2026.xlsx (96 kB)', 'Entry: README.txt (1.2 kB)'] },
+      ] },
+    { no: 11, time: '0.1512', src: '10.0.0.9', dst: '10.0.0.1', proto: 'SMB2', info: 'Create Request, File: payroll.xlsx',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Create (0x05)', 'Filename: payroll.xlsx', 'Access: Read'] },
+      ] },
+    { no: 12, time: '0.1601', src: '10.0.0.1', dst: '10.0.0.9', proto: 'SMB2', info: 'Create Response, File: payroll.xlsx',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Create (0x05)', 'Status: STATUS_SUCCESS', 'File ID: 0x00…f1'] },
+      ] },
+    { no: 13, time: '0.1704', src: '10.0.0.9', dst: '10.0.0.1', proto: 'SMB2', info: 'Read Request, File: payroll.xlsx, Length: 131072',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Read (0x08)', 'File: payroll.xlsx', 'Read Length: 131072 bytes'] },
+      ] },
+    { no: 14, time: '0.2011', src: '10.0.0.1', dst: '10.0.0.9', proto: 'SMB2', info: 'Read Response, 131072 bytes',
+      details: [
+        { layer: 'SMB2', rows: ['Command: Read (0x08)', 'Status: STATUS_SUCCESS', 'Byte Count: 131072'] },
+      ] },
+  ],
+  filters: [
+    { match: /^smb2\s*$/i, keep: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14] },
+    { match: /^smb2\.filename\s+contains\s+"payroll"\s*$/i, keep: [11, 12, 13, 14] },
+  ],
+  actions: [
+    { match: { menu: 'File→Export Objects→SMB' },
+      payload: {
+        kind: 'objects',
+        rows: [
+          { filename: 'payroll.xlsx',      size: '128.0 kB' },
+          { filename: 'budget-2026.xlsx',  size: '96.0 kB'  },
+          { filename: 'README.txt',        size: '1.2 kB'   },
+        ],
+      } },
+  ],
+};
+
 export default {
   stageConfig: {
     host: HOST,
@@ -280,7 +360,7 @@ export default {
       'ssh-brute.pcap': sshBrute,
       'http-creds.pcap': httpCreds,
       'dns-c2.pcap': dnsC2,
-      // smb-lateral.pcap: Task 7
+      'smb-lateral.pcap': smbLateral,
     },
   },
 
@@ -573,21 +653,79 @@ export default {
         explain: 'Sixty-second beacon. A jittered attacker would smear this over ±10s; the fixed cadence here is early-stage tradecraft, and it is why the Protocol Hierarchy view lit up in §12. In production you would page this on a Splunk `| streamstats` sliding-window rule; the pcap is the confirming ground truth.',
       },
     },
-    // Placeholder tail until Task 7 lands.
+    // §15 — swap to smb-lateral.
     {
-      id: 'act4-coming',
-      title: 'Act IV lands next',
+      id: 'open-smb-lateral',
+      title: 'Swap captures',
       blocks: [
-        { h2: 'SMB is up' },
-        { p: 'Type `next` to advance while Act IV is being built.' },
-        { task: 'Advance.' },
+        { h2: 'Act IV: SMB lateral movement' },
+        { p: 'The 5.55s SSH success in Act I meant the attacker had shell on `web-01`. This capture is what they did with it — pivoted to the file server (`10.0.0.1`, running SMB on 445), enumerated `\\10.0.0.1\\finance`, and pulled a spreadsheet. Source is `10.0.0.9`; the throughline resolves here.' },
+        { task: 'Load `smb-lateral.pcap`.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'load' && e.pcap === 'smb-lateral.pcap',
+        hints: ['File → Open → smb-lateral.pcap.'],
+        reveal: 'File → Open → smb-lateral.pcap',
+        explain: 'Fourteen packets: handshake, SMB negotiate + session setup, tree connect to the finance share, a directory list, and a single Read that pulls the whole file.',
+      },
+    },
+    // §16 — SMB filter.
+    {
+      id: 'filter-smb2',
+      title: 'Filter to SMB',
+      blocks: [
+        { h3: 'Modern SMB is `smb2`' },
+        { p: 'SMB1 is legacy and rare in a healthy 2026 network; the Wireshark keyword for the modern dialect (2.x and 3.x) is `smb2`. Use it to strip the handshake and leave only the protocol messages worth reading.' },
+        { code: 'smb2' },
+        { task: 'Filter to only the SMB2 messages.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'filter' && e.payload?.matched && /^smb2\s*$/i.test(e.filter),
+        hints: [
+          'The bare keyword is `smb2`.',
+          'Just type it in the filter bar.',
+        ],
+        reveal: 'smb2',
+        explain: 'Twelve SMB2 messages remain. Scroll to the Tree Connect on packet 7 — path `\\\\10.0.0.1\\finance`. The attacker knew where to look; a real triage would ask what other shares they touched off-capture.',
+      },
+    },
+    // §17 — Export Objects.
+    {
+      id: 'export-objects-smb',
+      title: 'Export the object',
+      blocks: [
+        { h3: 'File → Export Objects → SMB' },
+        { p: 'When a file traverses SMB, Wireshark can reassemble the Read responses back into the original bytes. `File → Export Objects → SMB` opens a dialog listing every file that crossed the wire in the capture, with size and the option to save. In an investigation this is how you recover what was taken.' },
+        { task: 'Open File → Export Objects → SMB.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'action' && e.action === 'File→Export Objects→SMB',
+        hints: [
+          'Click the `File ▾` menu in the stage.',
+          'Pick `Export Objects → SMB`.',
+        ],
+        reveal: 'File → Export Objects → SMB',
+        explain: 'Three files listed. `payroll.xlsx` (128 kB) is the one that was Read — packets 11–14 pulled it in a single request. This is the exfil. Names, sizes, and file IDs go straight into the incident write-up.',
+      },
+    },
+    // §18 — verdict.
+    {
+      id: 'verdict',
+      title: 'Call it',
+      blocks: [
+        { h3: 'Is the compromise contained?' },
+        { p: 'Zoom out. Act I: brute force succeeded from `10.0.0.9`. Act III: that same host was already beaconing out via DNS on a 60s cadence — so the box was owned before the SSH success, or the attacker persisted immediately after. Act IV: they used that access to pull `payroll.xlsx` from the finance share. Meanwhile Act II is a separate insider mistake by awilliams that also needs work but is unrelated. Two independent problems, both live.' },
+        { task: 'Given three acts share the same threat actor and the fourth is a separate insider mistake, is the compromise contained? (yes / no)' },
       ],
       checkpoint: {
         via: 'answer',
-        accept: /^\s*next\s*$/i,
-        hints: ['Type the word next.'],
-        reveal: 'next',
-        explain: 'Onward.',
+        accept: /^\s*n(o)?\s*$/i,
+        hints: ['Look at what still has access, and to what.'],
+        reveal: 'no',
+        explain: 'No. Kill `jsmith`\'s session, block `10.0.0.9` at the perimeter, sinkhole `*.badc2.example` at the resolver, and rotate the credential — those close Act I / III / IV. Force `intranet.corp` to HTTPS, rotate awilliams\'s password, and audit who else uses that portal — that closes Act II. You just triaged four incidents from four flat captures, and the shape of the packet-analysis work is the same every time: load, filter, pivot, follow, export.',
       },
     },
   ],
