@@ -5,11 +5,13 @@
 import ShellStage from './ShellStage';
 import SearchStage from './SearchStage';
 import EditorStage from './EditorStage';
+import PcapStage from './PcapStage';
 
 export const STAGES = {
   shell: ShellStage,
   search: SearchStage,
   editor: EditorStage,
+  pcap: PcapStage,
 };
 
 /** The stage component for a kind, or null if unknown. */
