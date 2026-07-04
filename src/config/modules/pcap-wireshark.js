@@ -122,13 +122,88 @@ const sshBrute = {
   ],
 };
 
+// ── Act II: HTTP credential leak ─ intranet host (10.0.0.55) hits a legacy
+// portal at http://intranet.corp/login and posts creds in cleartext. Deliberate
+// break from the jsmith throughline: this is awilliams making a mistake, not
+// the attacker on 10.0.0.9. The pedagogy is: not every bad packet is the same
+// attacker; HTTPS mattered here.
+const httpCreds = {
+  packets: [
+    { no: 1, time: '0.0000', src: '10.0.0.55', dst: '10.0.0.80', proto: 'TCP', info: '48211→80 [SYN]',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.55', 'Dst: 10.0.0.80', 'TTL: 64'] },
+        { layer: 'TCP', rows: ['Src Port: 48211', 'Dst Port: 80', 'Flags: SYN'] },
+      ] },
+    { no: 2, time: '0.0180', src: '10.0.0.80', dst: '10.0.0.55', proto: 'TCP', info: '80→48211 [SYN, ACK]',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.80', 'Dst: 10.0.0.55'] },
+        { layer: 'TCP', rows: ['Src Port: 80', 'Dst Port: 48211', 'Flags: SYN,ACK'] },
+      ] },
+    { no: 3, time: '0.0212', src: '10.0.0.55', dst: '10.0.0.80', proto: 'HTTP', info: 'GET /login HTTP/1.1',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.55', 'Dst: 10.0.0.80'] },
+        { layer: 'TCP', rows: ['Src Port: 48211', 'Dst Port: 80', 'Flags: PSH,ACK'] },
+        { layer: 'HTTP', rows: ['Request Method: GET', 'Request URI: /login', 'Host: intranet.corp', 'User-Agent: Mozilla/5.0'] },
+      ] },
+    { no: 4, time: '0.0402', src: '10.0.0.80', dst: '10.0.0.55', proto: 'HTTP', info: 'HTTP/1.1 200 OK (text/html)',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.80', 'Dst: 10.0.0.55'] },
+        { layer: 'HTTP', rows: ['Status Code: 200', 'Content-Type: text/html', 'Content-Length: 812'] },
+      ] },
+    { no: 5, time: '4.2201', src: '10.0.0.55', dst: '10.0.0.80', proto: 'HTTP', info: 'POST /login HTTP/1.1  (application/x-www-form-urlencoded)',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.55', 'Dst: 10.0.0.80'] },
+        { layer: 'TCP', rows: ['Src Port: 48211', 'Dst Port: 80', 'Flags: PSH,ACK'] },
+        { layer: 'HTTP', rows: ['Request Method: POST', 'Request URI: /login', 'Host: intranet.corp', 'Content-Type: application/x-www-form-urlencoded', 'Content-Length: 44'] },
+        { layer: 'HTML Form URL Encoded', rows: ['user: awilliams', 'password: Summer2026!'] },
+      ] },
+    { no: 6, time: '4.2517', src: '10.0.0.80', dst: '10.0.0.55', proto: 'HTTP', info: 'HTTP/1.1 302 Found (Location: /home)',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.80', 'Dst: 10.0.0.55'] },
+        { layer: 'HTTP', rows: ['Status Code: 302', 'Location: /home', 'Set-Cookie: session=8f31…'] },
+      ] },
+  ],
+  filters: [
+    { match: /^http\s*$/i, keep: [3, 4, 5, 6] },
+    { match: /^http\.request\.method\s*==\s*"POST"\s*$/i, keep: [5] },
+  ],
+  actions: [
+    { match: { menu: 'Analyze→Follow HTTP Stream' },
+      payload: {
+        kind: 'stream',
+        text: [
+          'GET /login HTTP/1.1',
+          'Host: intranet.corp',
+          'User-Agent: Mozilla/5.0',
+          '',
+          'HTTP/1.1 200 OK',
+          'Content-Type: text/html',
+          'Content-Length: 812',
+          '',
+          '<html>… login form …</html>',
+          '',
+          'POST /login HTTP/1.1',
+          'Host: intranet.corp',
+          'Content-Type: application/x-www-form-urlencoded',
+          'Content-Length: 44',
+          '',
+          'user=awilliams&password=Summer2026!',
+          '',
+          'HTTP/1.1 302 Found',
+          'Location: /home',
+          'Set-Cookie: session=8f31…; Path=/; HttpOnly',
+        ].join('\n'),
+      } },
+  ],
+};
+
 export default {
   stageConfig: {
     host: HOST,
     initialPcap: 'ssh-brute.pcap',
     pcaps: {
       'ssh-brute.pcap': sshBrute,
-      // http-creds.pcap: Task 5
+      'http-creds.pcap': httpCreds,
       // dns-c2.pcap:     Task 6
       // smb-lateral.pcap: Task 7
     },
@@ -265,13 +340,95 @@ export default {
         explain: 'One packet, at 5.55s — jsmith\'s password finally worked. That is the moment the brute force became a compromise. Everything after that packet on this host is post-exploitation.',
       },
     },
-    // Placeholder tail until Task 5 lands.
+    // §7 — swap to http-creds.
     {
-      id: 'act2-coming',
-      title: 'Act II lands next',
+      id: 'open-http-creds',
+      title: 'Swap captures',
       blocks: [
-        { h2: 'More acts on the way' },
-        { p: 'Type `next` to advance while Acts II–IV are being built.' },
+        { h2: 'Act II: an HTTP credential leak' },
+        { p: 'Same organization, different problem. An internal host is posting to a legacy portal at `http://intranet.corp/login` — a URL that starts with `http`, not `https`. Anyone on-path sees the request body. The user in this capture is `awilliams`, not jsmith; the point is that not every bad packet in your day comes from the same actor.' },
+        { task: 'Load `http-creds.pcap`.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'load' && e.pcap === 'http-creds.pcap',
+        hints: [
+          'Click the `File ▾` menu.',
+          'Pick Open · http-creds.pcap.',
+        ],
+        reveal: 'File → Open → http-creds.pcap',
+        explain: 'Six packets: a handshake, a GET, a POST, and a redirect. Small and fast — but the POST body is where the story lives.',
+      },
+    },
+    // §8 — POST filter.
+    {
+      id: 'filter-post',
+      title: 'Filter HTTP requests',
+      blocks: [
+        { h3: 'Match the method' },
+        { p: 'The `http` display filter keeps every HTTP-layer packet. To narrow further, filter on a request field. `http.request.method` names the verb; the value is a quoted string.' },
+        { code: 'http.request.method == "POST"' },
+        { task: 'Filter to only POST requests.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'filter' && e.payload?.matched && /^http\.request\.method\s*==\s*"POST"\s*$/i.test(e.filter),
+        hints: [
+          'The field is `http.request.method`.',
+          'The value is `"POST"` (quoted).',
+          'Try `http.request.method == "POST"`.',
+        ],
+        reveal: 'http.request.method == "POST"',
+        explain: 'One packet — the single POST. Look at its details tree: the URL-encoded form is decoded inline. You can already read the password without opening another dialog.',
+      },
+    },
+    // §9 — Follow HTTP Stream.
+    {
+      id: 'follow-http-stream',
+      title: 'Follow the stream',
+      blocks: [
+        { h3: 'Analyze → Follow HTTP Stream' },
+        { p: 'For long conversations, the details tree gets clumsy. `Follow HTTP Stream` reassembles both sides of an HTTP exchange — request headers, request body, response headers, response body — into one scrollable pane. It is how you read what really flowed between two endpoints.' },
+        { task: 'Open Analyze → Follow HTTP Stream.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'action' && e.action === 'Analyze→Follow HTTP Stream',
+        hints: [
+          'Click the `Analyze ▾` menu in the stage.',
+          'Pick `Follow HTTP Stream`.',
+        ],
+        reveal: 'Analyze → Follow HTTP Stream',
+        explain: '`user=awilliams&password=Summer2026!` sits in the request body in plain UTF-8. Anyone with a Ethernet tap between awilliams and the portal saw this password. The response set a session cookie — an attacker who saw the POST can now replay that session too.',
+      },
+    },
+    // §10 — why-it-matters answer.
+    {
+      id: 'why-http-bad',
+      title: 'Why this is bad',
+      blocks: [
+        { h3: 'One-word answer' },
+        { p: 'The password itself is fine — 12 characters, mixed case, a symbol. The problem is *how* it moved. Name the one thing about this exchange that makes it dangerous.' },
+        { task: 'One word: what is missing that would have protected the credential?' },
+      ],
+      checkpoint: {
+        via: 'answer',
+        accept: /\b(https|tls|ssl|encryption|encrypted)\b/i,
+        hints: [
+          'Look at the URL scheme in the Host header.',
+          'What protects a login form in transit?',
+        ],
+        reveal: 'HTTPS (TLS)',
+        explain: 'HTTPS. The portal was reachable on port 80 and awilliams — or the browser\'s bookmark, or a link somewhere — used it. The fix is not "pick a better password"; the fix is redirect 80→443 at the portal and force TLS. The lesson from the packet is that "should have been encrypted" is a visible, checkable property of a session, not a policy debate.',
+      },
+    },
+    // Placeholder tail until Task 6 lands.
+    {
+      id: 'act3-coming',
+      title: 'Act III lands next',
+      blocks: [
+        { h2: 'DNS tunneling is up' },
+        { p: 'Type `next` to advance while Act III is being built.' },
         { task: 'Advance.' },
       ],
       checkpoint: {
