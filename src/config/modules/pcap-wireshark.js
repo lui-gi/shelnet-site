@@ -93,7 +93,7 @@ const sshBrute = {
     { no: 14, time: '5.5488', src: '10.0.0.1', dst: '10.0.0.9', proto: 'SSH', info: 'Server: User auth success',
       details: [
         { layer: 'IPv4', rows: ['Src: 10.0.0.1', 'Dst: 10.0.0.9', 'TTL: 64'] },
-        { layer: 'TCP', rows: ['Src Port: 22', 'Dst Port: 55488', 'Flags: PSH,ACK'] },
+        { layer: 'TCP', rows: ['Src Port: 22', 'Dst Port: 55603', 'Flags: PSH,ACK'] },
         { layer: 'SSH', rows: ['Message Code: 52 (User authentication success)'] },
       ] },
   ],
@@ -154,7 +154,7 @@ const httpCreds = {
       details: [
         { layer: 'IPv4', rows: ['Src: 10.0.0.55', 'Dst: 10.0.0.80'] },
         { layer: 'TCP', rows: ['Src Port: 48211', 'Dst Port: 80', 'Flags: PSH,ACK'] },
-        { layer: 'HTTP', rows: ['Request Method: POST', 'Request URI: /login', 'Host: intranet.corp', 'Content-Type: application/x-www-form-urlencoded', 'Content-Length: 44'] },
+        { layer: 'HTTP', rows: ['Request Method: POST', 'Request URI: /login', 'Host: intranet.corp', 'Content-Type: application/x-www-form-urlencoded', 'Content-Length: 35'] },
         { layer: 'HTML Form URL Encoded', rows: ['user: awilliams', 'password: Summer2026!'] },
       ] },
     { no: 6, time: '4.2517', src: '10.0.0.80', dst: '10.0.0.55', proto: 'HTTP', info: 'HTTP/1.1 302 Found (Location: /home)',
@@ -185,7 +185,7 @@ const httpCreds = {
           'POST /login HTTP/1.1',
           'Host: intranet.corp',
           'Content-Type: application/x-www-form-urlencoded',
-          'Content-Length: 44',
+          'Content-Length: 35',
           '',
           'user=awilliams&password=Summer2026!',
           '',
