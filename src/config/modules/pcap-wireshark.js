@@ -197,6 +197,81 @@ const httpCreds = {
   ],
 };
 
+// ── Act III: DNS tunneling / C2 beacon ─ 10.0.0.9 (jsmith throughline
+// resumes) beacons to *.c2.badc2.example every 60s via DNS TXT queries. A
+// few benign DNS queries (pool.ntp.org, intranet.corp) sit inline so the
+// anomaly stands out against a real-looking baseline.
+const dnsC2 = {
+  packets: [
+    { no: 1, time: '0.0000',   src: '10.0.0.9', dst: '10.0.0.53', proto: 'DNS', info: 'Standard query TXT r7f2a1.c2.badc2.example',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.9', 'Dst: 10.0.0.53'] },
+        { layer: 'UDP', rows: ['Src Port: 51221', 'Dst Port: 53'] },
+        { layer: 'DNS', rows: ['Transaction ID: 0x8a12', 'Flags: Standard query', 'Query Name: r7f2a1.c2.badc2.example', 'Query Type: TXT'] },
+      ] },
+    { no: 2, time: '0.0117',   src: '10.0.0.53', dst: '10.0.0.9', proto: 'DNS', info: 'Standard query response TXT (198 bytes)',
+      details: [
+        { layer: 'IPv4', rows: ['Src: 10.0.0.53', 'Dst: 10.0.0.9'] },
+        { layer: 'DNS', rows: ['Transaction ID: 0x8a12', 'Answer TXT: "eyJvIjoic2FyIiwiYyI6ImxzIn0="'] },
+      ] },
+    { no: 3, time: '12.4402',  src: '10.0.0.9', dst: '10.0.0.53', proto: 'DNS', info: 'Standard query A pool.ntp.org',
+      details: [
+        { layer: 'DNS', rows: ['Query Name: pool.ntp.org', 'Query Type: A'] },
+      ] },
+    { no: 4, time: '12.4488',  src: '10.0.0.53', dst: '10.0.0.9', proto: 'DNS', info: 'Standard query response A 162.159.200.1',
+      details: [
+        { layer: 'DNS', rows: ['Answer A: 162.159.200.1'] },
+      ] },
+    { no: 5, time: '60.0044',  src: '10.0.0.9', dst: '10.0.0.53', proto: 'DNS', info: 'Standard query TXT c1e9d0.c2.badc2.example',
+      details: [
+        { layer: 'DNS', rows: ['Query Name: c1e9d0.c2.badc2.example', 'Query Type: TXT'] },
+      ] },
+    { no: 6, time: '60.0140',  src: '10.0.0.53', dst: '10.0.0.9', proto: 'DNS', info: 'Standard query response TXT (204 bytes)',
+      details: [
+        { layer: 'DNS', rows: ['Answer TXT: "eyJvIjoibGlzdF9kaXIiLCJjIjoiIn0="'] },
+      ] },
+    { no: 7, time: '73.1201',  src: '10.0.0.9', dst: '10.0.0.53', proto: 'DNS', info: 'Standard query AAAA intranet.corp',
+      details: [
+        { layer: 'DNS', rows: ['Query Name: intranet.corp', 'Query Type: AAAA'] },
+      ] },
+    { no: 8, time: '120.0055', src: '10.0.0.9', dst: '10.0.0.53', proto: 'DNS', info: 'Standard query TXT 8b3311.c2.badc2.example',
+      details: [
+        { layer: 'DNS', rows: ['Query Name: 8b3311.c2.badc2.example', 'Query Type: TXT'] },
+      ] },
+    { no: 9, time: '120.0121', src: '10.0.0.53', dst: '10.0.0.9', proto: 'DNS', info: 'Standard query response TXT (196 bytes)',
+      details: [
+        { layer: 'DNS', rows: ['Answer TXT: "eyJvIjoicHdkIiwiYyI6IiJ9"'] },
+      ] },
+    { no: 10, time: '180.0038', src: '10.0.0.9', dst: '10.0.0.53', proto: 'DNS', info: 'Standard query TXT 4dee02.c2.badc2.example',
+      details: [
+        { layer: 'DNS', rows: ['Query Name: 4dee02.c2.badc2.example', 'Query Type: TXT'] },
+      ] },
+    { no: 11, time: '180.0126', src: '10.0.0.53', dst: '10.0.0.9', proto: 'DNS', info: 'Standard query response TXT (212 bytes)',
+      details: [
+        { layer: 'DNS', rows: ['Answer TXT: "eyJvIjoiZG93bmxvYWQiLCJjIjoicHIueGxzIn0="'] },
+      ] },
+  ],
+  filters: [
+    { match: /^dns\s*$/i, keep: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
+    { match: /^dns\.qry\.name\s+contains\s+"badc2"\s*$/i, keep: [1, 2, 5, 6, 8, 9, 10, 11] },
+  ],
+  actions: [
+    { match: { menu: 'Statistics→Protocol Hierarchy' },
+      payload: {
+        kind: 'table',
+        columns: ['Protocol', 'Packets', '% Packets', 'Bytes'],
+        rows: [
+          ['Ethernet',       '11', '100.0%', '2.3 kB'],
+          ['IPv4',           '11', '100.0%', '2.3 kB'],
+          ['UDP',            '11', '100.0%', '2.3 kB'],
+          ['DNS',            '11', '100.0%', '2.3 kB'],
+          ['  DNS TXT (badc2.example)', '8',  '72.7%',  '1.9 kB'],
+          ['  DNS other',              '3',  '27.3%',  '0.4 kB'],
+        ],
+      } },
+  ],
+};
+
 export default {
   stageConfig: {
     host: HOST,
@@ -204,7 +279,7 @@ export default {
     pcaps: {
       'ssh-brute.pcap': sshBrute,
       'http-creds.pcap': httpCreds,
-      // dns-c2.pcap:     Task 6
+      'dns-c2.pcap': dnsC2,
       // smb-lateral.pcap: Task 7
     },
   },
@@ -422,13 +497,89 @@ export default {
         explain: 'HTTPS. The portal was reachable on port 80 and awilliams — or the browser\'s bookmark, or a link somewhere — used it. The fix is not "pick a better password"; the fix is redirect 80→443 at the portal and force TLS. The lesson from the packet is that "should have been encrypted" is a visible, checkable property of a session, not a policy debate.',
       },
     },
-    // Placeholder tail until Task 6 lands.
+    // §11 — swap to dns-c2.
     {
-      id: 'act3-coming',
-      title: 'Act III lands next',
+      id: 'open-dns-c2',
+      title: 'Swap captures',
       blocks: [
-        { h2: 'DNS tunneling is up' },
-        { p: 'Type `next` to advance while Act III is being built.' },
+        { h2: 'Act III: DNS tunneling' },
+        { p: 'Back on `10.0.0.9`. This capture shows the same host you triaged in Act I doing something new: DNS TXT queries to `*.c2.badc2.example` on a suspiciously regular cadence, interleaved with normal-looking `pool.ntp.org` and `intranet.corp` lookups. The payload is not in the packets — the payload *is* the packets.' },
+        { task: 'Load `dns-c2.pcap`.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'load' && e.pcap === 'dns-c2.pcap',
+        hints: ['File → Open → dns-c2.pcap.'],
+        reveal: 'File → Open → dns-c2.pcap',
+        explain: 'Eleven packets, all DNS. The suspicious ones share a subdomain pattern; the benign ones do not. That is your filterable distinction.',
+      },
+    },
+    // §12 — Protocol Hierarchy.
+    {
+      id: 'protocol-hierarchy',
+      title: 'Look at the mix',
+      blocks: [
+        { h3: 'Statistics → Protocol Hierarchy' },
+        { p: 'The Protocol Hierarchy dialog is Wireshark\'s "what proportion of the traffic is what protocol" view. On a healthy host, DNS is a rounding error. On a host that beacons over DNS, it dominates. Read the tree; look for a protocol taking a share it should not.' },
+        { task: 'Open Statistics → Protocol Hierarchy.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'action' && e.action === 'Statistics→Protocol Hierarchy',
+        hints: [
+          'Click the `Statistics ▾` menu in the stage.',
+          'Pick `Protocol Hierarchy`.',
+        ],
+        reveal: 'Statistics → Protocol Hierarchy',
+        explain: 'DNS is 100% of the packets in this window — and 72.7% of them are TXT queries to `badc2.example`. That is not a browser resolving a name; that is a channel. The proportion alone is the signal.',
+      },
+    },
+    // §13 — name filter.
+    {
+      id: 'filter-badc2',
+      title: 'Filter the suspicious names',
+      blocks: [
+        { h3: 'Substring match on query names' },
+        { p: 'The `contains` operator is a substring match on the field value. Point it at `dns.qry.name` to keep only queries whose name includes a specific pattern — perfect when you know the C2 domain family but not the exact random subdomain.' },
+        { code: 'dns.qry.name contains "badc2"' },
+        { task: 'Filter to only the badc2 queries and responses.' },
+      ],
+      checkpoint: {
+        via: 'stage',
+        expect: (e) => e.type === 'filter' && e.payload?.matched && /^dns\.qry\.name\s+contains\s+"badc2"\s*$/i.test(e.filter),
+        hints: [
+          'The field is `dns.qry.name`.',
+          'The operator is `contains` (no quotes around the operator).',
+          'Try `dns.qry.name contains "badc2"`.',
+        ],
+        reveal: 'dns.qry.name contains "badc2"',
+        explain: 'Eight packets — four query/response pairs. Look at the timestamps in the list.',
+      },
+    },
+    // §14 — cadence answer.
+    {
+      id: 'cadence',
+      title: 'Read the cadence',
+      blocks: [
+        { h3: 'Numbers hide in intervals' },
+        { p: 'Beacons rarely hide in payload; they hide in *timing*. Read the timestamps on the four badc2 queries: 0.0000, 60.0044, 120.0055, 180.0038. The gaps are the tell.' },
+        { task: 'How many seconds between successive queries?' },
+      ],
+      checkpoint: {
+        via: 'answer',
+        accept: /\b60\b/,
+        hints: ['Subtract the first two timestamps.'],
+        reveal: '60',
+        explain: 'Sixty-second beacon. A jittered attacker would smear this over ±10s; the fixed cadence here is early-stage tradecraft, and it is why the Protocol Hierarchy view lit up in §12. In production you would page this on a Splunk `| streamstats` sliding-window rule; the pcap is the confirming ground truth.',
+      },
+    },
+    // Placeholder tail until Task 7 lands.
+    {
+      id: 'act4-coming',
+      title: 'Act IV lands next',
+      blocks: [
+        { h2: 'SMB is up' },
+        { p: 'Type `next` to advance while Act IV is being built.' },
         { task: 'Advance.' },
       ],
       checkpoint: {
